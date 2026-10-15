@@ -495,13 +495,98 @@
       }
     }
 
-## 2026-10-16 | user.message | project-init-request
+## 2026-10-16 | 작업 기록 | project-init-commit
+
+### 사용자 요청 (event: project-init-request)
 
     현재 내용을 커밋 해. 커밋 이름은 "project_init"
 
-## 2026-10-16 | command.started | project-init-commit
+### 실행 시작 (operation: project-init-commit)
 
     명시적 사용자 요청에 따라 현재 변경 전체를 스테이징하고 커밋한다.
     명령: git add --all; git commit -m "project_init"
     테스트·빌드·푸시는 실행하지 않는다.
     이 시작 기록은 커밋에 포함하며, 실제 결과는 실행 후 로컬 기록에 추가한다.
+
+### 실행 결과 (operation: project-init-commit)
+
+    최초 git add는 .git/index.lock 쓰기 권한 거부로 종료 코드 128. 커밋은 실행되지 않았다.
+    권한을 확보한 뒤 git add --all 및 git commit -m "project_init" 실행 성공(종료 코드 0).
+    결과: main / 966efad / project_init. 13 files changed, 384 insertions(+), 547 deletions(-).
+    테스트·빌드·푸시는 실행하지 않았다. 이 결과 기록은 커밋 후 추가한 미커밋 기록이다.
+
+## 2026-10-16 | 작업 기록 | request-result-pairing
+
+### 사용자 요청
+
+    실행 결과 기록은 내가 요청한 메시지와 세트로 저장되는거야.
+
+### 진행 과정
+
+- 관련 Rules와 Queue의 최근 커밋 요청·실행 결과, State 말미를 읽었다. 읽기 명령 종료 코드 0.
+- Rules에 사용자 요청·실행 과정·결과를 동일 작업 ID의 한 세트로 저장하고 함께 이관하도록 추가했다.
+- project-init-commit 기록을 요청 원문 → 실행 시작 → 실행 결과 순서의 한 작업 기록으로 묶었다. 기존 원문 내용은 유지했다.
+
+### 결과
+
+- 요청과 실행 결과를 한 세트로 저장하는 규칙 및 기존 커밋 작업 기록에 반영했다.
+- 추가 커밋·커밋 수정·푸시·테스트는 실행하지 않았다. 이번 문서 변경은 미커밋 상태다.
+
+## 2026-10-16 | 작업 기록 | unity-setting-review
+
+### 사용자 요청
+
+    지금 유니티 프로젝트 구성을 추가했어. 해당 내용이 제대로 추가 되었는지 검토하고, 이상이 없다면, "Unity Setting"으로 커밋해
+
+### 진행 과정
+
+- Git 상태 및 운영 문서 조회. 기존 Rules/Queue 수정과 신규 Great Voyage/ 폴더 확인.
+- 루트 ProjectSettings/Packages 조회는 경로 없음. 실제 Unity 루트는 Great Voyage/임을 확인.
+- ProjectVersion, manifest, EditorBuildSettings, EditorSettings 조회 완료.
+- 정적 검토 시작: 생성 파일 추적 대상, manifest/lock 일치, meta 누락·GUID 중복, 빌드 씬 참조 확인. Editor 실행·테스트·빌드는 하지 않음.
+
+### 검토 결과
+
+- 정적 검토 종료 코드 0. Unity 버전 6000.6.4f1, Assets/Packages/ProjectSettings 존재.
+- manifest와 packages-lock의 직접 의존성 버전 일치. Assets 메타 누락·고아 메타·중복 GUID 없음. 빌드 씬 경로/GUID 및 Input Actions 참조 확인.
+- 커밋 차단 문제: Unity 프로젝트가 Great Voyage/ 하위에 있으나 루트 .gitignore의 /Library/, /UserSettings/ 규칙은 해당 하위 경로에 적용되지 않는다.
+- git ls-files --others --exclude-standard 결과: Library 34,038개, UserSettings 6개가 커밋 후보에 포함됨. 전체 후보 34,109개.
+- 이상이 없을 때만 커밋하라는 조건에 따라 스테이징·커밋하지 않았다. ignore 설정·프로젝트 경로는 임의 수정하지 않았다.
+- 해결 방안: 현재 하위 프로젝트 위치를 유지한다면 해당 경로에 맞게 .gitignore를 조정한 후 추적 대상을 재확인한다.
+- Editor 연결·컴파일·Play Mode·빌드 검증은 실행하지 않았다. 기존 Rules 변경은 보존했다.
+
+## 2026-10-16 | 작업 기록 | unity-structure-recheck
+
+### 사용자 요청
+
+    유니티 프로젝트 구조에 이상이 없는지 다시 검토해.
+
+### 진행 과정
+
+- Git 상태·운영 규칙·State·루트 파일 구조·ignore 조회 완료. Assets/Packages/ProjectSettings가 저장소 루트에 위치함을 확인.
+- 정적 검토 시작: 패키지 JSON 및 lock 의존성, 에셋 meta/GUID, 빌드 씬 및 프로젝트 설정 참조, Git 제외 경로 확인. Editor 실행·런타임 테스트는 수행하지 않음.
+
+### 결과
+
+- 정적 검토 종료 코드 0. Unity 루트는 D:/Great Voyage이며 Assets/Packages/ProjectSettings가 같은 루트에 있음. 버전 6000.6.4f1.
+- manifest/lock 직접 의존성 일치, lock 의존 노드 누락 없음. meta 누락·고아·형식 오류·중복 GUID 없음. SampleScene 경로/GUID 정상.
+- Library/Logs/UserSettings 및 csproj/slnx가 ignore됨. 신규 Git 후보는 .vscode 3개, Assets 32개, Packages 2개, ProjectSettings 28개(65개). 이전 생성 파일 추적 문제 해소.
+- QualitySettings의 모든 품질 단계가 UniversalRP를 참조하고, UniversalRP가 Renderer2D를 참조함.
+- 추가 확인 사항: Lit2DSceneTemplate.scenetemplate:68의 dependency GUID b3ab972b21db85d48ade9657efdd4771에 대응하는 meta를 Assets 및 설치된 패키지에서 찾지 못함.
+- Renderer2D.asset의 probeVolumeResources 6개 및 m_FallOffLookup 1개 GUID도 동일 범위에서 미해결. 현재 Renderer2DData/ScriptableRendererData 소스에서 해당 필드명을 찾지 못해 과거 직렬화 잔여일 가능성은 있으나 Editor에서 실제 사용 여부 미확인.
+- 후속 조회: Renderer2D/SceneTemplate 설정, Graphics/Quality의 pipeline 및 UniversalRP/Renderer2D GUID 확인. SceneTemplate에 큰 내장 이미지 데이터가 있어 전체 출력 일부가 잘렸으며 필요한 참조 줄은 rg로 별도 확인.
+- 폴더 및 Git 제외 구조는 정상. 일부 직렬화 참조는 추가 확인 필요하므로 모든 에셋 참조가 정상이라고 단정하지 않음.
+- 프로젝트 파일 수정, Editor 실행, 컴파일, 런타임 테스트, 커밋·푸시는 수행하지 않음.
+
+## 2026-10-16 | 작업 기록 | unity-setting-commit
+
+### 사용자 요청
+
+    이대로 커밋 해. "Unity Setting"
+
+### 진행 과정
+
+- 기존 변경과 스테이징 상태 확인 완료. Unity 프로젝트 및 기존 Agents 문서 변경을 현재 상태 그대로 포함한다.
+- 미확인 직렬화 참조 8개는 수정하지 않으며, 앞선 검토 기록을 보존한다.
+- 실행 예정: git add --all; git commit -m "Unity Setting".
+- 테스트·Editor 실행·푸시는 요청 범위에 포함하지 않는다. 커밋 실행 결과는 이 작업 기록 세트에 이어서 추가한다.

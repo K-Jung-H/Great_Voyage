@@ -30,3 +30,18 @@
 
 - 기존 미커밋 변경을 유지하고 AGENTS/Rules/Architecture/RoadMap/State의 잘못 해석한 요구사항을 수정했다. Queue에 사용자 정정·첨부 원문·작업 과정을 추가했다.
 - 테스트·컴파일·빌드·커밋·푸시를 실행하지 않았다. 이전 검증 결과는 위 과거 기록에만 해당한다.
+
+## Unity 구성 검토 — 2026-10-16
+
+- 새 Unity 프로젝트 경로: D:/Great Voyage/Great Voyage. 버전 6000.6.4f1. 위의 프로젝트 부재·버전 미정 기록은 추가 이전 상태다.
+- 패키지 manifest/lock, 에셋 메타 및 빌드 씬 참조 정적 검토에서 문제 없음.
+- 차단 사항: 루트 .gitignore가 중첩 프로젝트의 Library 34,038개와 UserSettings 6개를 제외하지 못함.
+- 사용자 요청은 이상이 없는 경우에만 Unity Setting 커밋. 문제가 있어 커밋하지 않음. 다음 작업은 사용자 지시에 따라 ignore 경로 정비 후 커밋 대상 재확인.
+- Editor 실행·컴파일·런타임 검증 미실행. 상세 요청·과정·결과는 Queue의 unity-setting-review 세트 참조.
+
+## Unity 구조 재검토 — 2026-10-16
+
+- 현재 Unity 루트는 D:/Great Voyage. 이전 하위 경로와 생성 파일 제외 문제는 해소됨.
+- 폴더 구조, 패키지 lock, meta 및 빌드 씬, 품질별 URP→Renderer2D 참조 정상. Git 신규 후보 65개, 생성 캐시 제외됨.
+- 미확인: Lit2DSceneTemplate의 dependency 1개 및 Renderer2D의 직렬화 참조 7개가 로컬 Assets/패키지 메타에서 해소되지 않음. Editor에서 잔여 필드인지 실제 누락인지 확인 필요.
+- 이번 요청의 정적 재검토만 수행. 커밋·푸시·Editor 실행 없음. 상세 과정은 Queue의 unity-structure-recheck 세트.
