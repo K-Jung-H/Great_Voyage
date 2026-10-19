@@ -181,3 +181,114 @@
 - 사용자 원문: 4단계 통과, 커밋 및 푸시 진행
 - 사용자 직접 테스트 통과로 4단계 대표 기능 완료. 이전 사용자 확인 대기 상태를 대체한다. 에이전트 추가 테스트 없음. 5단계 미착수.
 - 현재 codex/manual-navigation의 4단계 코드·설정 자산·씬·문서를 `수동 항해·출입항 및 저장 복원 구현`으로 커밋하고 origin의 동일 브랜치에 일반 푸시한다. main 병합·다른 브랜치 변경 없음.
+
+## 1~4단계 main 통합 — 2026-10-19
+
+- 사용자 확인(브랜치까지 병합해)에 따라 main에 1~4단계 브랜치를 통합했다. 단일 조상 관계여서 codex/manual-navigation을 fast-forward 병합해 main HEAD=8276144가 됐다.
+- player-interaction 836150b, game-time-save 61873c2, ship-floors-facilities e3a6ba6, manual-navigation 8276144 모두 main의 조상임을 확인했다. 기존 작업 브랜치는 보존했다.
+- 미커밋 Queue 기록은 stash로 보관 후 충돌 없이 복원하고 해당 임시 stash는 정상 제거됐다. 추가 기능 테스트·새 커밋 없음. 이 State 및 병합 결과 Queue는 로컬 미커밋 기록이다.
+- main 푸시는 수행하지 않았다. 로컬 origin/main 기준 ahead 5이며 원격 갱신은 별도 지시를 따른다. 다음 개발 단계는 5단계이며 아직 착수하지 않았다.
+
+## 통합 main 푸시 — 2026-10-19
+
+- 사용자 요청으로 git push origin main 성공. main 및 origin/main HEAD=8276144로 1~4단계 통합 결과 공유 완료. 앞선 main 푸시 미실행 상태를 대체한다.
+- Queue/State 실행 기록은 로컬 미커밋 상태로 보존하며 추가 커밋은 수행하지 않았다.
+
+## 5단계 요청 — 2026-10-19
+
+- 사용자 요청으로 선원 1명과 시설 업무·생활 단계 준비. main/origin/main HEAD=8276144, 기존 Queue/State 미커밋 기록 보존.
+- codex/crew-work-life 브랜치 생성과 선원 코드/설정/Prefab/별도 개발 씬·저장 슬롯 추가 범위 승인 대기. 부분 손상 침대 수리·경로 이동·선점/해제·식사/취침·화면 밖 진행이 대표 기능이다.
+- 구현 미착수. 기능 테스트·커밋·푸시·브랜치 생성 없음. 관련 작업 기록 stage5-crew-work-life.
+
+## 5단계 구현 결과 — 2026-10-19
+
+- 승인한 codex/crew-work-life 브랜치, 기준8276144. 기존 Queue/State 기록을 보존했다. 새 커밋·푸시·main 병합 없음.
+- CrewState/Settings/Simulation/View 및 meta, Crew Prefab, StandardCrew/PrototypeCrew/PrototypeShip 자산, CrewPrototype 씬 추가. 기존 ShipLayout/정의/시설 자산, GameSession/PlayerInteraction/SaveData/SaveService, CaptainsCabin 연결. 기능별 구조는 Architecture의 5단계 항목 참조.
+- 기본 CaptainsCabin은 선원0명과 기존 저장 슬롯을 유지한다. 사용자는 Assets/Scenes/CrewPrototype.unity를 단독으로 열어 Play해야 개발 선원2명·침대2개·상태 HUD를 볼 수 있다. 현재 Editor는 기존 clean CaptainsCabin을 그대로 유지했다.
+- 개발 씬은 crew-prototype 전용 공간/저장 슬롯이며 첫 생성 시 식량2/수리도구8, 침대 bed-001 내구도20 및 bed-002 내구도100이다. 선원1은1층, 선원2는2층에서 시작한다. 실제 기존 저장 파일을 수정하거나 삭제하지 않았다.
+- 선원 이동/정비 자격·선점/작업 주기별 도구 소비/식사·취침 우선/휴식/굶주림 체력 하한1/상태 기반 표시/주 업무 E 전환/저장 복원을 구현했다. 시설 제거·파손·사망/수감/전투 중단 연결점은 코드에 있으며 강제 주입 기능 테스트는 미실행이다. 자동 고용/거래/전투 시스템은 추가하지 않았다.
+- recompile_status completed. console_status 현재 compilationFailed=false, compiling=false, 오류0/경고0. 이전 캡처 error=6과 구분한다.
+- CLI 읽기 preview 참조 확인: missingScripts=0, missingReferences=[], standardCrew=0, prototypeCrew=2, prototypeBeds=2, bedStart=20, food=2/tools=8, standardSlot=cabin-session, prototypeSlot=crew-prototype, prototypeHudAssigned=true, activeScene=CaptainsCabin, sceneDirty=false, compilationFailed=false. 기능/Play Mode/빌드 테스트 미실행.
+- 사용자 확인 대기: 개발 씬 단독 실행 → 층을 넘어 침대 접근·단일 선점·수리도구 소비 → 식사/취침 시 수리 선점 해제/대체 수행 → 일감/도구가 없으면 휴식 → 다른 층/하선 중에도 HUD 상태 진행 → 정지 메뉴에서 모두 정지 → 이동/수리/식사 중 저장·재실행 후 경로/진행시간/자원 복원. 식량 고갈 시 체력1 하한은 장시간 추가 관찰 조건이며 에이전트가 실행하지 않았다.
+- 5단계 기능 통과 전 6단계로 진행하지 않는다. 실제 로드 호환과 선원 동작은 사용자 확인이 필요하다.
+
+## 5단계 이동 방식 보완 요구 — 2026-10-19
+
+- 사용자 원문: 선원의 움직임이 플레이어처럼 연속적인 좌표가 아닌데? 나는 선원의 움직임 및 길찾기 등에 context steering ai를 도입할 계획이야.
+- 현재 상태 좌표는 Vector2 연속값이나 이동을 생활/업무와 같은 .25초 간격으로 MoveTowards하고 CrewView에서 body.position을 직접 대입해 눈에 띄는 단계적 움직임이 발생한다. 기존 칸 중심 경로 추종은 최종 이동 방식으로 확정하지 않는다.
+- 사용자 방향: 선원 이동/길찾기에 context steering AI 도입 예정. 업무·욕구의 저빈도 판단, 경로 안내, 근거리 steering, 물리 이동을 분리하는 구조 보완이 필요하다. 전역 경로 탐색 방식과 화면 밖 장애물 감지는 상세 설계 미확정이다.
+- 이번에는 원인·구조 설명과 요구 기록만 수행하며 이동 리팩터링/패키지 도입/기능 테스트는 하지 않았다. 5단계 통과 미확인 상태 유지.
+
+## 선원 이동 구조 사용자 보완 — 2026-10-19
+
+- 사용자 원문: Context steering만 사용하는건 아니고, Context steering와 nav ai 를 혼합해서, 이동 목적지가 명확한 경우, 목적지까지의 이동 동선에 중간 목적지를 steering의 weight로 두는거지.
+- 확정 방향: Nav AI가 목적지까지 경로·중간 목적지를 제공하고, 해당 중간 목적지 방향을 Context steering의 가중치로 입력한다. 최종 이동은 회피 등 다른 가중치와 결합해 연속적으로 결정한다. 중간 목적지는 좌표를 강제 대입하는 지점이 아니다.
+- Nav AI의 구체 구현/패키지, 중간 목적지 전환 조건·가중치 수치·화면 밖 처리 세부는 미확정이다. 구현 변경·패키지 설치·테스트 미실행. 5단계 이동 보완 미완료.
+
+## Nav AI 재탐색 주기 제약 — 2026-10-19
+
+- 사용자 원문: `Nav AI 경로`  재탐색은 매프레임이 아니라, 주기적으로 긴 간격으로 호출하게 해서, 비용을 최소화 할거야.
+- Nav AI 경로 재탐색은 긴 주기의 별도 타이머로 제한한다. 그 사이에는 기존 경로를 재사용하고 중간 목적지를 steering 가중치로 사용한다. 중간 목적지 진행을 경로 재탐색 호출과 혼동하지 않는다.
+- 구체 재탐색 간격은 미확정이며 임의 수치로 확정하지 않는다. 코드·테스트 변경 없음.
+
+## 혼합 경로·연속 steering 이동 보완 결과 — 2026-10-19
+
+- crew-hybrid-steering-implementation: 기존 5단계 브랜치/파일에서 구현 완료. 생활 .25초 판단과 FixedUpdate 이동을 분리했다. 기존 Nav 경로 중간 목적지를 steering interest로 사용하고 장애물·선원 danger/관성·가속을 결합한다. 긴 주기 Nav 재탐색 기본3초는 CrewSettings에서 조정한다. 중간 목적지 진행만으로 재탐색하지 않는다.
+- 기존 Crew Prefab을 Dynamic Rigidbody2D/Interpolate/Continuous로 바꿨다. 매 LateUpdate 위치 대입은 제거하고 속도로 움직이며, 실제 위치는 상태와 저장에 수집한다. 화면 밖은 같은 방향 평가와 논리 원형 공간 검사로 이동한다. 세부 규칙은 Architecture 혼합 이동 절 참조.
+- SaveData v5: 위치·속도·기존 경로·자원·작업 진행·재탐색 대기를 보존. v4는 기존 상태를 유지하고 새 속도/대기만0으로 변환한다. 실제 저장 파일은 직접 변경하거나 삭제하지 않았다.
+- 컴파일 recompile_status completed, compilationFailed=false. CLI eval 자산 확인: repathSeconds=3, directions=16, stepSeconds=.25, moveSpeed=2, bodyType=Dynamic, interpolation=Interpolate, sceneDirty=false. Inspector 설정 갱신은 기존 두 CrewSettings 및 Crew Prefab만 수행했다.
+- 콘솔에는 Unity Pipeline .unity-pipeline-port 공유 위반 관련 오류2/경고1이 남아 있다. 원문을 조회해 도구 heartbeat descriptor 쓰기 오류로 구분했으며 C# 컴파일 실패는 아니다. 재시작·재설치·사용자 콘솔 삭제 없이 후속 eval은 성공했다.
+- 기능 테스트/Play Mode/커밋/푸시는 수행하지 않았다. CrewPrototype을 단독으로 열어 연속 이동·벽/선원 회피·시설 접근·계단 이동, HUD Nav 호출 빈도, 화면 밖 진행, 정지 및 이동 중 저장 복원을 사용자가 확인해야 한다. 5단계 통과 미확인/6단계 미착수 상태를 유지한다.
+
+## 저장 간소화·밀림·작업 복귀·배회 보완 — 2026-10-19
+
+- crew-save-push-wander-reset 구현 완료. 기존 5단계 변경을 보존하고 같은 브랜치에서 수정했다. 새 파일·패키지·커밋·푸시 없음.
+- SaveData v6: 전체 path는 NonSerialized, 최종/현재 중간 목적지 및 현재 위치/속도/행동/진행시간/작업 복귀점 저장. v4/v5 전체 경로는 첫·끝만 읽어 변환하고 로드 후 나머지 경로를 재구성한다. 실제 기존 저장 파일 직접 수정/삭제 없음.
+- 플레이어와 선원을 가속 제한 AddForce 모터로 보완해 충돌 밀림을 보존한다. 작업 중 질량4/평상시1, 복귀 최대 .6 Cell/초, 작업 위치에서 .18 Cell 초과 시 진행 보류. 직접 복귀가 막히면 같은 긴 주기 Nav 우회를 사용하고, 복귀 방향은 Context steering이 결정한다.
+- 할 일이 없으면 안전한 주변 지점으로 배회하며 Nav 쿨다운을 지킨다. HUD에 배회/작업점 복귀 표시를 추가했다.
+- CrewPrototype 하단 왼쪽 선원·침대·자원 재준비 버튼을 추가했다. 사용자가 눌러야 선원2명/식량2/도구8/손상 침대20/08시를 복원한다. 직전 상태는 .bak으로 보존하고 재준비 상태를 저장한다. 항해/플레이어 위치는 유지한다. 일반 슬롯에서는 비활성 보호. 에이전트는 버튼을 누르거나 실제 데이터 초기화를 실행하지 않았다.
+- 최종 recompile_status completed, compilationFailed=false. 자산/반사 메타데이터 확인: 양쪽 Dynamic, 선원/플레이어 Trigger=false, 레이어 충돌 무시=false, pathSerialized=false, resetButtonAssigned/resetAllowed=true, playerAcceleration=18, activeScene CrewPrototype/dirty=false.
+- 기능/Play Mode 테스트 미실행. 사용자 확인: 재준비 버튼 → 수리하는 선원과 평상시 선원을 밀어 저항 차이/완만한 복귀 확인 → 작업점 밖 진행 보류 → 완료 후 배회 → 이동/작업/밀려난 상태에서 저장 복원. 기존 저장의 v6 호환도 사용자 확인 대기다. 5단계 통과 미확인 유지.
+
+### 개발 저장 초기화 — 2026-10-19 22:02 +09:00
+- 사용자 요청으로 crew-prototype 슬롯의 json/bak을 같은 Editor 저장 폴더 아래 Backups/crew-prototype-reset-20261019-220221490/에 이동했다. 원본 해시 보존 확인, 활성 json/bak/tmp 없음. 일반 cabin-session 저장 2개는 해시 불변.
+- 다음 CrewPrototype Play는 저장 없는 초기 상태로 시작한다. 실제 Play/기능 확인은 미실행이며 사용자 재확인 대기. 코드 변경·커밋·푸시 없음. 기록 ID: crew-prototype-save-reset.
+
+### 5단계 통과 및 6단계 전환 — 2026-10-19
+- 사용자: 테스트 통과, 커밋 후, 새 브랜치에서 다음 단계 진행.
+- 5단계는 사용자 직접 테스트 통과. 기존 codex/crew-work-life 변경 전체를 커밋할 예정이며 추가 기능 테스트는 실행하지 않는다.
+- 다음 단계는 항구 거래·고용·계약. 새 브랜치 codex/port-trade-contracts를 이번 커밋 기준으로 사용할 계획. 필요한 신규 코드·설정·개발 씬 생성 범위는 Rules에 따라 구체화하여 승인 확인한다.
+- 커밋 완료: bdc0617c17286c09566da8f7c4dd8d75b5e91b54 (선원 업무·생활 및 혼합 이동 구현). 새 브랜치 codex/port-trade-contracts로 전환 완료. 푸시 없음.
+- 6단계 신규 Economy 코드·설정/PortPanel/PortPrototype 생성 범위 승인 대기. 아직 6단계 코드 작성·기능 테스트 없음. 커밋 후 결과 기록은 현재 브랜치 미커밋 문서로 유지한다.
+
+### 6단계 구현 및 사용자 확인 대기 — 2026-10-19
+- 승인된 codex/port-trade-contracts에서 Economy 코드4개, PortPanel, Economy 설정2개, PortPrototype 씬과 meta 추가. 기존 GameSession/Navigation/Crew/PlayerInteraction/Save 연결 수정. 5단계 커밋은 bdc0617, 이후 변경은 미커밋이다.
+- 구현: 직물 구매/판매, 후보1명 선불·후불 N회 계약, 항해 순번 1회 반영, 만료·전액 지급, 이번 입항 재고용, 사용자 선택 강제 매각·명성·영속 게임 오버, v7 저장/복원. 구조·개발값·후속 범위는 Architecture의 6단계 절 참조.
+- 컴파일 completed, 현재 compilationFailed=false/오류0/경고0. PreviewScene 읽기 확인: Missing scripts0/필수 참조 누락0/서비스3/슬롯 port-prototype/초기선원0/후보 층 존재. 원래 활성 CrewPrototype, dirty=false 유지.
+- 다음: 사용자가 PortPrototype을 단독으로 열어 거래→고용→항해→만료→정산과 저장/재개를 확인한다. 게임 오버·불충분 자금 분기는 별도 진행으로 확인 필요. 실제 기능 테스트는 미실행, 7단계 착수·커밋·푸시 없음.
+
+### 7단계 준비 — 2026-10-19
+- 사용자가 6단계 동작 통과를 보고했다. 개별 프로토타입과 실제 게임 기반의 차이를 논의했으며, 최신 지시는 우선 7단계를 진행한 뒤 구조를 다시 논의하는 것이다.
+- 현재 codex/port-trade-contracts, HEAD bdc0617. 6단계는 미커밋이며 커밋·푸시 요청은 없다.
+- 제안: 미커밋 변경을 그대로 유지해 codex/journal-autopilot-sleep 브랜치를 생성하고 기존 PortPrototype을 확장한다. JournalState/JournalSession/JournalMap/PlayerSleep/BedInteraction 신규 코드와 기존 일지 UI·선원/항해/고용·저장 연결 범위 승인 대기. 별도 개발 씬·패키지를 추가하지 않는다.
+
+### 6단계 커밋 및 7단계 승인 — 2026-10-19
+- 사용자 요청으로 6단계 변경 전체를 커밋하고 새 codex/journal-autopilot-sleep 브랜치를 생성한다. 앞서 제시한 7단계 신규 파일5개 및 기존 시스템·PortPrototype 확장 범위 승인으로 판단한다. 6단계 사용자 동작 통과. 푸시는 요청되지 않았다.
+
+### 7단계 구현 및 사용자 확인 대기 — 2026-10-19
+- 6단계 커밋 f7c65b3(항구 거래·고용·계약 및 정산 구현) 완료. 현재 codex/journal-autopilot-sleep. 푸시 없음. 이번 7단계 변경은 미커밋이다.
+- 신규 JournalState/JournalSession/JournalMap/PlayerSleep/BedInteraction 및 meta, 기존 PortPrototype UI/참조·후보 설정·일지/선원/항해/시간/고용/저장 연결 수정. 별도 씬·패키지 추가 없음.
+- 구현 범위와 상태 소유권은 Architecture 7단계 절 참조. 일지 지도·기록/계획·메모/레이어, 자격/방향타 작업 위치 기반 자동 조타, 수면20배속·06시/입항 중단, 경로 공백/취침 이월, v8 저장 복원 및 불침번/사건 연결점 구현. 사건 발생/체크포인트는8단계에 남긴다.
+- PreviewScene 참조 확인: missing scripts0/필수 누락0, 추가 항해사1/Navigation 경력1, helm deck-1(2.5,1.5), 지도860x615, 원래 활성 PortPrototype dirty=false. 코드 컴파일 실패 없음 확인. 최종 컴파일 결과는 Queue에 기록한다.
+- 사용자 확인: 주점 다음 후보→항해사 고용→함장실 책상에서 계획 펜/자동 조타 요청→수동 출항 및 조타 종료→항해사의 방향타 이동/조타→기록·침대 취침→입항/기상 중단·일지 이월→저장 재개. 항해사가 없는 경우 계획선만으로 조타되지 않는 조건도 확인 대상이다. 실제 기능 테스트는 에이전트 미실행.
+- 이후 7단계 사용자 결과를 확인하고 요청한 게임 구조 논의를 재개한다. 8단계로 자동 전환하지 않는다.
+- 최종 컴파일 확인: completed, compilationFailed=false/현재 오류0/경고0. Unity 생성 YAML 빈 필드 후행 공백 외에 기능 오류를 확인한 것은 없다. 실제 기능 테스트 미실행 상태 유지.
+
+### 7단계 Map 오류 원인 확인 — 2026-10-19
+- 사용자 기능 확인 중 MissingComponentException 발생으로 7단계 통과 아님. 원인 조사 결과 PortPrototype의 Map에는 RectTransform/JournalMap만 있고 CanvasRenderer가 실제 누락됨. JournalMap은 MaskableGraphic을 상속하지만 렌더러 요구 선언이 없으며 생성 코드도 추가하지 않았다. RectMask2D→MaskableGraphic.SetClipRect→CanvasRenderer 접근 시 예외가 발생한다.
+- 필요한 수정: JournalMap에 CanvasRenderer RequireComponent 명시 및 이미 생성된 Map에도 실제 CanvasRenderer 추가. 이전 컴파일/직렬화 필드 참조 검사는 이 의존성을 포함하지 못했다.
+- 이번 요청에서는 원인만 확인했고 코드/씬 수정·Play 실행 없음. 현재 브랜치/7단계 미커밋 변경 보존. 기록 ID stage7-map-renderer-diagnosis.
+
+### Map 렌더러 수정 적용 — 2026-10-19
+- 사용자 승인으로 JournalMap의 CanvasRenderer 필수 선언 및 기존 PortPrototype/Map의 실제 CanvasRenderer 추가/저장 완료. 재생성 시 필수 컴포넌트가 자동 추가된다.
+- 컴파일 completed/compilationFailed=false/현재 오류0/경고0, 씬 dirty=false. 실제 일지 열기/클리핑은 사용자 재확인 대기. Play Mode·커밋·푸시 없음. 기록 ID stage7-map-renderer-fix.

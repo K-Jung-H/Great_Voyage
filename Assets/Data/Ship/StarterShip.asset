@@ -21,6 +21,8 @@ MonoBehaviour:
     origin: {x: -7, y: -4}
     size: {x: 14, y: 8}
     entry: {x: -3.5, y: -1.5}
+    connectedFloors:
+    - deck-2
     blocked:
     - x: 2
       y: 2
@@ -52,6 +54,8 @@ MonoBehaviour:
     origin: {x: -7, y: -4}
     size: {x: 14, y: 8}
     entry: {x: -3.5, y: -1.5}
+    connectedFloors:
+    - deck-1
     blocked:
     - x: 2
       y: 2

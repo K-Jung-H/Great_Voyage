@@ -1,0 +1,87 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0113441d7e35e44c868940fa0a42f77, type: 3}
+  m_Name: PrototypeShip
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ShipDefinition
+  id: crew-prototype-ship
+  startingFloor: deck-2
+  cellSize: 1
+  floors:
+  - id: deck-1
+    displayName: "1\uCE35 \xB7 \uAC11\uD310"
+    origin: {x: -7, y: -4}
+    size: {x: 14, y: 8}
+    entry: {x: -3.5, y: -1.5}
+    connectedFloors:
+    - deck-2
+    blocked:
+    - x: 2
+      y: 2
+      width: 1
+      height: 1
+    - x: 10
+      y: 5
+      width: 1
+      height: 1
+    - x: 12
+      y: 1
+      width: 1
+      height: 1
+    reserved:
+    - x: 3
+      y: 2
+      width: 1
+      height: 1
+    - x: 9
+      y: 5
+      width: 1
+      height: 1
+    - x: 11
+      y: 1
+      width: 1
+      height: 1
+  - id: deck-2
+    displayName: "2\uCE35 \xB7 \uC120\uC2E4"
+    origin: {x: -7, y: -4}
+    size: {x: 14, y: 8}
+    entry: {x: -3.5, y: -1.5}
+    connectedFloors:
+    - deck-1
+    blocked:
+    - x: 2
+      y: 2
+      width: 1
+      height: 1
+    - x: 8
+      y: 4
+      width: 2
+      height: 2
+    reserved:
+    - x: 3
+      y: 2
+      width: 1
+      height: 1
+  facilities:
+  - {fileID: 11400000, guid: 9bf10a6664dadb442b8c19e5bd348e7d, type: 2}
+  initialFacilities:
+  - id: bed-001
+    definitionId: bed
+    floorId: deck-2
+    x: 2
+    y: 5
+    durability: 20
+  - id: bed-002
+    definitionId: bed
+    floorId: deck-2
+    x: 5
+    y: 5
+    durability: 100

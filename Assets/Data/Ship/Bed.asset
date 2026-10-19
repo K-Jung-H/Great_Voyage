@@ -17,4 +17,6 @@ MonoBehaviour:
   allowedFloors:
   - deck-2
   maxDurability: 100
+  repairable: 1
+  usableAsBed: 1
   prefab: {fileID: 4641976132210147413, guid: a5be5cfbce259364d9e8a4f51e5b5780, type: 3}

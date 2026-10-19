@@ -1,0 +1,53 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e9f91cad5948554cb5bf39827e495ad, type: 3}
+  m_Name: PortCrew
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.CrewSettings
+  id: port-prototype-crew
+  helmFloor: deck-1
+  helmPosition: {x: 2.5, y: 1.5}
+  prefab: {fileID: 3800295336126448159, guid: ed778ec7aa4795b409b2df5c7b325649, type: 3}
+  initialCrew: []
+  initialFood: 20
+  initialRepairTools: 8
+  stepSeconds: 0.25
+  moveSpeed: 2
+  repathInterval: 3
+  steeringDirections: 16
+  lookAhead: 1.1
+  avoidanceWeight: 2
+  momentumWeight: 0.15
+  acceleration: 10
+  bodyRadius: 0.28
+  clearance: 0.05
+  waypointRadius: 0.3
+  arrivalRadius: 0.12
+  predictionSeconds: 0.3
+  normalMass: 1
+  workingMass: 4
+  workReturnSpeed: 0.6
+  workReturnAcceleration: 3
+  workRadius: 0.18
+  wanderDistance: 3
+  hungerRate: 0.5
+  mealThreshold: 60
+  mealSeconds: 2
+  mealRecovery: 70
+  energyDrain: 0.3
+  sleepThreshold: 25
+  wakeThreshold: 90
+  sleepRecovery: 5
+  sleepHour: 22
+  wakeHour: 6
+  repairSeconds: 3
+  repairAmount: 10
+  starvationRate: 1
