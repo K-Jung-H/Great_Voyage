@@ -60,6 +60,7 @@ namespace GreatVoyage
             Stairway nearestStair = null;
             NavigationPoint nearestNavigation = null;
             CrewView nearestCrew = null;
+            PortServicePoint nearestService = null;
             float range = interactionRange * ship.CellSize;
             float nearestDistance = range;
             Vector2 origin = transform.position;
@@ -70,23 +71,27 @@ namespace GreatVoyage
                 Stairway stair = candidates[i].GetComponentInParent<Stairway>();
                 NavigationPoint navigationPoint = candidates[i].GetComponentInParent<NavigationPoint>();
                 CrewView crew = candidates[i].GetComponentInParent<CrewView>();
+                PortServicePoint service = candidates[i].GetComponentInParent<PortServicePoint>();
+                if (service != null && !service.Available) service = null;
                 if (crew != null && !crew.Available) crew = null;
                 if (navigationPoint != null && !navigationPoint.Available) navigationPoint = null;
-                if (desk == null && stair == null && navigationPoint == null && crew == null) continue;
-                Vector2 point = desk != null ? desk.InteractionPosition : stair != null ? stair.InteractionPosition : navigationPoint != null ? navigationPoint.InteractionPosition : crew.InteractionPosition;
-                Transform target = desk != null ? desk.transform : stair != null ? stair.transform : navigationPoint != null ? navigationPoint.transform : crew.transform;
+                if (desk == null && stair == null && navigationPoint == null && crew == null && service == null) continue;
+                Vector2 point = desk != null ? desk.InteractionPosition : stair != null ? stair.InteractionPosition : navigationPoint != null ? navigationPoint.InteractionPosition : crew != null ? crew.InteractionPosition : service.InteractionPosition;
+                Transform target = desk != null ? desk.transform : stair != null ? stair.transform : navigationPoint != null ? navigationPoint.transform : crew != null ? crew.transform : service.transform;
                 float distance = Vector2.Distance(origin, point);
                 if (distance > nearestDistance || !CanReach(target, point)) continue;
                 nearest = desk;
                 nearestStair = stair;
                 nearestNavigation = navigationPoint;
                 nearestCrew = crew;
+                nearestService = service;
                 nearestDistance = distance;
             }
 
-            journal.ShowPrompt(nearest != null || nearestStair != null || nearestNavigation != null || nearestCrew != null,
-                nearestCrew != null ? nearestCrew.Prompt : nearestNavigation != null ? nearestNavigation.Prompt : nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
-            if (nearestCrew != null && interactAction.WasPressedThisFrame()) nearestCrew.Interact();
+            journal.ShowPrompt(nearest != null || nearestStair != null || nearestNavigation != null || nearestCrew != null || nearestService != null,
+                nearestService != null ? nearestService.Prompt : nearestCrew != null ? nearestCrew.Prompt : nearestNavigation != null ? nearestNavigation.Prompt : nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
+            if (nearestService != null && interactAction.WasPressedThisFrame()) nearestService.Interact();
+            else if (nearestCrew != null && interactAction.WasPressedThisFrame()) nearestCrew.Interact();
             else if (nearestNavigation != null && interactAction.WasPressedThisFrame())
             {
                 nearestNavigation.Interact();

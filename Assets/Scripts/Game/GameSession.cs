@@ -22,6 +22,10 @@ namespace GreatVoyage
         [SerializeField, Tooltip("선원 개발 씬에서만 사용자 재준비 버튼을 허용한다.")]
         private bool allowCrewPrototypeReset;
 
+        [SerializeField, Tooltip("항구 거래·계약. 기존 개발 씬에서는 생략 가능.")] private EconomySession economy;
+        // Role: 경제 시스템이 연결된 경우 출항 전 미정산 상태를 검사한다.
+        public bool CanDepart() => economy == null || economy.CanDepart();
+
         public const double SecondsPerDay = 600d;
         public PauseService Pauses { get; } = new PauseService();
         public bool IsPaused => Pauses.IsPaused;
@@ -59,6 +63,9 @@ namespace GreatVoyage
                     throw new InvalidDataException("저장 위치가 현재 공간의 경계 밖에 있습니다.");
                 if (crew == null) throw new InvalidOperationException("선원 시뮬레이션 참조가 연결되지 않았습니다.");
                 state.crew = crew.Initialize(state.crew);
+                if (economy != null) state.economy = economy.Initialize(state.economy);
+                else if (state.economy != null) throw new InvalidDataException("경제 저장을 복원할 시스템 참조가 없습니다.");
+                state.economyEnabled = economy != null;
                 player.position = new Vector2(state.playerX, state.playerY);
                 player.linearVelocity = Vector2.zero;
                 IsReady = true;

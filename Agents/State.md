@@ -258,3 +258,19 @@
 - 사용자: 테스트 통과, 커밋 후, 새 브랜치에서 다음 단계 진행.
 - 5단계는 사용자 직접 테스트 통과. 기존 codex/crew-work-life 변경 전체를 커밋할 예정이며 추가 기능 테스트는 실행하지 않는다.
 - 다음 단계는 항구 거래·고용·계약. 새 브랜치 codex/port-trade-contracts를 이번 커밋 기준으로 사용할 계획. 필요한 신규 코드·설정·개발 씬 생성 범위는 Rules에 따라 구체화하여 승인 확인한다.
+- 커밋 완료: bdc0617c17286c09566da8f7c4dd8d75b5e91b54 (선원 업무·생활 및 혼합 이동 구현). 새 브랜치 codex/port-trade-contracts로 전환 완료. 푸시 없음.
+- 6단계 신규 Economy 코드·설정/PortPanel/PortPrototype 생성 범위 승인 대기. 아직 6단계 코드 작성·기능 테스트 없음. 커밋 후 결과 기록은 현재 브랜치 미커밋 문서로 유지한다.
+
+### 6단계 구현 및 사용자 확인 대기 — 2026-10-19
+- 승인된 codex/port-trade-contracts에서 Economy 코드4개, PortPanel, Economy 설정2개, PortPrototype 씬과 meta 추가. 기존 GameSession/Navigation/Crew/PlayerInteraction/Save 연결 수정. 5단계 커밋은 bdc0617, 이후 변경은 미커밋이다.
+- 구현: 직물 구매/판매, 후보1명 선불·후불 N회 계약, 항해 순번 1회 반영, 만료·전액 지급, 이번 입항 재고용, 사용자 선택 강제 매각·명성·영속 게임 오버, v7 저장/복원. 구조·개발값·후속 범위는 Architecture의 6단계 절 참조.
+- 컴파일 completed, 현재 compilationFailed=false/오류0/경고0. PreviewScene 읽기 확인: Missing scripts0/필수 참조 누락0/서비스3/슬롯 port-prototype/초기선원0/후보 층 존재. 원래 활성 CrewPrototype, dirty=false 유지.
+- 다음: 사용자가 PortPrototype을 단독으로 열어 거래→고용→항해→만료→정산과 저장/재개를 확인한다. 게임 오버·불충분 자금 분기는 별도 진행으로 확인 필요. 실제 기능 테스트는 미실행, 7단계 착수·커밋·푸시 없음.
+
+### 7단계 준비 — 2026-10-19
+- 사용자가 6단계 동작 통과를 보고했다. 개별 프로토타입과 실제 게임 기반의 차이를 논의했으며, 최신 지시는 우선 7단계를 진행한 뒤 구조를 다시 논의하는 것이다.
+- 현재 codex/port-trade-contracts, HEAD bdc0617. 6단계는 미커밋이며 커밋·푸시 요청은 없다.
+- 제안: 미커밋 변경을 그대로 유지해 codex/journal-autopilot-sleep 브랜치를 생성하고 기존 PortPrototype을 확장한다. JournalState/JournalSession/JournalMap/PlayerSleep/BedInteraction 신규 코드와 기존 일지 UI·선원/항해/고용·저장 연결 범위 승인 대기. 별도 개발 씬·패키지를 추가하지 않는다.
+
+### 6단계 커밋 및 7단계 승인 — 2026-10-19
+- 사용자 요청으로 6단계 변경 전체를 커밋하고 새 codex/journal-autopilot-sleep 브랜치를 생성한다. 앞서 제시한 7단계 신규 파일5개 및 기존 시스템·PortPrototype 확장 범위 승인으로 판단한다. 6단계 사용자 동작 통과. 푸시는 요청되지 않았다.

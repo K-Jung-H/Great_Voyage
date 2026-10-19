@@ -25,6 +25,56 @@ namespace GreatVoyage
         public float CellSize => ship.CellSize;
         public float BodyRadius => settings.bodyRadius;
 
+        // Role: 안정 ID로 현재 승선 선원을 조회한다.
+        public CrewState FindMember(string id) => state.members.Find(member => member.id == id);
+
+        // Role: 후보가 현재 함선에서 복원 가능한 인물인지 검사한다.
+        public void CheckCandidate(CrewState candidate)
+        {
+            candidate = CopyCandidate(candidate);
+            ValidateMember(candidate);
+            if (candidate.availability != CrewAvailability.Ready || candidate.activity != CrewActivity.Idle)
+                throw new InvalidDataException("고용 후보의 상태가 유효하지 않습니다.");
+        }
+
+        // Role: 계약 확정된 인물을 복사하고 물리 표현을 생성한다.
+        public void AddMember(CrewState candidate)
+        {
+            if (FindMember(candidate.id) != null || state.members.Count >= 256)
+                throw new InvalidOperationException("선원이 이미 승선했거나 인원 한도를 초과했습니다.");
+            CrewState member = CopyCandidate(candidate);
+            member.velocity = Vector2.zero;
+            CheckCandidate(member);
+            CrewView view = Instantiate(settings.prefab, transform);
+            view.name = member.id; view.Bind(member, this);
+            state.members.Add(member);
+            state.members.Sort((left, right) => string.Compare(left.id, right.id, StringComparison.Ordinal));
+            views.Add(member.id, view);
+        }
+
+        // Role: Unity가 빈 객체로 직렬화한 선택적 경로를 고용 복사본에서 정규화한다.
+        private static CrewState CopyCandidate(CrewState candidate)
+        {
+            if (candidate == null) throw new InvalidDataException("고용 후보가 없습니다.");
+            CrewState copy = JsonUtility.FromJson<CrewState>(JsonUtility.ToJson(candidate));
+            copy.path = new List<CrewWaypoint>();
+            if (copy.destination != null && string.IsNullOrEmpty(copy.destination.floorId)) copy.destination = null;
+            if (copy.nextWaypoint != null && string.IsNullOrEmpty(copy.nextWaypoint.floorId)) copy.nextWaypoint = null;
+            return copy;
+        }
+
+        // Role: 만료 선원의 업무 선점과 물리 표현을 해제하고 재계약용 상태를 반환한다.
+        public CrewState RemoveMember(string id)
+        {
+            CrewState member = FindMember(id);
+            if (member == null) return null;
+            Cancel(member);
+            member.velocity = Vector2.zero;
+            if (views.TryGetValue(id, out CrewView view)) { view.gameObject.SetActive(false); Destroy(view.gameObject); views.Remove(id); }
+            state.members.Remove(member);
+            return member;
+        }
+
         // Role: 저장 상태를 검증하고 행동에서 선점을 복원한 뒤 표시만 생성한다.
         public CrewRosterState Initialize(CrewRosterState saved)
         {

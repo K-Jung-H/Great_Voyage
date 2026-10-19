@@ -1,0 +1,59 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 39d7598ab2c5c764380daf412f69e958, type: 3}
+  m_Name: PrototypeEconomy
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.EconomySettings
+  id: prototype-economy
+  productId: cloth
+  productName: "\uC9C1\uBB3C"
+  initialGold: 200
+  initialReputation: 100
+  ports:
+  - portId: port-a
+    buyPrice: 20
+    sellPrice: 15
+    initialStock: 20
+  - portId: port-b
+    buyPrice: 28
+    sellPrice: 22
+    initialStock: 20
+  candidate:
+    id: hire-maintainer-001
+    displayName: "\uC815\uBE44 \uC120\uC6D0"
+    specialty: 1
+    primaryDuty: 1
+    availability: 0
+    floorId: deck-1
+    position: {x: -3.5, y: -1.5}
+    velocity: {x: 0, y: 0}
+    repathRemaining: 0
+    health: 100
+    happiness: 100
+    hunger: 0
+    energy: 100
+    activity: 0
+    targetId: 
+    remainingSeconds: 0
+    destination:
+      floorId: 
+      position: {x: 0, y: 0}
+    nextWaypoint:
+      floorId: 
+      position: {x: 0, y: 0}
+    hasWorkPosition: 0
+    workPosition: {x: 0, y: 0}
+    wanderSequence: 0
+  wagePerVoyage: 40
+  maxVoyages: 5
+  liquidationRate: 0.6
+  debtReputationRate: 1
+  gameOverThreshold: 0

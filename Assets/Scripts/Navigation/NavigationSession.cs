@@ -21,6 +21,13 @@ namespace GreatVoyage
         public bool IsReady => state != null && session.IsReady;
         public bool IsAboard => state == null || state.aboard;
         public bool IsDocked => state != null && !string.IsNullOrEmpty(state.dockedPort);
+        public string DockedPort => state?.dockedPort;
+        public int CompletedVoyages => state?.completedSequence ?? 0;
+        public int PortCount => definition.ports.Length;
+        // Role: 경제 정의의 항구 ID를 검증한다.
+        public bool HasPort(string id) => !string.IsNullOrEmpty(id) && Port(id) != null;
+        // Role: 정산 후 출항 요청을 기존 출항 검사로 처리한다.
+        public void RequestDeparture() { if (IsReady && !session.IsPaused) Depart(); }
         public bool IsSteering { get; private set; }
         public event Action<string, string> VoyageCompleted;
 
@@ -107,6 +114,7 @@ namespace GreatVoyage
         private void Depart()
         {
             if (!IsDocked || !IsAboard || state.voyageSequence == int.MaxValue) return;
+            if (!session.CanDepart()) return;
             state.departurePort = state.dockedPort;
             state.dockedPort = null;
             state.departureCleared = false;
