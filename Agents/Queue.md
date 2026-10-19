@@ -798,3 +798,78 @@
 - git switch codex/player-interaction; git merge --ff-only main 성공. 환경 커밋을 작업 브랜치의 기반으로 포함했다. 구현을 main에 병합하지 않았다.
 - 작업 브랜치 Architecture/State/RoadMap에 실제 구현 범위와 사용자 직접 조작 테스트 통과 반영. 조작감·객체 계층 구체화는 후속으로 유보. 추가 테스트 없음.
 - started: git add --all; git commit -m "player interation test". 승인된 현재 변경 전체를 작업 브랜치 커밋에 포함한다. 이후 git status/log로 결과를 확인하고 최종 응답에 보고한다. 이 커밋 자신의 성공 결과는 파일에 사전 확정하지 않는다. 푸시 없음.
+
+## 2026-10-19T19:31:12.6184801+09:00 | stage2-time-save
+
+### 사용자 요청
+
+    다음 단계 진행
+
+### 진행 과정
+
+- Git 상태/HEAD/diff/cached, Rules/State/RoadMap 및 현재 JournalPanel/PlayerMovement/PlayerInteraction, GameDesign의 시간·저장 규칙을 조회했다. 현재 codex/player-interaction, HEAD 836150b213a318a64e14f1b59552e6a953d59df7, 시작 시 작업 트리 깨끗함. 1단계 사용자 테스트 통과 확인. 긴 반복 출력 일부 생략.
+- 다음 범위: 하루 600초 시간·날짜 표시, 정지 사유별 등록/해제, 일지 열기/닫기 연동, 안정적인 플레이어·공간 ID와 위치·시간 저장, 정상 종료 저장 및 마지막 상태 복원. 저장 버전/원자적 교체와 손상·미지원 버전 처리 포함. 과거 슬롯 선택·되돌리기 UI는 만들지 않는다.
+- 예정 파일: Assets/Scripts/Game의 GameSession/GameClock/PauseService, Assets/Scripts/Save의 SaveData/SaveService 및 UI 시간 표시. 기존 JournalPanel·플레이어 입력과 CaptainsCabin 씬의 참조 연결을 필요한 범위에서 수정. 조작감·객체 계층 재설계는 제외.
+- 새 시스템 브랜치 규칙에 따라 현재 836150b를 기준으로 codex/game-time-save 생성 또는 현재 브랜치 계속 사용 여부를 질문했다. 응답 대기이며 브랜치 생성·구현 파일 수정 미실행. 컴파일 확인은 구현 후 수행하고 기능 테스트·커밋·푸시는 자동 실행하지 않는다.
+
+### stage2-time-save 승인 후 재개 — 2026-10-19
+
+    새 브랜치에서 진행
+
+- git switch -c codex/game-time-save 성공. 기준 836150b, 기존 요청 기록만 미커밋인 상태로 보존.
+- started: 시간/정지 사유/세션 데이터/원자 저장 및 UI 연결을 작성한다. 읽기 실패 시 기존 저장을 덮어쓰지 않고 진행을 차단한다. 일지와 별도 정지 메뉴를 중첩해 사용할 수 있도록 한다. 게임 시간은 Time.timeScale 전역 변경 없이 관리한다. Unity 연결·씬 dirty 확인 후 해당 씬에 필요한 컴포넌트만 연결한다. 기능 테스트와 Play Mode는 실행하지 않는다.
+
+### stage2-time-save 결과 — 2026-10-19
+
+- apply_patch로 GameSession/PauseService/SaveData/SaveService/SessionPanel 생성, 기존 JournalPanel/PlayerMovement/PlayerInteraction 연결 수정. 전체 코드 원문은 해당 파일에 있으며 긴 도구 인자·반복 출력은 요약 기록.
+- 기존 unity.exe command --project-path D:/Great Voyage editor_status 성공. 최초 eval은 Main thread operation timed out after 5000ms, 읽기 명령만 --timeout 20000으로 재조회하여 CaptainsCabin dirty=false 확인. 설치·재시작 없음.
+- CLI recompile 시작 → recompile_status completed. Temp/Stage2Authoring/ConnectSession.cs 작성 → run_script --file Temp/Stage2Authoring/ConnectSession.cs --entry ConnectSession.Build 성공. 깨끗한 대상 씬 조건·기존 세션 미존재 검사 후 컴포넌트/UI/참조 연결 및 씬 저장. 임시 작성 스크립트는 Git 제외이며 실행 의존성 아님.
+- run_script의 FindFirstObjectByType 폐기 예정 경고 3개, 실행 성공. 게임 스크립트 compilationFailed=false, 현재 콘솔 오류/경고 0. 캡처 버퍼 errors=1은 앞선 호출 오류와 구분.
+- 읽기 eval로 현재 씬 Missing Script 0, 게임 필수 참조 17개 assigned=true, dirty=false 확인. 실제 게임 기능·파일 저장/복원 테스트는 실행하지 않았다.
+- Architecture/State/RoadMap에 구현 범위·저장 경로·오류 처리·검증 한계·사용자 확인 순서 기록. 1단계 통과를 2단계 통과로 확대하지 않음.
+- 최종 결과: 시간 표시와 독립 정지 사유, 정상 종료 저장/마지막 상태 복원 구현. 사용자 기능 확인 대기. 3단계·배포·조작감 변경·커밋·푸시 없음.
+
+## 2026-10-19 | assess-state-determinism
+
+### 사용자 요청
+
+    테스트는 통과 했다. 내가 중요하게 생각하는 요소는 구조가 단순하지만 명확해야 한다. 그래야 저장/복원 환경이 안정적일것이다. 또한 결정론적 구조가 되어야 한다. 즉, 얼마나 쉽게 저장하고 불러올수 있는가가 중요하다. 현재 단계에서 해당 조건을 전부 충족 하나?
+
+### 과정과 결과
+
+- Git status/diff 통계/cached 및 GameSession/PauseService/SaveData/SaveService/PlayerMovement 전체 읽기 완료(종료 0). 기존 미커밋 2단계 구현 유지.
+- 사용자 테스트 통과 기록. 평가는 코드 정적 검토이며 추가 테스트가 아니다.
+- 결론: 현재 범위의 위치/시간 저장복원 기능과 파일 보호는 구현됐으나 결정론적 실행·상태 단일 원본·완전한 중간 상태 복원은 미충족. 프레임 delta 시간, Rigidbody2D 상태, 복원 시 속도0/UI 정지 초기화가 근거다. GameSession은 시간/저장/Unity 객체/종료 연결 책임이 혼재한다.
+- 제안은 상태 원본/논리 tick/안전한 저장 경계/향후 난수와 처리 순서 보존을 구분한다. FixedUpdate만으로 완전 결정론이 성립한다고 주장하지 않는다. 원자 저장은 실행 결정론과 다른 문제다.
+- State/RoadMap에 사용자 통과와 구조 기준 기록. 게임 코드 변경·추가 테스트·커밋·푸시·다음 단계 실행 없음.
+
+## 2026-10-19 | clarify-checkpoint-roadmap
+
+### 사용자 보완 원문
+
+    내 설명에 보완을 하자면, 완벽한 결정론적까지 원하는건 아니고, 이벤트가 발생한다면, 저장하지 않고, 다시 불러와도 해당 이벤트는 발생하는 같은 결과가 나와야 해. 저장/복원은 세밀한 단위가 아니라, 이벤트 진행 중, 저장 하고 불러오면, 이벤트 발생 시점에서부터 다시 시작하는거야. 게임 진행 과정에서 사건이 발생할때, 저장이 이루어지고, 저장하지 않고, 다시 불러와도, 이전과 결정론적 구조(=같은 시드 실행)이기 때문에, 같은 결과가 유지되는거지. 이해 됬나?
+
+### 이번 요청
+
+    나는 현재 단계가 pause/load를 다루길래, 내가 원하는 구조를 미리 상세하게 설명한거야. 해당 구조를 구현하는 계획이 다른 단계에 있다면 2단계를 완료하고 기존 로드맵을 유지하고, 로드맵을 새로 재구성해야 한다면, 지금 차라리 기반을 완성하는게 좋겠다고 판단했어.
+
+### 과정과 결과
+
+- Git 상태/HEAD/diff 통계/cached, Rules/State, RoadMap 2~9단계, GameDesign 저장 정책 조회. 기존 8단계에 이벤트 전후 저장·결과 중복 방지 구현이 이미 있음을 확인. 긴 반복 출력은 일부 생략.
+- 판단: 전체 로드맵 재구성 불필요. 2단계는 사용자 테스트 통과로 완료, 이벤트 시작 체크포인트·시드/난수 조건은 8단계에서 구현하고 9단계 전투에 적용한다. 앞선 완전 결정론 기반 정비를 선행해야 한다는 평가는 요구보다 넓었으므로 대체.
+- Python pathlib로 기존 GameDesign/RoadMap/State/Architecture 갱신. 원본 기획서 보존, 사용자 추가 명세를 별도 우선 절로 기록. 일반 저장과 이벤트 도중 시작 체크포인트 보존의 차이, 사건 발생용 난수 진행 정보, 종료 결과 저장 경계 명시.
+- 이번에는 문서·기록만 변경. 게임 코드 변경·추가 테스트·커밋·푸시·3단계 착수 없음.
+
+## 2026-10-19 | stage2-commit-stage3-start
+
+### 사용자 요청
+
+    2단계 내용을 커밋하여 저장하고, 3단계를 진행해
+
+### 브랜치 승인
+
+    새 브랜치에서 진행
+
+- Git 상태·diff·Rules·State·RoadMap 확인. 기준 836150b, 2단계 구현·사용자 통과·이벤트 시작 체크포인트 명세를 함께 보존한다.
+- started: git add --all; git commit -m '게임 시간·정지·저장 복원 구현'. 성공 후 codex/ship-floors-facilities를 생성한다. 푸시·main 병합 없음. 3단계는 2층·계단·시설 점유/접근과 상태 저장 확장, 기능 테스트는 별도 사용자 확인.
+

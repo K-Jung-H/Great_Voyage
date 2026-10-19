@@ -10,6 +10,8 @@ namespace GreatVoyage
         private JournalPanel journal;
         [SerializeField, Tooltip("책상 상호작용 지점까지의 최대 거리.")]
         private float interactionRange = 1.25f;
+        [SerializeField, Tooltip("정지 중 새 게임 상호작용을 차단할 세션.")]
+        private GameSession session;
 
         private readonly Collider2D[] candidates = new Collider2D[16];
         private readonly RaycastHit2D[] obstacles = new RaycastHit2D[16];
@@ -33,7 +35,7 @@ namespace GreatVoyage
         {
             if (journal == null) return;
             movement.SetInputBlocked(journal.IsOpen);
-            if (journal.IsOpen)
+            if (journal.IsOpen || (session != null && session.IsPaused))
             {
                 journal.ShowPrompt(false);
                 return;

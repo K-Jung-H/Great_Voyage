@@ -38,3 +38,21 @@
 - CameraFollow는 플레이어 추적, JournalPanel은 일지 표시·닫기·안내를 담당한다. Input System과 UGUI 사용. 최소 화면의 글꼴은 OS 동적 폰트이며 게임 시간·저장은 다음 단계다.
 - Assets/Art/Prototype에 단색 Square/Circle Sprite. Unity 생성 SceneTemplateSettings도 구현 작업에 포함한다.
 - 사용자 조작 테스트 통과(2026-10-19). 조작감·객체 계층의 최종 설계는 후속 구체화 대상으로 유보한다.
+
+## 2단계 시간·정지·저장 구현 — 2026-10-19
+
+- GameSession: 하루 600초의 누적 시간과 현재 세션 관리. 새 게임 임시 시작 시각은 1일 08:00. 안정적인 playthroughId/playerId/spaceId 및 물리 위치를 저장·복원한다. 시간 진행은 Time.timeScale 대신 세션의 정지 상태를 확인한다.
+- PauseService: 정지 사유마다 IDisposable 핸들을 발급하며 해당 핸들만 해제한다. JournalPanel과 SessionPanel은 서로 독립된 핸들을 소유한다. UI 핸들은 저장하지 않으며 재실행 시 닫힌 UI로 복원한다.
+- PlayerMovement/PlayerInteraction: 기존 UI 차단과 세션 정지 상태를 함께 확인한다. 정지 등록 즉시 세션이 플레이어 속도를 0으로 설정한다. 조작감·객체 계층은 재설계하지 않았다.
+- SaveData/SaveService: 형식·버전·인물/공간 ID·유한한 위치와 시간 검증. 임시 파일 Flush 후 기존 파일을 File.Replace로 교체한다. 기존 파일이 없을 때 File.Move를 사용한다. 백업은 복구용 파일이며 사용자 선택 저장 슬롯이나 자동 과거 상태 복원 기능은 제공하지 않는다.
+- 로드 오류/미지원 버전은 기존 파일을 보존하고 진행을 정지시킨다. 저장 실패 시 오류를 표시하고 메뉴·운영체제의 정상 종료 요청을 중단한다. Editor 정지 버튼·강제 종료는 일반 종료 취소 흐름을 보장할 수 없으므로 별도로 구분한다.
+- 저장 위치: Application.persistentDataPath/Saves/Editor/cabin-session.json(Editor) 또는 Saves/Player/cabin-session.json(Player). 개발 중 저장을 실제 플레이 저장과 분리한다. 이번 작업에서는 Play Mode를 실행하거나 저장 파일을 생성하지 않았다.
+- SessionPanel: 우측 상단 일수·HH:mm, 일시정지 버튼, 계속/저장 후 종료 메뉴, 오류 표시. 게임 시간의 시작일·시각은 임시 데이터이며 항해 DAY 표시가 아니다.
+- CaptainsCabin 씬에 GameSession과 UI를 연결했다. 플레이어 Prefab의 씬 세션 참조는 씬 인스턴스 override로 관리한다. 신규 씬·패키지·입력 자산 변경 없이 기존 1단계 씬을 확장했다.
+- 현재는 선장실 하나의 저장 범위다. 공간 전환·계약·재고·이벤트 결과·게임 오버는 해당 시스템 구현 때 확장한다. 별도 GameClock 클래스를 미리 늘리지 않고 현재 시간 책임은 GameSession 안에 한정했다.
+
+## 이벤트 저장의 후속 설계 경계 — 2026-10-19
+
+- 2단계의 일반 위치·시간 저장은 완료했으며 이벤트 체크포인트는 아직 구현되지 않았다. 완전한 물리 결정론은 필요하지 않다.
+- 8단계에서 현재 진행 상태와 이벤트 시작 스냅샷을 구분하고, 이벤트 도중 저장 요청이 시작 스냅샷을 선택하도록 저장 정책을 연결한다. 기존 SaveService의 검증·원자 쓰기 기반은 재사용하되 데이터 형식은 확장한다.
+- 사건 발생용 난수 진행 정보와 이벤트별 재현 조건을 저장한다. 이벤트 시작·종료 경계와 결과 중복 방지를 함께 설계한다. 구체 요구는 GameDesign의 2026-10-19 보완 절을 따른다.

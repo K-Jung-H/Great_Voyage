@@ -8,6 +8,8 @@ namespace GreatVoyage
     {
         [SerializeField, Tooltip("선내 이동 속도(초당 Unity 단위).")]
         private float moveSpeed = 3.5f;
+        [SerializeField, Tooltip("UI 외의 정지 사유도 이동에 반영할 게임 세션.")]
+        private GameSession session;
 
         private Rigidbody2D body;
         private InputAction moveAction;
@@ -32,7 +34,8 @@ namespace GreatVoyage
         // Role: 입력을 정규화해 충돌이 처리되는 물리 속도로 전달한다.
         private void FixedUpdate()
         {
-            Vector2 direction = inputBlocked ? Vector2.zero : moveAction.ReadValue<Vector2>();
+            Vector2 direction = inputBlocked || (session != null && session.IsPaused)
+                ? Vector2.zero : moveAction.ReadValue<Vector2>();
             body.linearVelocity = Vector2.ClampMagnitude(direction, 1f) * moveSpeed;
         }
 

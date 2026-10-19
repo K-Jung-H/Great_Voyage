@@ -12,8 +12,11 @@ namespace GreatVoyage
         private GameObject interactionPrompt;
         [SerializeField, Tooltip("일지 닫기 버튼.")]
         private Button closeButton;
+        [SerializeField, Tooltip("일지의 정지 사유를 등록할 세션.")]
+        private GameSession session;
 
         private InputAction closeAction;
+        private System.IDisposable pause;
         private Font displayFont;
         public bool IsOpen => panelRoot != null && panelRoot.activeSelf;
 
@@ -42,14 +45,17 @@ namespace GreatVoyage
         // Role: 책상 상호작용으로 최소 일지 화면을 표시한다.
         public void Open()
         {
+            if (session != null && pause == null) pause = session.Pauses.Acquire("Journal");
             if (panelRoot != null) panelRoot.SetActive(true);
             ShowPrompt(false);
         }
 
-        // Role: 일지를 닫는다. 게임 시간 처리는 다음 단계에서 연결한다.
+        // Role: 일지를 닫고 일지가 소유한 정지 사유만 해제한다.
         public void Close()
         {
             if (panelRoot != null) panelRoot.SetActive(false);
+            pause?.Dispose();
+            pause = null;
         }
 
         // Role: 책상 사용 가능 여부에 따라 상호작용 안내를 표시한다.
