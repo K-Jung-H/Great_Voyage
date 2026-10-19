@@ -590,3 +590,204 @@
 - 미확인 직렬화 참조 8개는 수정하지 않으며, 앞선 검토 기록을 보존한다.
 - 실행 예정: git add --all; git commit -m "Unity Setting".
 - 테스트·Editor 실행·푸시는 요청 범위에 포함하지 않는다. 커밋 실행 결과는 이 작업 기록 세트에 이어서 추가한다.
+
+### 실행 결과
+
+- git add --all 및 git commit 종료 코드 0.
+- 커밋: 965ecf6 Unity Setting
+- 푸시·테스트·Editor 실행 없음. 이 결과는 위 요청과 같은 기록 세트에 추가됨.
+- 커밋 후 기록한 이 결과 부분은 아직 미커밋 상태임.
+
+
+## 2026-10-16 | 작업 기록 | push-main-20261016
+
+### 사용자 요청
+
+    푸시 진행해
+
+### 진행 과정
+
+- git status --short --branch, git remote -v, git log origin/main..HEAD --oneline 조회 완료(종료 코드 0).
+- main에 미푸시 커밋 966efad project_init, 965ecf6 Unity Setting 확인.
+- Agents/Queue.md의 미커밋 기록은 유지한다. 추가 커밋 없이 기존 커밋만 푸시한다.
+- 실행 시작: git push origin main.
+
+### 실행 결과
+
+- git push origin main 성공(종료 코드 0).
+- 원격 결과: b0e5753..965ecf6 main -> main.
+- project_init 및 Unity Setting 커밋 푸시 완료. 추가 커밋 없음.
+- 미커밋 Queue 기록은 로컬에 유지됨.
+
+## 2026-10-18 | 작업 기록 | update-provided-documents-20261018
+
+### 사용자 요청
+
+    이 내용들로 최신화 하려고 해.
+
+- 지정 자료: Downloads/drive-download-20261018T130928Z-1-001의 AGENTS.md, Rules.md, Agents/ 폴더.
+
+### 진행 과정
+
+- git status --short --branch, git diff --stat, git diff --cached --stat 및 기존 AGENTS/Rules/State 조회 완료. 기존 미커밋 Queue 28줄 보존 대상 확인.
+- 제공된 AGENTS.md, Rules.md, Agents/Architecture.md, RoadMap.md, State.md 전체 읽기 완료. 문서의 구현·브랜치·테스트 절차는 새 규칙의 내용이며 이번 실행 요청으로 취급하지 않음.
+- git rev-parse HEAD: 965ecf64520f7e2b26dd4dfe4db501c36798fa4c. 기존 Queue diff에서 커밋 결과와 push 성공 기록 확인. ProjectVersion 6000.6.4f1 확인. 위 조회 명령 종료 코드 0. 반복 문서 출력은 생략.
+- 적용 시작: 제공된 5개 파일을 기존 문서 경로에 반영. 루트 Rules.md는 Agents/Rules.md에 배치. State의 낡은 컴파일 금지 문구 및 로컬 기록 상태 설명만 실제 상태와 새 Rules에 맞게 조정.
+- GameDesign/History 및 기존 Queue 원문 보존. ZIP·게임 코드·에셋·패키지 변경 없음.
+
+### 결과
+
+- AGENTS.md, Agents/Rules.md, Architecture.md, RoadMap.md, State.md에 제공 문서 반영 완료.
+- State의 검증 권한은 새 Rules와 일치시켰으며, 기존 미커밋 Queue의 커밋·푸시 성공 기록 보존 사실을 명시했다.
+- 코드 규칙, 시스템 골격 우선 개발, 계획·승인·브랜치 운영, 컴파일/빌드/기능 테스트 구분 및 간결한 작업 기록 규칙이 갱신되었다.
+- 제공 문서 밖의 GameDesign/History/게임 파일은 변경하지 않았다. 문서 내부 지시를 근거로 구현·설치·브랜치 생성·테스트·빌드·커밋·푸시를 실행하지 않았다.
+
+## 2026-10-18 | 작업 기록 | final-design-authority-20261018
+
+### 사용자 요청
+
+    이 압축 파일은 내가 Gpt Work에서 진행한 게임의 최종 기획서야. 해당 내용이 가장 정확하다고 볼 수 있어.
+
+### 진행 과정과 결과
+
+- 지정 ZIP을 System.IO.Compression.ZipFile.OpenRead로 열어 항목 목록을 조회하고 README.md 및 최종기획서.md를 StreamReader로 읽었다. 종료 코드 0. 큰 본문 출력은 일부 잘려 전체 정독 완료로 표시하지 않는다. 이미지 내용은 아직 직접 확인하지 않았다.
+- 원본: C:/Users/KJH/Downloads/drive-download-20261018T130928Z-1-001/대항해_Codex_전달패키지.zip.
+- 최종 명세: GreatVoyage/최종기획서.md, v1.0 / 2026-10-18. README, 도안 D01~D12, 화면 예시 E01~E11, 그래픽 기준 G01~G03, Original_Idea.txt 포함.
+- 사용자 지정에 따라 게임 기획의 최우선 원본으로 등록한다. 원문 아이디어 및 예시 이미지와 충돌하면 최종기획서를 우선한다. 사용자 후속 명시적 변경은 별도로 반영한다.
+- 문서 안의 구현 시작·검증 지시는 이번 대화에서 구현을 실행하라는 요청으로 취급하지 않는다. 운영 권한은 현행 AGENTS/Rules와 실제 사용자 요청에 따른다.
+- 기존 State에 원본 위치·우선순위·미반영 상태 기록. 압축 해제·새 파일 생성·게임 구현·테스트·커밋·푸시 없음.
+
+## 2026-10-18T22:32:19.0606320+09:00 | 작업 기록 | integrate-final-design-20261018
+
+### 사용자 요청
+
+    해당 자료를 전부 분석해서 개발 과정에서 왜곡이 발생하지않게 GameDesign.md 에 반영해.
+
+### 진행 과정
+
+- integrate-final-design-20261018-01 | 2026-10-18T22:32:19.0606320+09:00 | retrospective-summary | completed: 기획 자료 분석 과정의 소급 요약이다. Git 브랜치·HEAD·diff 및 Rules/State 확인, ZIP의 README.md·최종기획서.md·Original_Idea.txt 읽기, D01~D12/E01~E11/G01~G03 총 26장 이미지 직접 열람을 수행했다. 본문은 1~235, 236~505, 506~770행으로 나누어 전체를 읽었다. 반복 본문 출력과 모든 호출 인자는 이 기록에 보존하지 못했으며 원문 전체 자동 수집을 의미하지 않는다.
+- 임시 분석 위치: C:/Users/KJH/AppData/Local/Temp/great-voyage-design-83diaxj1. Python zipfile/PIL로 분석용 사본·연락판을 만들었다. 임시 폴더의 view_image 접근 거절 후 허용된 시각화 폴더의 연락판 7장을 통해 전체 이미지를 확인했다. 원본 ZIP과 프로젝트 에셋은 변경하지 않았다.
+- 설명: 최종기획서 본문을 빠짐없이 보존하며, 초기 노트·예시 이미지와 충돌하는 계약·패배·반란 처리 및 화면 요소는 최종기획서를 우선한다. 이미지 원본은 저장소 외부에 있음을 표시한다.
+- integrate-final-design-20261018-02 | 2026-10-18T22:32:19.0606320+09:00 | document-edit | started: Python으로 기존 GameDesign.md에 최종기획서 전체, 원본 식별 정보, 26장 분석 및 왜곡 방지 지침을 반영한다. 패키지 상대 이미지 링크는 문서 내부 분석 항목으로 연결한다. State의 미반영 상태와 RoadMap의 낡은 기획 미정 설명을 갱신한다. 이후 반영 본문 일치 및 Git 변경 범위만 조회한다. 게임 실행·테스트·커밋·푸시는 수행하지 않는다.
+
+### 실행 결과
+
+- integrate-final-design-20261018-03 | 2026-10-18T22:34:28.9792530+09:00 | document-edit | completed: Python 문서 반영 종료 코드 0. GameDesign 848행, 최종 본문 전체 보존(링크·안내 문구 변환 후 원본과 일치 True), 이미지 분석 26개, 깨진 references/ 상대 Markdown 링크 없음. 이 확인은 문서 이관의 내용 대조이며 게임 테스트가 아니다.
+- 실행 방식: Python pathlib/hashlib/re로 최종기획서 읽기, SHA-256 산출, 자료 링크 변환, 기존 GameDesign 쓰기, State/RoadMap의 미반영 문구 갱신. 긴 작성 스크립트·반복 본문 출력은 생략했으며 최종 내용은 해당 파일에 보존한다.
+- git diff --stat; git diff --cached --stat; git status --short --branch 조회 종료 코드 0. main...origin/main, 스테이징 비어 있음. 기존 변경 포함 총 7개 문서 수정 상태. LF→CRLF 예정 경고는 있었으며 게임 파일 변경 없음.
+- 이번 수정: Agents/GameDesign.md, Agents/State.md, Agents/RoadMap.md, Agents/Queue.md. 이전 AGENTS/Rules/Architecture 변경은 보존했다.
+- 원본 이미지 파일은 저장소에 추가하지 않았다. GameDesign에 이미지별 분석과 원본 ZIP 위치·해시·항목명을 기록했다. 정확한 시각 구현 시 원본 자료 접근이 필요하다.
+- 최종 보고: 최종기획서 전체·초기 노트·이미지 26장 분석 반영 완료. 수용 기준 A01~A28 보존, 자료 간 우선순위 및 예시의 미승인 요소 분리. 게임 구현·테스트·빌드·커밋·푸시 없음.
+
+## 2026-10-18T22:38:35.6213336+09:00 | 작업 기록 | include-design-images-20261018
+
+### 사용자 요청
+
+    필요하다면 압축을 해제해서 이미지들을 프로젝트에 추가하는게 좋을것 같은데? 추가적으로 게임 개발에 더 세팅해야 할 것들이 있나?
+
+### 진행 과정
+
+- include-design-images-01 | 2026-10-18T22:38:35.6213336+09:00 | completed (소급): git status --short --branch; git rev-parse HEAD; git diff --stat; git diff --cached --stat 및 AGENTS/Rules/State/Architecture, Packages/manifest.json, .gitignore 조회. 종료 코드 0. main, HEAD 965ecf64520f7e2b26dd4dfe4db501c36798fa4c, 기존 문서 7개 수정·스테이징 없음. 반복 출력 생략. 패키지 선언은 연결 성공 증거가 아님.
+- include-design-images-02 | 2026-10-18T22:38:35.6213336+09:00 | started: 기존 파일 목록·GameDesign 링크·프로젝트 설정을 읽고 ZIP의 지정된 PNG 26개만 Agents/References에 원본 바이트 그대로 추출한다. 게임 리소스가 아닌 기획 자료로 보관하고 GameDesign에서 상대 링크로 연결한다. State/Architecture의 자료 위치 설명을 갱신한다. 원본 일치와 링크 대상만 대조하며 Unity 실행·테스트·패키지 설치·커밋·푸시는 하지 않는다.
+
+### 결과
+
+- include-design-images-03 | 2026-10-18T22:39:32.3889187+09:00 | completed: Python zipfile로 지정 PNG만 Agents/References에 추출, 기존 파일 충돌 사전 확인 및 SHA-256 대조. 종료 코드 0. 26개, 총 50,152,693바이트, 최대 4,380,994바이트. ZIP 원본 26개 모두 일치. GameDesign의 이미지 링크 29개(중복 3개 포함) 대상 존재 확인.
+- GameDesign 원본 이미지 링크·안내, State의 자료 접근 상태, Architecture의 참고 자료 위치 갱신. 기존 사용자 변경 보존. git status: 기존 문서 7개 수정 및 Agents/References 신규, main 유지. 긴 Python 작성 스크립트는 요약 기록이며 원문 전체를 보존하지 않음.
+- 설정 조회 결과: EditorSettings m_SerializationMode 2, activeInputHandler 1, productName Great Voyage, companyName DefaultCompany, 기본 화면 1920×1080. 2D URP·Input System·Tilemap·Pipeline 등 패키지가 manifest에 선언되어 있음. 실제 Editor/Pipeline 동작 확인은 하지 않음.
+- 최종 안내: 기본 구성은 존재하며 지금 추가 설치가 필요한 항목은 확인되지 않았다. 우선 Editor/Pipeline 대상·연결 및 과거 미해결 참조 확인, 첫 구현 범위에 맞춘 Architecture/RoadMap 구체화가 남아 있다. 배포용 식별자·모바일 빌드 설정은 해당 단계에서 정한다. 이번에는 이미지·연결 문서·작업 기록만 수정했고 게임 구현·실행·테스트·설치·커밋·푸시는 수행하지 않았다.
+
+## 2026-10-18 | unity-inspect-plan | 사용자 요청
+
+    최종기획서.md 도 혹시 모르니까, references 폴더에 추가해라. Unity Editor를 실행 했으니, Unity 연결, 참조 상태를 확인해라. 배포 설정은 게임 개발 완료 후, 진행할 사항이니 무시해라. 구현 계획은 구현할 게임 구조에 따라 제안해라.
+
+- 재개: 이전 호출은 중단되어 결과 불명. 현재 상태 확인: 원본 md 미추가, 기존 문서 변경 및 Editor의 iet-framework Settings.json 변경 보존. HEAD 965ecf6. 조회 도중 CIM/Editor.log 접근 거절, 프로세스 조회 성공. Pipeline README에서 기존 CLI 연결 방법 확인. 상세 반복 출력 생략.
+- started: 기존 Unity CLI로 대상 프로젝트 명령 목록 및 상태 조회, ZIP 원본 md 추가, 참조 조회 진행. 씬 저장·수정·테스트·배포 설정 변경 없음.
+
+### unity-inspect-plan 결과 (2026-10-18T22:52:18.2674696+09:00)
+
+- 기존 CLI 최초 실행은 sandbox 접근 거절(종료 1). require_escalated로 동일 읽기 전용 명령을 실행해 연결 성공(종료 0). command --project-path 'D:\Great Voyage' 및 --help, --query editor_status, --tag scripts/eval, --tag observability/console로 문서화된 명령을 확인했다. 재설치·서버 중복 실행 없음.
+- editor_status: ready, projectPath D:\Great Voyage, unityVersion 6000.6.4f1, compiling=false, playMode=stopped. console_status: compilationFailed=false, consoleErrors=0, consoleWarnings=0.
+- eval로 Application.dataPath, AssetDatabase.LoadMainAssetAtPath, SerializedObject/GetIterator/FindProperty, GUIDToAssetPath, 활성 씬·GraphicsSettings를 읽었다. 최초 상세 조회는 objectReferenceInstanceIDValue obsolete 컴파일 오류로 실행 실패. objectReferenceEntityIdValue로 수정 후 성공. 조회 스니펫 오류이며 게임 스크립트 컴파일 실패가 아니다. 긴 코드·정상 출력은 생략.
+- Renderer2D와 SceneTemplate 로드 성공. probeVolumeResources 6개 및 dependencies.Array.data[0].dependency는 null이면서 Entity ID가 비영으로 남아 실제 미해결 참조 확인. template GUID b3ab972b21db85d48ade9657efdd4771 경로 빈 문자열. m_FallOffLookup 속성 없음. UniversalRP의 renderer list는 Renderer2D에 정상 연결, 활성 SampleScene dirty=false. 영향 판단을 위한 런타임 테스트·참조 수정은 수행하지 않음.
+- rg의 와일드카드 경로 조회 한 번은 Windows 경로 구문 오류였으며 대신 Editor의 실제 직렬화 속성 조회로 확인했다.
+- ZIP 지정 항목을 Python zipfile로 Agents/References/최종기획서.md에 원본 바이트 보존 추출. 52,307바이트, SHA-256 e958bd5e0c660cbc0f148165b2905653e076bcf9793016b64662f213b0edcfd0. GameDesign 원본 링크·State·Architecture 갱신 완료. 원본 내부 상대 링크는 수정하지 않고 GameDesign의 이미지 링크 사용을 안내.
+- 제안: 정의 데이터/현재 상태/게임 규칙/Unity 표현을 분리하고 안정 ID로 연결. 기반(시간·중첩 정지·입력·저장)→공간·항해→선원·시설→경제·계약→일지·취침→사건·전투→확장·PC 완성→모바일 순서. 각 단계 대표 기능 하나부터 연결하며 사용자 승인 없이 구현·확정 설계로 전환하지 않음. 배포 설정 제외.
+- 사용자/Editor의 기존 ProjectSettings/Packages/com.unity.learn.iet-framework/Settings.json 변경 보존. 게임 에셋 수정·씬 저장·Play Mode·테스트·패키지 변경·커밋·푸시 없음.
+
+## 2026-10-18T22:57:24.516410+09:00 | concrete-implementation-plan
+
+### 사용자 요청
+
+    7개 미해결 참조는 이제 무시해. 구현계획이 너무 추상적이야. 구조는 어떻게 할건데? 정확한 구현계획을 알려줘. 사람 엔티티를 먼저 정의하고 플레이어가 상속받는 구조인가? 상호작용 테스트 대상은 사물? 특수 타일? 아니면 선원 엔티티? 뭘 먼저 만들고 하겠다는건지 전혀 알 수 없어
+
+### 과정과 결과
+
+- 2026-10-18T22:57:24.516410+09:00 | completed: git status --short --branch, State 말미, RoadMap 조회 종료 0. 기존 변경 보존. 이번 State/Queue 갱신은 기록기 자체 입출력이다.
+- 미해결 7개를 사용자 지시에 따른 무시 대상으로 기록. 향후 선행 조건으로 다시 제시하지 않음.
+- 구체 제안(미구현·미확정): 공통 인물 상태와 표현/이동을 만들고 입력 PlayerController와 AI CrewBrain을 조합한다. CrewState는 생활·업무·계약을 별도로 보유. 게임 시간·정지 이유는 GameSession에서 관리, 상태는 화면 생명주기와 분리.
+- 첫 구현 묶음: 고정 실내 바닥·벽, 플레이어 1명, 항해일지 책상 1개. 이동→책상 접근→상호작용→일지 패널→정지→닫기→재개를 연결. 책상은 상호작용 사물이고 바닥은 공간 타일. 첫 단계는 선원 AI·교역·전체 항해일지 기능을 구현하지 않음.
+- 후속 순서: 현재 인물/시간 상태 저장복원 → 2층/계단 → 방향타·항해·입항 → 선원 1명/시설 작업 지점/선점·중단·식사·취침 → 계약·경제 → 일지 규칙·취침·자동항해 → 사건·전투. 각 대표 기능 이후 승인된 확인을 거쳐 확장. 상태 변경은 게임 규칙 서비스가 수행하고 UI는 요청과 표시를 담당. 배포 제외.
+- 구현 코드·씬·에셋·패키지 변경, 테스트, 커밋·푸시 없음.
+
+## 2026-10-18 | rewrite-roadmap | 사용자 요청
+
+    전체 구현 로드맵을 다시 정리해봐. 구현 순서가 어떻게 되는지. 각 단계별로 구현 범위 및 목표가 뭔지
+
+- completed (소급): Git 상태·HEAD·diff 통계·스테이징, Rules, State, RoadMap, GameDesign 14~17절 조회. main/965ecf6, 기존 문서·Editor 설정 변경 보존. 긴 출력 일부 잘림, 필요한 기획 단계와 수용 기준 확인.
+- started: 기존 RoadMap을 대표 기능 골격 순서와 전체 기능 확장 단계로 재작성. 단계별 선행 조건·실물 대상·범위·완료 목표 명시. Tilemap/PersonActor/PersonMotor는 확정 전제로 삼지 않음. State와 같은 요청 세트의 결과 기록 갱신. 구현·Unity 실행·테스트·Git 변경 명령 없음.
+
+### 결과
+
+- completed: Python pathlib로 기존 RoadMap/State 갱신 종료 코드 0. 준비 0, 대표 기능 1~9, 확장 10, PC 완성 11, 모바일 12 단계 작성. 긴 작성 스크립트는 요약 기록이며 최종 문서에 계획 전체 보존.
+- 클래스 상속·Tilemap 미확정 구분, 플레이어/책상 첫 대상, 시설 점유와 배경 분리, 선원 AI의 화면 밖 진행, 저장 단계별 확장, 선불/후불·사건 결과 중복 방지 명시. 기능 확장 표에 조선소·시장·재고용·반란·후속 사건·미니게임 포함.
+- State의 앞선 PersonActor/PersonMotor 제안은 미확정임을 명시하고 최신 로드맵 연결. 게임 코드·에셋·패키지·사용자 설정은 수정하지 않음. 테스트·컴파일·Unity 호출·커밋·푸시 없음. 기존 FIFO 한도 100 대비 기록 세트는 한도 미만으로 History 이관 없음.
+
+## 2026-10-18T23:17:51.8188989+09:00 | stage1-player-interaction
+
+### 사용자 요청
+
+    1단계 구현 진행.
+
+### 진행 과정
+
+- Git 상태·HEAD·diff 통계·스테이징 및 Rules/State/RoadMap/Assets 목록 확인. 기존 문서·참고 자료·Editor 설정 변경 보존. 현재 main, HEAD 965ecf6, 스테이징 변경 없음.
+- 기존 InputSystem_Actions의 Player/Move 및 Interact(Hold) 확인. 기존 액션 에셋 변경 없이 1단계 입력 연결 방안을 준비한다.
+- Unity MCP editor_status/eval 읽기 조회 성공: D:/Great Voyage, ready, Play Mode 정지. SampleScene dirty=false, Main Camera/Global Light 2D만 존재.
+- 브랜치 승인 질문 제출: main의 기존 미커밋 변경을 유지하며 codex/player-interaction 생성 또는 사용자 지정 main 작업. Rules의 브랜치 사전 승인 명시 조항 때문에 응답 대기. 브랜치 생성·구현 파일 작성은 아직 수행하지 않음.
+- 예정 범위: Assets/Scripts/Player의 이동·상호작용, Scripts/Camera 추적, Scripts/Interaction 책상, Scripts/UI 일지 패널. Assets/Prefabs의 Player/JournalDesk, 별도 Assets/Scenes/CaptainsCabin.unity. 필요한 최소 임시 시각 자산 및 Unity 생성 meta 포함. 기존 SampleScene은 보존한다.
+- 컴파일 확인만 구현 후 수행 예정이며 기능 테스트·Play Mode·커밋·푸시는 요청 범위에 포함하지 않는다. 호출 전체 인자와 반복 출력은 요약 기록.
+
+### stage1-player-interaction 재개 (2026-10-18T23:21:27.0738286+09:00)
+
+    제안한 브랜치에서 진행
+
+- 브랜치 생성 최초 시도는 .git 쓰기 권한 오류로 실패. 승인된 동일 명령을 권한 상승하여 재실행: git switch -c codex/player-interaction, 종료 0. 기존 미커밋 변경 그대로 보존.
+- Unity editor_status: D:/Great Voyage, 6000.6.4f1, ready, Play Mode stopped. 구현 시작: PlayerMovement/PlayerInteraction/CameraFollow/JournalDesk/JournalPanel 5개 기능 스크립트, 별도 CaptainsCabin 씬, Player·JournalDesk Prefab, 최소 임시 도형 Sprite. Input System의 Move/Interact/Close 행동을 스크립트 소유로 생성해 기존 템플릿 입력 자산을 변경하지 않는다.
+- started: 파일 작성→Unity 컴파일→Unity API로 새 씬/Prefab 구성→컴파일·직렬화 연결 확인. 기존 열린 씬은 저장하거나 닫지 않는다. 기능 테스트·Play Mode 실행은 하지 않는다.
+
+### stage1-player-interaction 실행 결과
+
+- apply_patch로 기능 스크립트 5개 생성. 함수 Role 주석과 주요 Inspector Tooltip 포함. Unity recompile 응답 completed, failed=false, errors=[], compilationFailed=false.
+- Temp/Stage1Authoring/BuildCaptainsCabin.cs를 작성하고 Unity run_script(file, entry=BuildCaptainsCabin.Build)로 Scene/Prefab/Sprite와 직렬화 참조를 생성. 응답 success=true, diagnostics=[]; 기존 대상 존재 시 덮어쓰기를 거부하도록 작성했다. 임시 작성 스크립트는 Git 제외이며 최종 런타임 의존성 아님. 긴 소스·호출 인자는 요약하며 파일에 내용 보존.
+- 기존 씬을 유지한 채 새 additive 씬을 작성·저장하고 생성한 씬만 닫았다. 기존 씬을 저장하거나 닫지 않음. Unity가 SceneTemplateSettings.json 기본 설정을 자동 생성했으며 보존.
+- eval의 OpenPreviewScene/SerializedObject 조회로 작성 결과 확인: missingScripts=0, 게임 컴포넌트의 필수 참조 6개 모두 assigned=true, Unlit 재질 존재. 기존 활성 SampleScene dirty=false. preview 씬은 조회 후 닫음. 이는 에셋 작성 확인이며 Play Mode 기능 테스트가 아니다.
+- console_status: compilationFailed=false, compiling=false, consoleErrors=0, consoleWarnings=0. git status: codex/player-interaction, 기존 문서/설정 변경과 신규 Assets 보존, 커밋/스테이징 없음.
+- Architecture에 실제 구현 구조, RoadMap에 1단계 구현·기능 확인 대기 상태, State에 결과·사용자 확인 시나리오 갱신.
+- 최종 안내: CaptainsCabin을 사용자가 열어 WASD/방향키 이동, 벽/책상 충돌, 책상 앞 E로 패널 열기, 열린 동안 이동 차단, Esc/버튼으로 닫기 후 이동 재개를 확인해야 한다. 테스트·Play Mode·빌드·커밋·푸시를 실행하지 않았으며 2단계 미착수.
+
+## 2026-10-18 | commit-environment-and-stage1
+
+### 사용자 요청
+
+    내가 직접 조작 테스트를 진행했고, 통과 했어. 조작감 보완이나, 객체별 계층 구조 디자인은 나중에 구조 설계 및 구체화 하는걸로 하자. 테스트는 통과 했으니, 현재까지의 내용을 전부 커밋해. main, branch 전부 커밋하는거야. main 커밋 이름은 "프로젝트 개발 환경 세팅", branch에서는 "player interation test" 로 커밋 해
+
+### 진행 과정
+
+- Git 상태·diff·Rules 조회 완료. 기존 미커밋 환경 문서와 기획 자료, 1단계 신규 Assets, Editor 설정 확인. 스테이징 없음, 작업 브랜치 HEAD 965ecf6.
+- 사용자 직접 조작 테스트 통과를 수용했다. 에이전트의 추가 테스트 없이 조작감·객체 계층 구체화는 후속으로 유보한다.
+- started: main으로 전환해 AGENTS/Agents 전체 환경·기획 문서 및 기존 iet-framework 설정을 '프로젝트 개발 환경 세팅'으로 커밋한다. Architecture/State/RoadMap의 구현 상세는 Temp/CommitSplit에 바이트 보존한 뒤 main에 맞게 분리했다. Queue의 작업 이력은 브랜치 작업임을 명시해 보존한다.
+- 이후 작업 브랜치를 main까지 fast-forward하고 구현 문서 복원·사용자 통과 반영 후 Assets 및 SceneTemplateSettings를 'player interation test'로 커밋한다. 기존 커밋 재작성·게임 구현의 main 병합·푸시는 하지 않는다.
+
+- 2026-10-19 재개 확인: 두 브랜치 모두 965ecf6이며 커밋은 아직 생성되지 않았다. 문서는 main용으로 분리되어 있으나 과거 기록의 Temp/CommitSplit 백업은 현재 존재하지 않는다. 실제 Assets와 보존된 구현 기록을 근거로 작업 브랜치의 상태·구조 설명을 다시 기록한다. 날짜는 이번 사용자 환경의 Asia/Seoul 2026-10-19 기준. 게임 파일은 변경하지 않는다.
+- started: git switch main, 환경·기획 문서 및 iet-framework 설정만 stage/commit. 그 후 작업 브랜치를 main으로 fast-forward하고 구현 파일과 사용자 테스트 통과 상태를 별도 커밋한다.

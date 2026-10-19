@@ -1,47 +1,87 @@
 # State
 
-기준일: 2026-10-16 (Asia/Seoul)
+기준일: 2026-10-18 (Asia/Seoul)
 
 ## 현재 상태
 
-- 개발 환경 문서 정비와 작업 트리 복구 완료. 이후 사용자 정정에 따라 작업 기록·인계·실행 범위 규칙 수정. 게임 코드·에셋 변경 없음.
-- 복구 대상: b0e5753ffad510e0b93bc60e15bb95ff06a61bc7. 이전 Codex가 명시적 요청 없이 생성·push했음을 이전 대화의 실제 실행과 커밋 내용으로 식별했다.
-- 복구 기준: f136c147fffbb062664707d38f9d05b7ae31f4ef (기존 Initial commit). 그 외 사용자 독립 커밋은 관찰되지 않았다.
-- 시작 시 main의 HEAD와 origin/main은 b0e5753, 작업 트리·스테이징은 깨끗했다. 보존할 기존 미커밋 변경은 없었다.
-- 히스토리·스테이징을 변경하지 않고 .gitignore를 기준 커밋 내용으로 복원하고 문서를 재구성했다. b0e5753은 로컬·원격 히스토리에 남는다. 원격은 이번 미커밋 정비 결과를 반영하지 않는다.
+- 저장소 `main`의 확인된 최신 커밋은 `965ecf64520f7e2b26dd4dfe4db501c36798fa4c` (`Unity Setting`)이다. 이 커밋에 Unity 프로젝트 파일과 기존 에이전트 문서 변경이 포함되어 있다. 2026-10-18 문서 갱신 시작 시 로컬에는 Queue.md의 미커밋 결과 기록만 있었고 스테이징 변경은 없었다. 이번 제공 문서 반영 결과도 미커밋 상태로 남긴다.
+- Unity 프로젝트의 루트는 저장소 루트이며 Assets/, Packages/, ProjectSettings/가 존재한다. ProjectSettings/ProjectVersion.txt에 명시된 Unity 버전은 6000.6.4f1이다.
+- Packages/manifest.json에 Universal Render Pipeline 17.6.0, Input System 1.20.0, Unity Pipeline 0.8.0-exp.1 등이 선언되어 있다. 2026-10-18 기존 Unity CLI/Pipeline으로 이 프로젝트의 실행 중 Editor 연결을 확인했다. MCP는 사용하지 않았다.
+- main에는 기본 Unity 구성과 개발 환경 문서가 있다. 1단계 구현은 작업 브랜치에 분리한다.
+- 사용자가 제공한 대항해_Codex_전달패키지.zip 내 GreatVoyage/최종기획서.md(v1.0, 2026-10-18)를 게임 기획의 최우선 원본으로 삼는다. 최종기획서 전체와 이미지 26장·초기 노트 대조를 GameDesign.md에 반영했다. 문서의 개발 지시 자체는 즉시 구현·검증 실행의 허가가 아니다.
 
 ## 미해결 및 다음 행동
 
-- 작업 중 설명·실행 명령·출력·오류·수정 과정을 기록한다. 사용자 첨부 예시 원문을 Queue에 보존했다. 별도 자동 수집 플랫폼 구축은 미해결 과제에서 제외한다.
-- 사용자 정정: 기기 간 작업은 최신 커밋 기준. 미커밋 기록의 기기 간 동기화는 불필요하며 미해결 과제에서 제외한다.
-- 사용자 정정: 요청하지 않은 후속 동작을 임의로 수행하지 않는다. 커밋뿐 아니라 테스트·컴파일·빌드 등도 명시적 요청 없이 실행하지 않는다. 별도 기술적 차단 구축은 요구사항이 아니다.
-- 게임 기획·Unity 버전·대상 플랫폼 미정. 이번 작업에서 확정하거나 프로젝트를 생성하지 않는다.
-- Unity 프로젝트가 없어 컴파일·Edit Mode·Play Mode·Editor 기능 검증을 수행하지 않는다.
-- 다음 세션은 실제 미커밋 변경과 State를 확인한다. Queue는 작업 재개·인계·진행 기록 확인 등 필요 시에만 관련 부분을 읽는다. 사용자 요청 없이 add/commit/push하지 않는다.
+- 2026-10-18 Editor 조회에서 Lit2DSceneTemplate dependency 1개와 Renderer2D probeVolumeResources 6개가 null이면서 비영(非零) Entity ID를 가진 미해결 참조임을 확인했다. m_FallOffLookup은 현재 SerializedObject 속성에 없어 잔여 YAML로 판단한다. 활성 UniversalRP→Renderer2D 연결은 정상이며 미해결 7개의 기능 영향은 아직 확인하지 않았다.
+- Editor 실행·컴파일·Edit Mode·Play Mode·런타임 기능 검증은 이 문서 정비 과정에서 수행하지 않았다.
+- 기기 간 작업 인계는 최신 커밋을 기준으로 한다. 미커밋 기록의 별도 동기화는 요구하지 않는다.
+- 커밋·푸시·기능 테스트는 명시적 요청·승인 범위에서만 수행한다. 구현에 필요한 컴파일 확인과 필요성이 명확한 빌드는 새 AGENTS/Rules의 허용 범위에 따른다. 다음 작업 시작 시 실제 Git 상태 및 State를 확인하고, Queue는 재개·인계 등 실행 맥락이 필요할 때만 관련 부분을 읽는다.
 
-## 이전 정비의 검증 기록
+## 이전 정비의 검증 기록 — 2026-10-16
 
-- 최종 검증 통과: 7개 문서 구조, 링크, 기존 18개 이벤트 원문·ID 보존, 기준 .gitignore 일치, GameDesign/README 보존, HEAD·스테이징 불변.
-- 이전 Python 테스트 통과는 제거된 도구의 과거 결과이며 현재 환경의 자동화 검증 결과가 아니다.
-
-- 최종 검사 결과: 위 항목 및 git diff --check 통과. cleanup-20261016 / verify-20261016 완료. 이번 작업의 커밋·푸시·히스토리 변경 없음.
-
-## 이번 정정 작업
-
-- 기존 미커밋 변경을 유지하고 AGENTS/Rules/Architecture/RoadMap/State의 잘못 해석한 요구사항을 수정했다. Queue에 사용자 정정·첨부 원문·작업 과정을 추가했다.
-- 테스트·컴파일·빌드·커밋·푸시를 실행하지 않았다. 이전 검증 결과는 위 과거 기록에만 해당한다.
+- 개발 환경 문서 정비 및 작업 트리 복구를 수행했다. 복구 대상은 `b0e5753ffad510e0b93bc60e15bb95ff06a61bc7`, 당시 복구 기준은 `f136c147fffbb062664707d38f9d05b7ae31f4ef`였다.
+- 당시 최종 검증 기록에는 7개 문서 구조, 링크, 기존 18개 이벤트 원문·ID 보존, 기준 .gitignore 일치, GameDesign/README 보존, HEAD·스테이징 불변 및 `git diff --check` 통과가 포함된다.
+- 이전 Python 테스트 통과는 이후 제거된 도구에 대한 과거 결과이며 현재 Unity 프로젝트의 검증 결과가 아니다.
+- 당시 사용자 정정에 따라 AGENTS/Rules/Architecture/RoadMap/State의 요청 범위 및 Queue 열람 정책을 수정하고 관련 과정을 Queue에 기록했다. 자세한 요청·명령·결과는 Queue/History를 참조한다.
 
 ## Unity 구성 검토 — 2026-10-16
 
-- 새 Unity 프로젝트 경로: D:/Great Voyage/Great Voyage. 버전 6000.6.4f1. 위의 프로젝트 부재·버전 미정 기록은 추가 이전 상태다.
-- 패키지 manifest/lock, 에셋 메타 및 빌드 씬 참조 정적 검토에서 문제 없음.
-- 차단 사항: 루트 .gitignore가 중첩 프로젝트의 Library 34,038개와 UserSettings 6개를 제외하지 못함.
-- 사용자 요청은 이상이 없는 경우에만 Unity Setting 커밋. 문제가 있어 커밋하지 않음. 다음 작업은 사용자 지시에 따라 ignore 경로 정비 후 커밋 대상 재확인.
-- Editor 실행·컴파일·런타임 검증 미실행. 상세 요청·과정·결과는 Queue의 unity-setting-review 세트 참조.
+- 처음에는 `D:/Great Voyage/Great Voyage` 하위에 Unity 프로젝트가 있어, 루트 .gitignore가 하위 Library 34,038개와 UserSettings 6개를 제외하지 못했다. 문제 때문에 당시 요청된 조건부 커밋을 실행하지 않았다.
+- Unity 버전은 6000.6.4f1이며 패키지 manifest/lock과 에셋 메타 및 빌드 씬 참조에 대한 정적 검토를 수행했다.
+- Editor 실행·컴파일·런타임 검증은 수행하지 않았다. 상세 내용은 Queue의 `unity-setting-review` 세트에 있다.
 
 ## Unity 구조 재검토 — 2026-10-16
 
-- 현재 Unity 루트는 D:/Great Voyage. 이전 하위 경로와 생성 파일 제외 문제는 해소됨.
-- 폴더 구조, 패키지 lock, meta 및 빌드 씬, 품질별 URP→Renderer2D 참조 정상. Git 신규 후보 65개, 생성 캐시 제외됨.
-- 미확인: Lit2DSceneTemplate의 dependency 1개 및 Renderer2D의 직렬화 참조 7개가 로컬 Assets/패키지 메타에서 해소되지 않음. Editor에서 잔여 필드인지 실제 누락인지 확인 필요.
-- 이번 요청의 정적 재검토만 수행. 커밋·푸시·Editor 실행 없음. 상세 과정은 Queue의 unity-structure-recheck 세트.
+- Unity 프로젝트 루트를 `D:/Great Voyage`로 정리해 이전 하위 경로 및 생성 파일 제외 문제를 해소했다.
+- 폴더 구조, 패키지 lock, meta, 빌드 씬, 품질별 URP→Renderer2D 참조에 대한 정적 검토를 수행했다. 당시 Git 신규 후보는 65개였으며 생성 캐시는 제외되었다.
+- Lit2DSceneTemplate의 dependency GUID 1개 및 Renderer2D의 직렬화 참조 7개는 로컬 Assets/패키지 메타에서 해소되지 않았다. 실제 결함인지는 Editor 확인이 필요하다.
+- 이 재검토에서는 커밋·푸시·Editor 실행을 수행하지 않았다. 상세 내용은 Queue의 `unity-structure-recheck` 세트에 있다.
+
+## Unity Setting 커밋 — 2026-10-16
+
+- 별도의 명시적 사용자 요청에 따라 `Unity Setting` 커밋 `965ecf64520f7e2b26dd4dfe4db501c36798fa4c`가 생성되었다.
+- 커밋에 포함된 Queue에는 실행 예정 단계까지 기재되어 있으나, 현재 로컬 Queue의 `unity-setting-commit` 세트에는 성공 결과가 추가되어 있다. `push-main-20261016` 세트의 푸시 성공 기록도 로컬에 보존되어 있다. 이 기존 미커밋 원문은 수정하지 않았다.
+
+## 최종 기획 원본
+
+- 위치: C:/Users/KJH/Downloads/drive-download-20261018T130928Z-1-001/대항해_Codex_전달패키지.zip.
+- 최종기획서와 도안 12장·예시 11장·그래픽 레퍼런스 3장·초기 노트로 구성. 초기 노트와 예시의 미확정 기능보다 최종기획서를 우선한다.
+- ZIP은 저장소 밖에 있다. 이미지 26장은 Agents/References에 원본 그대로 추출했다(현재 미커밋). 본문 전체·README·초기 노트 정독 및 이미지 26장 직접 검토를 완료했다. GameDesign에는 최종 본문 전체, 자료 우선순위, 이미지별 적용 경계와 왜곡 방지 사항을 반영했다. GameDesign의 ID 링크로 저장소 내 원본 이미지를 열 수 있다. 향후 이미지와 문서를 함께 커밋하면 기기 간 인계에 포함된다.
+
+## 기획 반영 — 2026-10-18
+
+- 최종 본문 1~20절과 A01~A28을 보존하고 이미지 링크는 References의 PNG로, 초기 노트 링크는 내부 분석 항목으로 연결했다. SHA-256으로 원본을 식별한다.
+- 화장실 크기, 주민 요청의 `30~3분`, 협상 평가 단위 등은 임의 확정하지 않았다. 임시값·위임 사항·후속 콘텐츠는 본문의 분류를 유지한다.
+- 게임 구현·컴파일·빌드·기능 테스트·커밋·푸시는 수행하지 않았다. 다음 구현 범위는 사용자 요청에 따른다. 관련 기록: integrate-final-design-20261018.
+
+## 기획 이미지 보관 — 2026-10-18
+
+- 사용자 요청에 따라 Agents/References에 D01~D12, E01~E11, G01~G03 원본 PNG 26장을 추가했다. ZIP과 바이트 일치를 확인했으며 GameDesign의 원본 링크를 연결했다.
+- 개발 준비 판단: 기존 패키지 구성을 우선 재사용한다. Editor/Pipeline 연결 및 기존 미해결 참조는 실제 동작 확인이 남아 있다. 첫 구현 전에 GameDesign 14~15절에 맞춘 Architecture/RoadMap 구체화가 필요하며 이번 요청에서는 별도 설계·설치·구현을 수행하지 않았다.
+- Unity 실행·테스트·커밋·푸시 없음. 기록: include-design-images-20261018.
+
+## Unity 연결·원본 보존 — 2026-10-18
+
+- Agents/References/최종기획서.md를 ZIP 원본 그대로 추가했다. 원본의 상대 링크는 보존하고 실제 이미지 열람은 GameDesign에서 연결한다.
+- Unity CLI: C:/Users/KJH/AppData/Local/Unity/bin/unity.exe. project-path를 D:/Great Voyage로 지정해 연결했다. Editor 6000.6.4f1, ready, compiling=false, playMode=stopped. 조회 당시 compilationFailed=false, 콘솔 오류/경고 0.
+- 활성 씬 Assets/Scenes/SampleScene.unity, dirty=false. 활성 파이프라인 Assets/Settings/UniversalRP.asset 및 Renderer2D 참조 정상. 전체 기능·렌더링 테스트를 통과했다는 의미는 아니다.
+- 참조 조회용 eval 첫 호출은 구형 objectReferenceInstanceIDValue API 오류로 실행되지 않았다. objectReferenceEntityIdValue로 수정한 읽기 전용 조회는 성공했다. 게임 코드 컴파일 실패와 구별한다.
+- 프로젝트에 기존 iet-framework Settings.json 변경이 있어 보존했다. 씬 저장·참조 수정·설치·Play Mode·테스트·커밋·푸시 없음.
+- 구현 구조와 순서는 이번 응답에서 제안한다. 아직 확정된 아키텍처·구현으로 취급하지 않는다. 배포 설정은 게임 개발 완료 후 다룬다.
+
+## 사용자 지시와 구체 설계 제안 — 2026-10-18
+
+- 사용자 지시에 따라 기존 미해결 참조 7개는 무시한다. 이후 개발의 차단 조건이나 선행 점검 과제로 취급하지 않으며 정상 참조로 수정됐다는 의미는 아니다.
+- 이번 요청은 구체 구현 계획 설명이다. 구현·테스트를 시작하지 않는다. 제안: 공통 PersonState/PersonActor에 PlayerController 또는 CrewBrain을 조합하고 Player : Crew 상속은 사용하지 않는다. 첫 상호작용은 선장실 항해일지 책상, 이후 계단과 방향타, 그 다음 선원 1명의 업무 선점·수행을 연결한다. 상세 제안은 Queue의 concrete-implementation-plan 세트와 응답에 남긴다.
+
+## 로드맵 재정리 — 2026-10-18
+
+- RoadMap을 준비(0), 대표 기능 골격(1~9), 전체 기능 확장(10), PC 완성(11), 모바일 입력(12)으로 구체화했다. 단계별 선행 조건·실제 대상·구현 순서·완료 목표·제외 범위를 기록했다. 구현은 미착수다.
+- 앞선 PersonActor/PersonMotor·공통 인물 상속 구조는 확정 설계가 아니다. 플레이어의 필요한 Unity 컴포넌트부터 시작하고 실제 공유 필요에 따라 분리하는 제안으로 갱신한다. Tilemap은 필수 전제가 아니며 함선 외형·시설 Prefab과 논리 배치 영역을 분리하는 안이다.
+- 첫 구현 대상: 선장실 공간 + 플레이어 1명 + 일지 책상 1개. 이동·충돌·카메라·사물 상호작용·최소 패널부터 시작하고 시간/저장은 다음 묶음으로 연결한다. 기획서의 최종 일지 기능 완성으로 간주하지 않는다.
+- 7개 참조 무시와 배포 설정 제외 지시 유지. 이번 변경은 문서·작업 기록만이며 구현·기능 테스트·커밋·푸시 없음.
+
+## main 개발 환경 커밋 기준
+
+- main은 개발 환경·기획·전체 로드맵을 보관한다. 1단계 코드·씬·Prefab 및 테스트 상태는 codex/player-interaction에 분리한다. Queue의 구현 기록은 해당 브랜치의 작업 이력이며 main에 코드가 존재한다는 뜻이 아니다.
+- 사용자는 1단계 직접 조작 테스트 통과를 보고했다. 조작감 보완과 객체 계층 구조의 구체화는 후속 작업으로 미룬다.
