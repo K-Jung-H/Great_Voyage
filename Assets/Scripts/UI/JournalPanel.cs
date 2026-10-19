@@ -59,9 +59,17 @@ namespace GreatVoyage
         }
 
         // Role: 책상 사용 가능 여부에 따라 상호작용 안내를 표시한다.
-        public void ShowPrompt(bool visible)
+        public void ShowPrompt(bool visible, string message = "[E] 항해 일지 열기")
         {
-            if (interactionPrompt != null) interactionPrompt.SetActive(visible && !IsOpen);
+            if (interactionPrompt != null)
+            {
+                interactionPrompt.SetActive(visible && !IsOpen);
+                if (visible)
+                {
+                    Text label = interactionPrompt.GetComponentInChildren<Text>();
+                    if (label != null) label.text = message;
+                }
+            }
         }
 
         // Role: 비활성화된 UI의 입력과 표시를 정리한다.

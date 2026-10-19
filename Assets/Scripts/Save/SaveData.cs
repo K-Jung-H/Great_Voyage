@@ -6,12 +6,13 @@ namespace GreatVoyage
     public sealed class SaveData
     {
         public string format = "GreatVoyage.CabinSession";
-        public int version = 1;
+        public int version = 2;
         public string playthroughId;
         public string playerId = "player";
         public string spaceId = "captains-cabin";
         public double elapsedSeconds = 200d;
         public float playerX;
         public float playerY;
+        public ShipState ship;
     }
 }

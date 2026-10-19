@@ -11,6 +11,8 @@ namespace GreatVoyage
         private Rigidbody2D player;
         [SerializeField, Tooltip("현재 공간의 안정적인 저장 식별자.")]
         private string spaceId = "captains-cabin";
+        [SerializeField, Tooltip("층과 시설 상태를 복원할 함선.")]
+        private ShipLayout ship;
 
         public const double SecondsPerDay = 600d;
         public PauseService Pauses { get; } = new PauseService();
@@ -34,11 +36,15 @@ namespace GreatVoyage
             try
             {
                 if (player == null) throw new InvalidOperationException("플레이어 참조가 연결되지 않았습니다.");
+                if (ship == null) throw new InvalidOperationException("함선 참조가 연결되지 않았습니다.");
                 state = saves.Load(spaceId) ?? new SaveData
                 {
                     playthroughId = Guid.NewGuid().ToString("D"), spaceId = spaceId,
-                    playerX = player.position.x, playerY = player.position.y
+                    playerX = player.position.x * ship.CellSize, playerY = player.position.y * ship.CellSize
                 };
+                state.ship = ship.Initialize(state.ship);
+                if (!ship.ValidPosition(state.ship.activeFloor, new Vector2(state.playerX, state.playerY)))
+                    throw new InvalidDataException("저장 위치가 현재 층의 경계 밖에 있습니다.");
                 player.position = new Vector2(state.playerX, state.playerY);
                 player.linearVelocity = Vector2.zero;
                 IsReady = true;
@@ -74,6 +80,7 @@ namespace GreatVoyage
             {
                 state.playerX = player.position.x;
                 state.playerY = player.position.y;
+                ship.RememberPosition();
                 saves.Save(state, spaceId);
                 ErrorMessage = null;
                 errorPause?.Dispose();

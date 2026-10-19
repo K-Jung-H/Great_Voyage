@@ -873,3 +873,55 @@
 - Git 상태·diff·Rules·State·RoadMap 확인. 기준 836150b, 2단계 구현·사용자 통과·이벤트 시작 체크포인트 명세를 함께 보존한다.
 - started: git add --all; git commit -m '게임 시간·정지·저장 복원 구현'. 성공 후 codex/ship-floors-facilities를 생성한다. 푸시·main 병합 없음. 3단계는 2층·계단·시설 점유/접근과 상태 저장 확장, 기능 테스트는 별도 사용자 확인.
 
+
+- completed: 2단계 커밋 61873c2 생성, 승인한 codex/ship-floors-facilities 전환 성공. Unity CLI 대상 CaptainsCabin, Edit Mode, dirty=false 확인.
+- started: 층/시설 정의와 저장 상태 분리, 격자 점유·계단 접근 경로 검사, 현재 층 표시·층별 위치 복원, v1→v2 저장 호환 구현. 1층에는 침대를 배치하지 않는다. 새로운 UI 편집기·선원·항해는 제외. 씬 수정 전에 기존 저장 파일은 직접 변경하지 않는다.
+
+
+### stage2-commit-stage3-start 결과 — 2026-10-19
+
+- apply_patch로 ShipDefinition/FacilityDefinition/ShipState/ShipLayout/Stairway 생성, GameSession/SaveData/SaveService에 함선 저장 상태·v1→v2 읽기 호환 연결. PlayerInteraction과 JournalPanel의 안내를 계단까지 확장했다. 긴 작성 명령 원문은 해당 코드 파일로 보존하고 여기서는 요약한다.
+- 기존 unity.exe command --project-path D:/Great Voyage recompile; recompile_status completed. Temp/Stage3Authoring/BuildShipFloors.cs를 작성한 뒤 run_script --file Temp/Stage3Authoring/BuildShipFloors.cs --entry BuildShipFloors.Build 성공, diagnostics=[]. 씬·Prefab·SO·meta는 Unity API로 생성했다. 임시 작성 스크립트는 Git 제외이며 실행 의존성 아님.
+- 씬 생성 전 기존 scene dirty=false/Play Mode stopped 확인. 중복 Ship·정의 자산 있으면 재생성 거부하도록 작성. 기존 선실을 2층으로 보존하고 1층/계단/침대 정의 연결, 씬 저장.
+- console_status: compilationFailed=false, 현재 consoleErrors=0/consoleWarnings=0. 앞선 작업의 Pipeline 캡처 카운트 1은 현재 콘솔 오류와 구분한다.
+- 읽기 eval 결과 Missing Script 0, 미연결 필수 참조 [], floorCount=2, startingFloor=deck-2, bedSize=2×1, bedFloors=[deck-2], Bed.prefab 연결, 초기 배치1개, dirty=false. 게임 기능은 실행하지 않았다.
+- Architecture/State/RoadMap에 실제 구조·저장 호환·범위·확인 대기 항목 기록. 사용자 테스트 시 층 이동·표시/충돌 분리·왕복 위치·1층 저장 복원 확인 안내. 추가 커밋·푸시·main 병합·4단계 구현 없음.
+
+## stage3-legacy-save-fix — 2026-10-19T20:10:00+09:00
+
+- 사용자 원문: 테스트 불가능 " 저장을 불러오지 못했습니다. 기존 파일은 보존됩니다.
+함선 또는 현재 층 상태가 유효하지 않습니다.
+UnityEngine.Debug:LogError (object,UnityEngine.Object)
+GreatVoyage.GameSession:Awake () (at Assets/Scripts/Game/GameSession.cs:56)
+
+" 지속 발생, 이전 테스트 데이터 파일과 충돌하는 것으로 의심됨
+- completed (소급 요약): Git 상태 및 Rules/State/저장 코드 확인. 기존 3단계 미커밋 변경 보존. 저장 파일 일반 읽기는 접근 거부, 권한 확장 후 Get-Content 성공(exit 0). cabin-session.json은 version=1, ship 필드 없음, elapsedSeconds=218.342231628485, 위치=(1.2291204929351807,2.3805558681488037). 원본 변경 없음.
+- completed: unity.exe command --project-path D:/Great Voyage editor_status → ready, compiling=false, playMode=stopped, 대상 경로 일치(exit 0).
+- started: SaveService.Load의 v1 변환에서 ship을 명시적으로 null로 정규화해 ShipLayout의 초기 함선 생성 경로 사용. 위치/시간 보존, v2 손상 데이터 거부 유지. 이후 recompile/recompile_status로 컴파일만 확인. 기능 테스트·저장 삭제·커밋 없음.
+- completed: apply_patch로 SaveService.cs의 v1 변환에 ship=null 추가. 기존 저장 파일은 변경하지 않음. recompile → compiling, recompile_status → completed, console_status → compilationFailed=false/consoleErrors=0. 캡처 누적 error=6과 샘플 compiling=true는 과거 샘플이며 최신 recompile_status 완료와 구분한다.
+- completed: git diff --check에서 기존 Unity 직렬화 씬의 trailing whitespace 발견, 본 수정 대상이 아니므로 씬 변경 없음. ShipLayout.Initialize의 saved ?? NewState() 경로 확인. State 갱신. 명령 정상 출력은 요약했으며 기능 테스트·커밋·푸시는 실행하지 않았다.
+- 결과: 이전 정상 v1 저장의 함선 초기화 누락 수정. 사용자가 다시 Play하여 로드 오류 없이 기존 위치·시간과 2층 함선이 복원되는지 확인 필요.
+
+## stage3-cell-review — 2026-10-19T20:20:00+09:00
+
+- 사용자 원문: 테스트 통과, 침대와 같은 특수 타일은 표준 Cell 크기를 공유할텐데, 이를 반영했나? 크기 규격은 Stair이나 다른 상호작용 Collider, Trigger Area, Wall 도 규격을 공유하게 하려고 하는데
+- completed (소급 기록): git branch --show-current / rev-parse --short HEAD / status --short --branch / diff --stat / diff --cached --stat 조회. codex/ship-floors-facilities, HEAD 61873c2, 기존 3단계 변경 보존, 스테이징 없음. AGENTS/Rules/State, ShipDefinition/FacilityDefinition/Stairway/ShipLayout/PlayerInteraction 읽기. 최초 병렬 출력 일부 잘려 핵심 정의 재조회.
+- completed: rg로 Architecture의 격자 정의와 Temp/Stage3Authoring/BuildShipFloors.cs 작성 코드 확인. cellSize는 시설 위치/격자 환산에 적용되지만 CreateView에서 Prefab 크기/Collider를 환산하지 않는다. 계단 작성 크기는 .9×.9 Unity 단위, 상호작용 거리는 별도 1.25 Unity 단위, Trigger 검색 제외. 벽도 공통 규격 자동 연결 코드가 없다. 기존 작성 스크립트는 현재 에셋 수치의 참고 근거이며 이번에 Editor 자산 조회·변경은 하지 않았다.
+- 결과: 부분 반영 상태를 설명하고 공통 Cell 기준의 점유 크기·물리 영역·상호작용 영역 구분을 제안한다. 사용자 테스트 통과와 추가 규격 요구를 State에 기록. 게임 코드·에셋 변경, 테스트·컴파일·커밋·푸시 없음.
+
+## shared-cell-implementation — 2026-10-19T20:17:00+09:00
+- 사용자 원문: 보완 진행
+- started: 기존 파일에서 공통 Cell 환산 보완. 층 루트의 Cell→Unity 환산으로 벽/계단/Collider/자식 Trigger를 함께 확대, 시설 Prefab 정규화 후 점유 칸 수 적용, 상호작용 거리 Cell 환산. 새 파일 없음. 기능 테스트·커밋 없음.
+- completed: git status/cached diff 확인, 기존 변경 보존. ShipLayout/Stairway/JournalDesk/GameSession 및 씬 작성 코드 읽기. CLI editor_status 성공: D:/Great Voyage, ready, stopped. 전체 출력 대신 관련 결과 요약.
+- completed: apply_patch로 ShipDefinition의 좌표 단위 주석, FacilityDefinition의 Prefab 규약, ShipLayout의 층 스케일/격자 환산/시설 점유 크기, PlayerInteraction의 Cell 거리 및 함선 참조 수정. recompile/recompile_status 완료.
+- started: CLI eval로 clean Edit Mode 확인 후 기존 Bed.prefab의 2×1 제작 좌표를 1×1 정규화하고 PlayerInteraction.ship 참조 연결. 루트 Collider와 자식 시각 비율을 함께 보존. 변경 후 씬/Prefab만 저장. 자동 기능 테스트 없음.
+- completed: eval --timeout 20000 --code로 기존 Bed.prefab을 LoadPrefabContents, 직계 자식 x위치/크기를 2로 나누고 BoxCollider2D.size=one/offset.x÷2, SaveAsPrefabAsset 후 Unload. 기존 player의 SerializedObject.ship에 ShipLayout 할당, clean CaptainsCabin 씬 저장. 성공 diagnostics=[]. 실제 원문 전체 대신 API/인자와 변환을 기록함.
+- completed: 새 게임의 플레이어 시작 위치에도 CellSize 환산 추가. 최종 recompile → recompile_status completed. 읽기 eval: shipAssigned=true, bedUnitCollider=(1,1), bedCells=(2,1), sceneDirty=false, compilationFailed=false. 기능 동작은 실행하지 않음.
+- completed: Architecture/State에 제작 규약과 기존 저장 좌표 보존 한계 기록. 현재 1 Cell 기준 외형/범위 유지. 신규 파일 생성 없음, 기존 Scene/Bed Prefab 및 ShipDefinition/FacilityDefinition/ShipLayout/PlayerInteraction/GameSession 수정. 기능 테스트·커밋·푸시·다음 단계 착수 없음.
+
+## stage3-commit — 2026-10-19
+
+- 사용자 원문: 3단계 통과 커밋 진행
+- completed: git branch/status/diff --stat/diff --cached --stat 확인. 브랜치 codex/ship-floors-facilities, 기존 스테이징 없음, 변경은 3단계 코드/자산/씬/문서. Rules의 커밋 지시 범위 확인. 출력의 반복 줄바꿈 경고는 생략.
+- completed: 사용자 테스트 통과를 State/RoadMap에 반영. 에이전트 추가 테스트 없음.
+- started: 3단계 관련 파일을 명시하여 git add 후 git commit -m '함선 층·시설 및 공통 Cell 규격 구현'. 이후 git status 및 log로 결과 확인. 푸시·main 병합 없음. 커밋 실행 결과는 실행 후 이 세트에 이어 기록한다.

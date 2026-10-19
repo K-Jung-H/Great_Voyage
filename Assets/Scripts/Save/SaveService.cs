@@ -25,6 +25,12 @@ namespace GreatVoyage
                 throw new InvalidDataException("저장 파일 크기가 현재 형식의 범위를 초과합니다.");
             SaveData data = JsonUtility.FromJson<SaveData>(File.ReadAllText(FilePath, Encoding.UTF8));
             Validate(data, expectedSpace);
+            if (data.version == 1)
+            {
+                // v1에는 함선이 없다. 역직렬화된 빈 객체 대신 초기 함선 생성 경로를 사용한다.
+                data.ship = null;
+                data.version = 2;
+            }
             return data;
         }
 
@@ -47,8 +53,10 @@ namespace GreatVoyage
         // Role: 현재 단계에서 해석할 수 있는 식별자·버전·유한한 위치와 시간만 수용한다.
         private static void Validate(SaveData data, string expectedSpace)
         {
-            if (data == null || data.format != "GreatVoyage.CabinSession" || data.version != 1)
+            if (data == null || data.format != "GreatVoyage.CabinSession" || (data.version != 1 && data.version != 2))
                 throw new InvalidDataException("손상되었거나 지원하지 않는 저장 형식입니다.");
+            if (data.version == 2 && data.ship == null)
+                throw new InvalidDataException("함선 상태가 누락된 저장 파일입니다.");
             if (!Guid.TryParse(data.playthroughId, out _) || data.playerId != "player" || data.spaceId != expectedSpace)
                 throw new InvalidDataException("저장된 인물 또는 공간 식별자를 확인할 수 없습니다.");
             if (double.IsNaN(data.elapsedSeconds) || double.IsInfinity(data.elapsedSeconds) || data.elapsedSeconds < 0 || data.elapsedSeconds > 600d * 365000d
