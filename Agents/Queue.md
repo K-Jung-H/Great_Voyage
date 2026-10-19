@@ -4,37 +4,6 @@
 
 기록 원본은 이 문서와 History.md다. 수동 기록·이관 규칙은 Rules.md 참조. 이전 기록은 작업 세트 경계를 유지해 History로 이관한다.
 
-## stage3-commit — 2026-10-19
-
-- 사용자 원문: 3단계 통과 커밋 진행
-- completed: git branch/status/diff --stat/diff --cached --stat 확인. 브랜치 codex/ship-floors-facilities, 기존 스테이징 없음, 변경은 3단계 코드/자산/씬/문서. Rules의 커밋 지시 범위 확인. 출력의 반복 줄바꿈 경고는 생략.
-- completed: 사용자 테스트 통과를 State/RoadMap에 반영. 에이전트 추가 테스트 없음.
-- started: 3단계 관련 파일을 명시하여 git add 후 git commit -m '함선 층·시설 및 공통 Cell 규격 구현'. 이후 git status 및 log로 결과 확인. 푸시·main 병합 없음. 커밋 실행 결과는 실행 후 이 세트에 이어 기록한다.
-- completed: 최초 git add/commit은 .git/index.lock Permission denied(exit 1)로 변경 없이 실패. 권한 확장 후 같은 명시 파일 목록 add 성공, commit 성공(exit 0): e3a6ba6 `함선 층·시설 및 공통 Cell 규격 구현`, 29 files changed. 푸시 없음. 이 실행 결과 기록은 커밋 후 추가된 로컬 미커밋 기록이다.
-
-## stage4-navigation — 2026-10-19
-- 사용자 원문: 4단계 진행.
-- completed (소급 요약): git branch/rev-parse/status/diff/cached 확인. codex/ship-floors-facilities, e3a6ba6. 미커밋 변경은 직전 커밋 결과 Queue 1줄이며 보존한다. Rules/State/RoadMap/Architecture와 GameDesign 항해 규칙 확인. 대량 병렬 출력 일부 생략/절단으로 4단계 본문 및 기획 6.1 재조회.
-- 계획: 수동 항해·출입항 대표 기능. 선착장/방향타/개발 항구2개/고정 해역/별도 세계 위치·방향·속도/HUD/저장·복원/안정 항해완료 ID. 자동조타·세계 생성·바람·계약 제외.
-- pending: e3a6ba6에서 codex/manual-navigation 브랜치 생성 승인 및 항해 시스템의 필요한 코드/자산 생성 범위 확인. 기존 Queue 변경 그대로 보존 예정. 구현/브랜치 생성/기능 테스트 미실행.
-- 사용자 승인 원문: 제안한 브랜치와 범위로 진행
-- completed: git switch -c codex/manual-navigation e3a6ba6 성공(exit 0), Queue/State 변경 보존. CLI editor_status ready/stopped, projectPath D:/Great Voyage. 기존 저장/UI/이동 코드 확인.
-- started: NavigationState/NavigationDefinition/NavigationSession/NavigationPoint 및 meta, 개발용 해역 정의와 갑판 방향타/승하선/공유 항구 공간/HUD 추가. 기존 GameSession/SaveData/SaveService/ShipLayout/PlayerInteraction 연결. 저장 v3와 v1/v2 호환, 항해 ID·출항지 재입항 해제 상태 보존. 기존 저장 직접 변경 없음. 기능 테스트 제외.
-- completed: NavigationState/Definition/Session/Point 및 저장 v3·상호작용·층 표시 연결 코드 작성. 최초 컴파일 recompile_status=completed. 실제 기능 테스트 미실행.
-- started: CLI eval로 clean CaptainsCabin에서 항해 정의(항구 A=(0,0), B=(30,0), 입항3/이탈5, 최대속도4), 방향타·승하선 지점·개발 항구 공간·HUD 작성/참조 연결. ShipDefinition의 갑판 고정 차단/접근 예약 칸에 새 사물 반영. 이후 읽기 참조/컴파일 확인.
-- completed: Unity eval authoring 성공 diagnostics=[]. clean Edit Mode guard 및 중복 구성 방지 후 PrototypeSea 자산, Deck1 Helm/Gangway, Ship 밖 PrototypePort+BoardShip, NavigationStatus Text 생성. GameSession/PlayerInteraction/NavSession/Point 참조 연결. StarterShip deck-1 blocked (10,5,1,1)/(12,1,1,1), reserved (9,5,1,1)/(11,1,1,1) 추가. SaveAssets/SaveScene 성공. 긴 eval 원문은 전체 복사하지 않고 주요 API/좌표/조건을 요약함.
-- completed: 소스 diff와 CameraFollow 확인, console_status groundTruth compilationFailed=false/compiling=false/consoleErrors=0/Warnings=0. 누적 error=6은 이전 캡처. 읽기 eval에서 scene 모든 root의 Missing Script와 새 컴포넌트 직렬화 참조 검사: missingScripts=0, missingReferences=[], navigationPoints=3, portCount=2, A=(0,0), B=(30,0), sceneDirty=false. 런타임 메서드/Play Mode/기능 테스트 실행 없음.
-- completed: Architecture/RoadMap/State에 구현·조작·저장 호환·검증 범위와 사용자 확인 대기 기록. 5단계/커밋/푸시/병합/패키지 변경 없음.
-
-## stage4-commit-push — 2026-10-19
-- 사용자 원문: 4단계 통과, 커밋 및 푸시 진행
-- completed: git branch/rev-parse/status/diff --stat/diff --cached --stat/remote/log 확인. 현재 codex/manual-navigation, HEAD e3a6ba6, 스테이징 없음. 변경은 4단계 코드/자산/씬/문서이며 origin=https://github.com/K-Jung-H/Great_Voyage.git. 이전 미커밋 기록 포함 보존.
-- completed: State/RoadMap/Architecture에 사용자 테스트 통과 반영. 에이전트 추가 테스트 없음.
-- started: 4단계 파일 목록을 명시하여 git add 및 git commit -m '수동 항해·출입항 및 저장 복원 구현'. 성공 후 git push -u origin codex/manual-navigation. 강제 푸시·main 병합·다음 단계 없음. 실행 결과는 같은 세트에 추가한다.
-- completed: 명시 파일 git add/commit 성공(exit 0), 커밋 8276144 `수동 항해·출입항 및 저장 복원 구현`, 23 files changed. 반복 LF/CRLF 경고는 요약. 이 결과는 커밋 후 로컬 기록이다.
-- started: git push -u origin codex/manual-navigation 실행. 승인된 동일 브랜치 일반 푸시만 수행.
-- completed: git push -u origin codex/manual-navigation 성공(exit 0). 원격 새 브랜치 생성, origin/codex/manual-navigation 추적 설정. main 변경·PR 생성 없음. 커밋·푸시 결과를 추가한 Queue만 로컬 미커밋으로 유지한다.
-
 ## merge-stages-1-to-4 — 2026-10-19
 - 사용자 원문: 1,2,3,4 단계에서 생성된 브랜치를 main에 merge 해, 브랜치 병합까지 진행하라는건 아니야.
 - 설명 요청: main 병합과 병합하지 않는다는 표현이 충돌하여 확인 요청.
@@ -139,3 +108,38 @@
 - 사용자 원문: 6단계를 커밋하고, 새 브랜치에서 7단계 구현을 진행해라
 - completed: codex/port-trade-contracts, HEAD bdc0617, 6단계 코드/자산/문서 미커밋 및 cached 비어 있음 확인. Rules/State/항해·선원 구현 재확인. 앞서 제시한 브랜치·신규 파일 범위 승인 확인.
 - started: git add -- Agents Assets; git commit -m '항구 거래·고용·계약 및 정산 구현'; git switch -c codex/journal-autopilot-sleep. 사용자 동작 통과 기록 포함. 푸시·추가 기능 테스트 없음.
+- completed: 6단계 커밋 f7c65b3 생성, codex/journal-autopilot-sleep 브랜치 생성·전환 성공. D03/E02 이미지 직접 확인. 일지 세 영역 구성, 계획선과 조타 분리, 실제 근무 항해사, 취침 중 시간·항해·선원·기록 공통 갱신 및 입항 경계 중단으로 구현한다.
+- started: 승인된 JournalState/JournalSession/JournalMap/PlayerSleep/BedInteraction 추가. 기존 일지 UI, 세션 시간 진행, 항해/선원/고용/저장 및 PortPrototype 참조를 수정. 기능 테스트·푸시 없음.
+- completed: 5개 신규 스크립트와 일지 세 영역 UI/지도 편집·레이어·메모, 공유 시간 간격, 항해사 이동·조타·야간 예외, 침대 선점·취침/불침번 상태, 복원 v8 및 다중 후보 고용 연결 작성. 중간 patch가 문맥 불일치로 실패했고 실제 변경 없음을 rg로 확인 후 재적용했다. 새 기능은 아직 실행하지 않았다.
+- started: Unity recompile로 코드 확인 후 기존 PortPrototype에 직렬화 참조·UI와 추가 항해사 후보를 Unity API로 반영한다.
+- completed: recompile_status completed。Unity eval에서 활성 PortPrototype/dirty=false 및 일지 루트·안내가 형제임을 확인한 뒤 승인된 UI 루트를 교체하고 참조를 저장. JournalMap/JournalSession/PlayerSleep·침대/선원/항해 참조 및 추가 항해사(경력1)/방향타 접근점(2.5,1.5) 설정 완료 diagnostics=[]. 저장 파일 및 게임 동작은 실행하지 않았다. 긴 authoring eval은 API·값 중심 요약 기록이다.
+- started: 코드 경계 검토에서 미세 이동 샘플 누적, 마지막 기록 위치, 취침 전 미기록 사건 소실 및 불침번 복귀 시 경로 이월을 보완. 최종 컴파일 및 읽기 참조 검증을 수행한다.
+- completed: PreviewScene/SerializedObject 확인 결과 Missing scripts=0; missing refs=; extraCandidates=1; navigator=Navigation experience=1; helm=deck-1 (2.50,1.50); mapSize=(860,615); original PortPrototype dirty=False; compilationFailed=False. PreviewScene 종료. 불침번 다른 층 복원/침대 예약 유지, 플레이어 복원 좌표 기준 순찰 시작, 사건 경계 시각/취침 중단 및 경로 이월를 최종 보완했다. 기능 실행은 하지 않았다.
+- completed: Architecture/State/RoadMap에 실제 구현·개발값·복원 순서·이벤트 미구현 범위와 사용자 확인 시나리오 기록. 테스트 통과로 표시하지 않는다.
+- completed: 최종 recompile_status=completed, console_status groundTruth compilationFailed=false/compiling=false/consoleErrors0/consoleWarnings0. 누적 캡처 error14/warn5는 현재 컴파일 결과와 구분한다. git diff --check exit1은 Unity가 저장한 빈 YAML 필드(m_Name/m_Text/targetId/floorId)의 trailing space만 보고했으며 직렬화 내용을 임의 편집하지 않았다. 코드/문서 공백 검사는 별도로 확인한다.
+- completed: FIFO 2개 과거 작업 세트를 원문 그대로 History에 기록/대조 후 Queue에서 제거. 현재 기록 포함 96개 이벤트로 한도100 유지. 7단계 사용자 확인 대기, 7단계 커밋/푸시/8단계 착수/기능 테스트 없음.
+
+## stage7-map-renderer-diagnosis — 2026-10-19
+- 사용자 원문:
+    MissingComponentException: There is no 'CanvasRenderer' attached to the "Map" game object, but a script is trying to access it.
+    You probably need to add a CanvasRenderer to the game object "Map". Or your script needs to check if the component is attached before using it.
+    UnityEngine.Object+MarshalledUnityObject.TryThrowEditorNullExceptionObject (UnityEngine.Object unityObj, System.String parameterName) (at <93e6391e4688454a985ab5dc6ed6bd98>:0)
+    UnityEngine.Bindings.ThrowHelper.ThrowNullReferenceException (System.Object obj) (at <93e6391e4688454a985ab5dc6ed6bd98>:0)
+    UnityEngine.CanvasRenderer.EnableRectClipping (UnityEngine.Rect rect) (at <46f45de80d174b0197ed66b3543ec385>:0)
+    UnityEngine.UI.MaskableGraphic.SetClipRect (UnityEngine.Rect clipRect, System.Boolean validRect) (at ./Library/PackageCache/com.unity.ugui@0727b404f3a0/Runtime/UGUI/UI/Core/MaskableGraphic.cs:148)
+    UnityEngine.UI.RectMask2D.PerformClipping () (at ./Library/PackageCache/com.unity.ugui@0727b404f3a0/Runtime/UGUI/UI/Core/RectMask2D.cs:253)
+    UnityEngine.UI.ClipperRegistry.Cull () (at ./Library/PackageCache/com.unity.ugui@0727b404f3a0/Runtime/UGUI/UI/Core/Culling/ClipperRegistry.cs:55)
+    UnityEngine.UI.CanvasUpdateRegistry.PerformUpdate () (at ./Library/PackageCache/com.unity.ugui@0727b404f3a0/Runtime/UGUI/UI/Core/CanvasUpdateRegistry.cs:212)
+    UnityEngine.Canvas.SendWillRenderCanvases () (at <46f45de80d174b0197ed66b3543ec385>:0)
+    UnityEngine.StackTraceUtility:ExtractStringFromExceptionInternal(Object, String&, String&)
+
+     발생. 문제 원인 파악 필요
+- completed: codex/journal-autopilot-sleep, HEAD f7c65b3, 기존 7단계 미커밋 변경 보존/cached 비어 있음. JournalMap의 CanvasRenderer 요구 선언 부재, JournalPanel.BuildLayout의 RectTransform+JournalMap 생성 확인. 설치된 uGUI Graphic은 RectTransform만 RequireComponent로 지정한다. Rules/State 확인.
+- started: Unity editor_status 및 읽기 eval로 로드된 JournalMap 오브젝트의 실제 컴포넌트 조회, 설치된 MaskableGraphic/표준 Image의 렌더러 요구 및 Scene YAML 대조. 원인 파악 요청이므로 수정·Play 실행·씬 저장은 하지 않는다.
+- completed: editor_status ready/stopped, D:/Great Voyage. 읽기 eval: scene=Assets/Scenes/PortPrototype.unity; object=MapViewport/Map; active=False; CanvasRenderer=False; components=RectTransform,JournalMap. Scene YAML도 동일한2개 컴포넌트만 보유. MaskableGraphic.SetClipRect는 canvasRenderer.EnableRectClipping을 직접 호출하며, 표준 Image는 CanvasRenderer RequireComponent를 별도로 선언함을 설치된 소스에서 확인.
+- 결과: 직접 원인은 JournalMap/생성 코드의 CanvasRenderer 의존성 누락으로 저장된 Map이 렌더러 없이 만들어진 것. RectMask2D 클리핑 시 해당 의존성에 접근해 예외 발생. 이전 컴파일/필드 참조 검사는 이 필수 컴포넌트 조건을 검사하지 못했다. 수정은 JournalMap의 RequireComponent 선언과 기존 Scene Map의 CanvasRenderer 추가가 필요하다. 이번 요청은 원인 조사이므로 코드/씬 수정·기능 테스트·커밋/푸시 없음.
+
+## stage7-map-renderer-fix — 2026-10-19
+- 사용자 원문: 적용해.
+- started: 기존 7단계 미커밋 변경 보존. JournalMap에 RequireComponent(CanvasRenderer) 선언을 추가하고 Unity API로 기존 PortPrototype의 Map에 누락된 CanvasRenderer만 추가한다. 씬 전체 재생성·Play Mode 테스트·커밋/푸시 없이 컴파일 및 컴포넌트 연결 확인을 수행한다.
+- completed: JournalMap에 RequireComponent(typeof(CanvasRenderer)) 추가. recompile_status completed. Unity eval로 clean PortPrototype의 Map에 Undo.AddComponent<CanvasRenderer> 추가/저장 성공: CanvasRenderer=True; added=True; dirty=False; compilationFailed=False. console_status groundTruth 현재 오류0/경고0. 누적 캡처2000건은 현재 컴파일 결과와 구분. Play/클리핑 기능 테스트 미실행, 커밋·푸시 없음.

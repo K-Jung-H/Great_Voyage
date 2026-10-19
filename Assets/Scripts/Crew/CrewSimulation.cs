@@ -13,6 +13,8 @@ namespace GreatVoyage
         [SerializeField, Tooltip("시간·정지·저장을 관리하는 세션.")] private GameSession session;
         [SerializeField, Tooltip("층 경로와 시설 상태의 원본.")] private ShipLayout ship;
         [SerializeField, Tooltip("개발용 상태 표시. 정식 빈 선원 구성에서는 생략 가능.")] private Text statusLabel;
+        [SerializeField] private NavigationSession navigation;
+        private const string HelmTarget = "navigation-helm";
         private CrewRosterState state;
         private readonly Dictionary<string, string> claims = new Dictionary<string, string>();
         private readonly Dictionary<string, CrewView> views = new Dictionary<string, CrewView>();
@@ -24,6 +26,15 @@ namespace GreatVoyage
         public bool IsReady => state != null && session.IsReady;
         public float CellSize => ship.CellSize;
         public float BodyRadius => settings.bodyRadius;
+        public bool HelmsmanReady => state != null && state.members.Exists(member => member.activity == CrewActivity.Helming
+            && member.availability == CrewAvailability.Ready && AtWorkPosition(member) && TargetUsable(member));
+
+        // Role: 플레이어가 사용할 침대의 선점 가능 여부를 확인한다.
+        public bool PlayerBedAvailable(string id) => !claims.TryGetValue(id, out string owner) || owner == "player";
+        // Role: 침대를 플레이어에게 예약해 선원과의 중복 사용을 방지한다.
+        public bool ReservePlayerBed(string id) { if (!PlayerBedAvailable(id)) return false; claims[id] = "player"; return true; }
+        // Role: 취침 종료 시 플레이어의 침대 예약만 해제한다.
+        public void ReleasePlayerBed(string id) { if (!string.IsNullOrEmpty(id) && claims.TryGetValue(id, out string owner) && owner == "player") claims.Remove(id); }
 
         // Role: 안정 ID로 현재 승선 선원을 조회한다.
         public CrewState FindMember(string id) => state.members.Find(member => member.id == id);
@@ -159,6 +170,7 @@ namespace GreatVoyage
                 || !Enum.IsDefined(typeof(CrewActivity), member.activity) || !Enum.IsDefined(typeof(CrewAvailability), member.availability)
                 || !Enum.IsDefined(typeof(CrewSpecialty), member.specialty) || !Enum.IsDefined(typeof(CrewDuty), member.primaryDuty)
                 || (member.primaryDuty == CrewDuty.Maintenance && member.specialty != CrewSpecialty.Maintenance)
+                || member.navigationExperience < 0 || (member.primaryDuty == CrewDuty.Navigation && !QualifiedNavigator(member))
                 || (member.health == 0 && member.availability != CrewAvailability.Dead))
                 throw new InvalidDataException("저장된 선원 상태가 유효하지 않습니다.");
             foreach (CrewWaypoint point in member.path)
@@ -223,7 +235,8 @@ namespace GreatVoyage
                 return;
             }
             bool sleeping = member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Sleeping;
-            bool needsSleep = night || member.energy <= settings.sleepThreshold || (sleeping && member.energy < settings.wakeThreshold);
+            bool navigationDuty = navigation != null && navigation.NeedsNavigator && member.primaryDuty == CrewDuty.Navigation && QualifiedNavigator(member);
+            bool needsSleep = !navigationDuty && (night || session.IsSleeping || member.energy <= settings.sleepThreshold || (sleeping && member.energy < settings.wakeThreshold));
             if (needsSleep)
             {
                 if (!sleeping || !OwnsUsableTarget(member))
@@ -236,6 +249,16 @@ namespace GreatVoyage
                 return;
             }
             if (sleeping) { Cancel(member); return; }
+            if (member.activity == CrewActivity.GoingToHelm || member.activity == CrewActivity.Helming)
+            {
+                if (!navigationDuty || !OwnsUsableTarget(member)) Cancel(member);
+                else return;
+            }
+            if (navigationDuty)
+            {
+                if (member.activity != CrewActivity.Idle) Cancel(member);
+                TryStartHelm(member); return;
+            }
             if (member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing)
             {
                 if (!OwnsUsableTarget(member) || state.repairTools == 0) { Cancel(member); return; }
@@ -343,11 +366,29 @@ namespace GreatVoyage
         // Role: 생활 판단과 독립적으로 물리 간격에서 연속 이동을 갱신한다.
         private void FixedUpdate()
         {
+            if (!IsReady || session.IsSleeping) return;
+            AdvanceMovement(Time.fixedDeltaTime);
+        }
+
+        // Role: 취침 가속 중 물리를 비활성화하고 같은 논리 steering을 작은 간격으로 진행한다.
+        public void AdvanceSleepMovement(float seconds)
+        {
+            HideForSleep(); AdvanceMovement(seconds);
+        }
+
+        // Role: 화면 밖 이동으로 전환하기 전에 실제 물리 위치를 수집한다.
+        public void HideForSleep()
+        {
+            foreach (CrewView view in views.Values) view.SynchronizeVisibility(false);
+        }
+
+        // Role: 실제 또는 취침 시뮬레이션 간격으로 선원의 이동을 처리한다.
+        private void AdvanceMovement(float seconds)
+        {
             if (!IsReady) return;
             foreach (CrewState member in state.members) views[member.id].SynchronizeVisibility(IsVisible(member));
             CapturePositions();
             if (session.IsPaused) { StopWhenPaused(); return; }
-            float seconds = Time.fixedDeltaTime;
             foreach (CrewState member in state.members)
             {
                 member.repathRemaining = Mathf.Max(0, member.repathRemaining - seconds);
@@ -411,6 +452,12 @@ namespace GreatVoyage
             {
                 view.DriveVelocity(Vector2.zero, settings.acceleration, settings.normalMass);
                 if (member.activity == CrewActivity.Wandering) { Cancel(member); return; }
+                if (member.activity == CrewActivity.GoingToHelm)
+                {
+                    if (member.floorId == settings.helmFloor && Vector2.Distance(member.position, settings.helmPosition) <= settings.arrivalRadius)
+                    { member.activity = CrewActivity.Helming; member.velocity = Vector2.zero; view.ApplyVelocity(Vector2.zero); BeginWorkPosition(member); }
+                    return;
+                }
                 FacilityState target = ship.GetFacility(member.targetId);
                 if (target != null && member.floorId == target.floorId && ship.IsAtFacilityAccess(target.id, member.position, settings.arrivalRadius))
                 {
@@ -440,7 +487,9 @@ namespace GreatVoyage
         {
             member.repathRemaining = settings.repathInterval;
             CrewWaypoint destination = workDestination ?? member.destination;
-            if (workDestination == null && member.activity != CrewActivity.Wandering)
+            if (workDestination == null && member.targetId == HelmTarget)
+                destination = new CrewWaypoint { floorId = settings.helmFloor, position = settings.helmPosition };
+            else if (workDestination == null && member.activity != CrewActivity.Wandering)
             {
                 FacilityState target = ship.GetFacility(member.targetId);
                 if (target == null || !ship.TryGetAccessCell(target.id, out Vector2 access)) { Cancel(member); return false; }
@@ -594,6 +643,8 @@ namespace GreatVoyage
         // Role: 현재 시설이 행동 자격과 기능 조건을 계속 만족하는지 검사한다.
         private bool TargetUsable(CrewState member)
         {
+            if (member.targetId == HelmTarget) return QualifiedNavigator(member) && member.primaryDuty == CrewDuty.Navigation
+                && navigation != null && navigation.NeedsNavigator && ship.IsWalkablePosition(settings.helmFloor, settings.helmPosition);
             FacilityState item = ship.GetFacility(member.targetId);
             if (item == null || item.durability <= 0) return false;
             FacilityDefinition kind = ship.GetFacilityDefinition(item.definitionId);
@@ -626,8 +677,9 @@ namespace GreatVoyage
             if (!IsReady || session.IsPaused || !Enum.IsDefined(typeof(CrewDuty), duty)) return;
             CrewState member = state.members.Find(candidate => candidate.id == id);
             if (member == null || member.availability != CrewAvailability.Ready || (duty == CrewDuty.Maintenance && member.specialty != CrewSpecialty.Maintenance)) return;
+            if (duty == CrewDuty.Navigation && !QualifiedNavigator(member)) return;
             member.primaryDuty = duty;
-            if (member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing) Cancel(member);
+            if (member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing || member.targetId == HelmTarget) Cancel(member);
         }
 
         // Role: 사망·수감·전투 등 외부 시스템의 업무 중단을 즉시 반영한다.
@@ -654,7 +706,7 @@ namespace GreatVoyage
         }
 
         // Role: 표시만 현재 층에 제한하고 시뮬레이션은 모든 층에서 유지한다.
-        public bool IsVisible(CrewState member) => IsReady && member.availability != CrewAvailability.Dead && ship.IsFloorVisible(member.floorId);
+        public bool IsVisible(CrewState member) => IsReady && !session.IsSleeping && member.availability != CrewAvailability.Dead && ship.IsFloorVisible(member.floorId);
 
         // Role: 자원·행동·시설 선점 상태를 개발 HUD로 표시한다.
         private void LateUpdate()
@@ -678,16 +730,29 @@ namespace GreatVoyage
         private static string ActivityName(CrewActivity activity) => activity switch
         {
             CrewActivity.GoingToRepair => "수리 이동", CrewActivity.Repairing => "수리", CrewActivity.GoingToBed => "취침 이동",
-            CrewActivity.Sleeping => "취침", CrewActivity.Eating => "식사", CrewActivity.Wandering => "배회", _ => "휴식"
+            CrewActivity.Sleeping => "취침", CrewActivity.Eating => "식사", CrewActivity.Wandering => "배회", CrewActivity.GoingToHelm => "방향타 이동", CrewActivity.Helming => "조타", _ => "휴식"
         };
         // Role: 전체 경로를 런타임 캐시로 사용하는 이동 행동을 구분한다.
-        private static bool IsNavigating(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Wandering;
+        private static bool IsNavigating(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Wandering || member.activity == CrewActivity.GoingToHelm;
         // Role: 밀림 저항과 작업 시작점 복귀가 필요한 행동을 구분한다.
-        private static bool IsWorking(CrewState member) => member.activity == CrewActivity.Repairing || member.activity == CrewActivity.Sleeping || member.activity == CrewActivity.Eating;
+        private static bool IsWorking(CrewState member) => member.activity == CrewActivity.Repairing || member.activity == CrewActivity.Sleeping || member.activity == CrewActivity.Eating || member.activity == CrewActivity.Helming;
         // Role: 작업 복귀 경로가 필요한 밀림 상태를 구분한다.
         private bool IsReturning(CrewState member) => IsWorking(member) && member.hasWorkPosition && !AtWorkPosition(member);
         // Role: 시설 선점이 필요한 행동인지 구분한다.
-        private static bool HasTarget(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Sleeping;
+        private static bool HasTarget(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Sleeping || member.activity == CrewActivity.GoingToHelm || member.activity == CrewActivity.Helming;
+        // Role: 항해 특기와 최소 항해 경력을 함께 확인한다.
+        public static bool QualifiedNavigator(CrewState member) => member.specialty == CrewSpecialty.Navigation && member.navigationExperience >= 1;
+
+        // Role: 유효한 항해사가 방향타 접근 지점을 선점하고 이동을 시작한다.
+        private void TryStartHelm(CrewState member)
+        {
+            if (member.repathRemaining > 0 || claims.ContainsKey(HelmTarget)) return;
+            member.repathRemaining = settings.repathInterval;
+            if (!BuildPath(member, settings.helmFloor, settings.helmPosition, out List<CrewWaypoint> path)) return;
+            claims.Add(HelmTarget, member.id); member.targetId = HelmTarget; member.path = path;
+            member.destination = new CrewWaypoint { floorId = settings.helmFloor, position = settings.helmPosition };
+            member.activity = CrewActivity.GoingToHelm;
+        }
         // Role: 0~100 상태 수치인지 검사한다.
         private static bool Percent(float value) => Finite(value) && value >= 0 && value <= 100;
         // Role: 수치가 유한한지 검사한다.

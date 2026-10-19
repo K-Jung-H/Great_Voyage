@@ -67,6 +67,8 @@ namespace GreatVoyage
             }
             if (data.version < 7) { data.economyEnabled = false; data.version = 7; }
             if (!data.economyEnabled) data.economy = null;
+            if (data.version < 8) { data.journalEnabled = false; data.version = 8; }
+            if (!data.journalEnabled) { data.journal = null; data.sleep = null; }
             return data;
         }
 
@@ -94,7 +96,7 @@ namespace GreatVoyage
         // Role: 현재 단계에서 해석할 수 있는 식별자·버전·유한한 위치와 시간만 수용한다.
         private static void Validate(SaveData data, string expectedSpace)
         {
-            if (data == null || data.format != "GreatVoyage.CabinSession" || data.version < 1 || data.version > 7)
+            if (data == null || data.format != "GreatVoyage.CabinSession" || data.version < 1 || data.version > 8)
                 throw new InvalidDataException("손상되었거나 지원하지 않는 저장 형식입니다.");
             if (data.version >= 2 && data.ship == null)
                 throw new InvalidDataException("함선 상태가 누락된 저장 파일입니다.");
@@ -106,6 +108,8 @@ namespace GreatVoyage
                 throw new InvalidDataException("경제 상태가 누락된 저장 파일입니다.");
             if (data.version >= 7 && !data.economyEnabled && data.economy != null && !string.IsNullOrEmpty(data.economy.settingsId))
                 throw new InvalidDataException("경제 사용 여부와 저장 상태가 일치하지 않습니다.");
+            if (data.version >= 8 && data.journalEnabled && (data.journal == null || data.sleep == null))
+                throw new InvalidDataException("일지 또는 취침 상태가 누락되었습니다.");
             if (!Guid.TryParse(data.playthroughId, out _) || data.playerId != "player" || data.spaceId != expectedSpace)
                 throw new InvalidDataException("저장된 인물 또는 공간 식별자를 확인할 수 없습니다.");
             if (double.IsNaN(data.elapsedSeconds) || double.IsInfinity(data.elapsedSeconds) || data.elapsedSeconds < 0 || data.elapsedSeconds > 600d * 365000d

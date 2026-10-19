@@ -13,6 +13,8 @@ MonoBehaviour:
   m_Name: PortCrew
   m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.CrewSettings
   id: port-prototype-crew
+  helmFloor: deck-1
+  helmPosition: {x: 2.5, y: 1.5}
   prefab: {fileID: 3800295336126448159, guid: ed778ec7aa4795b409b2df5c7b325649, type: 3}
   initialCrew: []
   initialFood: 20

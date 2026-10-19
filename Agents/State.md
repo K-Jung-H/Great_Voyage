@@ -274,3 +274,21 @@
 
 ### 6단계 커밋 및 7단계 승인 — 2026-10-19
 - 사용자 요청으로 6단계 변경 전체를 커밋하고 새 codex/journal-autopilot-sleep 브랜치를 생성한다. 앞서 제시한 7단계 신규 파일5개 및 기존 시스템·PortPrototype 확장 범위 승인으로 판단한다. 6단계 사용자 동작 통과. 푸시는 요청되지 않았다.
+
+### 7단계 구현 및 사용자 확인 대기 — 2026-10-19
+- 6단계 커밋 f7c65b3(항구 거래·고용·계약 및 정산 구현) 완료. 현재 codex/journal-autopilot-sleep. 푸시 없음. 이번 7단계 변경은 미커밋이다.
+- 신규 JournalState/JournalSession/JournalMap/PlayerSleep/BedInteraction 및 meta, 기존 PortPrototype UI/참조·후보 설정·일지/선원/항해/시간/고용/저장 연결 수정. 별도 씬·패키지 추가 없음.
+- 구현 범위와 상태 소유권은 Architecture 7단계 절 참조. 일지 지도·기록/계획·메모/레이어, 자격/방향타 작업 위치 기반 자동 조타, 수면20배속·06시/입항 중단, 경로 공백/취침 이월, v8 저장 복원 및 불침번/사건 연결점 구현. 사건 발생/체크포인트는8단계에 남긴다.
+- PreviewScene 참조 확인: missing scripts0/필수 누락0, 추가 항해사1/Navigation 경력1, helm deck-1(2.5,1.5), 지도860x615, 원래 활성 PortPrototype dirty=false. 코드 컴파일 실패 없음 확인. 최종 컴파일 결과는 Queue에 기록한다.
+- 사용자 확인: 주점 다음 후보→항해사 고용→함장실 책상에서 계획 펜/자동 조타 요청→수동 출항 및 조타 종료→항해사의 방향타 이동/조타→기록·침대 취침→입항/기상 중단·일지 이월→저장 재개. 항해사가 없는 경우 계획선만으로 조타되지 않는 조건도 확인 대상이다. 실제 기능 테스트는 에이전트 미실행.
+- 이후 7단계 사용자 결과를 확인하고 요청한 게임 구조 논의를 재개한다. 8단계로 자동 전환하지 않는다.
+- 최종 컴파일 확인: completed, compilationFailed=false/현재 오류0/경고0. Unity 생성 YAML 빈 필드 후행 공백 외에 기능 오류를 확인한 것은 없다. 실제 기능 테스트 미실행 상태 유지.
+
+### 7단계 Map 오류 원인 확인 — 2026-10-19
+- 사용자 기능 확인 중 MissingComponentException 발생으로 7단계 통과 아님. 원인 조사 결과 PortPrototype의 Map에는 RectTransform/JournalMap만 있고 CanvasRenderer가 실제 누락됨. JournalMap은 MaskableGraphic을 상속하지만 렌더러 요구 선언이 없으며 생성 코드도 추가하지 않았다. RectMask2D→MaskableGraphic.SetClipRect→CanvasRenderer 접근 시 예외가 발생한다.
+- 필요한 수정: JournalMap에 CanvasRenderer RequireComponent 명시 및 이미 생성된 Map에도 실제 CanvasRenderer 추가. 이전 컴파일/직렬화 필드 참조 검사는 이 의존성을 포함하지 못했다.
+- 이번 요청에서는 원인만 확인했고 코드/씬 수정·Play 실행 없음. 현재 브랜치/7단계 미커밋 변경 보존. 기록 ID stage7-map-renderer-diagnosis.
+
+### Map 렌더러 수정 적용 — 2026-10-19
+- 사용자 승인으로 JournalMap의 CanvasRenderer 필수 선언 및 기존 PortPrototype/Map의 실제 CanvasRenderer 추가/저장 완료. 재생성 시 필수 컴포넌트가 자동 추가된다.
+- 컴파일 completed/compilationFailed=false/현재 오류0/경고0, 씬 dirty=false. 실제 일지 열기/클리핑은 사용자 재확인 대기. Play Mode·커밋·푸시 없음. 기록 ID stage7-map-renderer-fix.

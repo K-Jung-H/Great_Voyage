@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace GreatVoyage
 {
-    public enum CrewSpecialty { None, Maintenance }
-    public enum CrewDuty { None, Maintenance }
+    public enum CrewSpecialty { None, Maintenance, Navigation }
+    public enum CrewDuty { None, Maintenance, Navigation }
     public enum CrewAvailability { Ready, Dead, Imprisoned, Combat }
-    public enum CrewActivity { Idle, GoingToRepair, Repairing, GoingToBed, Sleeping, Eating, Wandering }
+    public enum CrewActivity { Idle, GoingToRepair, Repairing, GoingToBed, Sleeping, Eating, Wandering, GoingToHelm, Helming }
 
     [Serializable]
     public sealed class CrewWaypoint
@@ -23,6 +23,7 @@ namespace GreatVoyage
         public string displayName;
         public CrewSpecialty specialty;
         public CrewDuty primaryDuty;
+        public int navigationExperience;
         public CrewAvailability availability;
         public string floorId;
         public Vector2 position;

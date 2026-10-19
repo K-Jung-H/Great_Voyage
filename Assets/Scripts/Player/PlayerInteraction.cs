@@ -40,7 +40,7 @@ namespace GreatVoyage
             if (journal == null || ship == null) return;
             bool steering = navigation != null && navigation.IsSteering;
             movement.SetInputBlocked(journal.IsOpen || steering);
-            if (journal.IsOpen || (session != null && session.IsPaused))
+            if (journal.IsOpen || (session != null && (session.IsPaused || session.IsSleeping)))
             {
                 journal.ShowPrompt(false);
                 return;
@@ -61,6 +61,7 @@ namespace GreatVoyage
             NavigationPoint nearestNavigation = null;
             CrewView nearestCrew = null;
             PortServicePoint nearestService = null;
+            BedInteraction nearestBed = null;
             float range = interactionRange * ship.CellSize;
             float nearestDistance = range;
             Vector2 origin = transform.position;
@@ -73,11 +74,13 @@ namespace GreatVoyage
                 CrewView crew = candidates[i].GetComponentInParent<CrewView>();
                 PortServicePoint service = candidates[i].GetComponentInParent<PortServicePoint>();
                 if (service != null && !service.Available) service = null;
+                BedInteraction bed = candidates[i].GetComponentInParent<BedInteraction>();
+                if (bed != null && !bed.Available) bed = null;
                 if (crew != null && !crew.Available) crew = null;
                 if (navigationPoint != null && !navigationPoint.Available) navigationPoint = null;
-                if (desk == null && stair == null && navigationPoint == null && crew == null && service == null) continue;
-                Vector2 point = desk != null ? desk.InteractionPosition : stair != null ? stair.InteractionPosition : navigationPoint != null ? navigationPoint.InteractionPosition : crew != null ? crew.InteractionPosition : service.InteractionPosition;
-                Transform target = desk != null ? desk.transform : stair != null ? stair.transform : navigationPoint != null ? navigationPoint.transform : crew != null ? crew.transform : service.transform;
+                if (desk == null && stair == null && navigationPoint == null && crew == null && service == null && bed == null) continue;
+                Vector2 point = bed != null ? bed.InteractionPosition : desk != null ? desk.InteractionPosition : stair != null ? stair.InteractionPosition : navigationPoint != null ? navigationPoint.InteractionPosition : crew != null ? crew.InteractionPosition : service.InteractionPosition;
+                Transform target = bed != null ? bed.transform : desk != null ? desk.transform : stair != null ? stair.transform : navigationPoint != null ? navigationPoint.transform : crew != null ? crew.transform : service.transform;
                 float distance = Vector2.Distance(origin, point);
                 if (distance > nearestDistance || !CanReach(target, point)) continue;
                 nearest = desk;
@@ -85,12 +88,15 @@ namespace GreatVoyage
                 nearestNavigation = navigationPoint;
                 nearestCrew = crew;
                 nearestService = service;
+                nearestBed = bed;
                 nearestDistance = distance;
             }
 
-            journal.ShowPrompt(nearest != null || nearestStair != null || nearestNavigation != null || nearestCrew != null || nearestService != null,
-                nearestService != null ? nearestService.Prompt : nearestCrew != null ? nearestCrew.Prompt : nearestNavigation != null ? nearestNavigation.Prompt : nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
-            if (nearestService != null && interactAction.WasPressedThisFrame()) nearestService.Interact();
+            journal.ShowPrompt(nearest != null || nearestStair != null || nearestNavigation != null || nearestCrew != null || nearestService != null || nearestBed != null,
+                nearestBed != null ? nearestBed.Prompt : nearestService != null ? nearestService.Prompt : nearestCrew != null ? nearestCrew.Prompt : nearestNavigation != null ? nearestNavigation.Prompt : nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
+            if (interactAction.WasPressedThisFrame() && nearest == null && nearestBed == null && (nearestService != null || nearestCrew != null || nearestNavigation != null || nearestStair != null)) session?.MarkInteraction();
+            if (nearestBed != null && interactAction.WasPressedThisFrame()) nearestBed.Interact();
+            else if (nearestService != null && interactAction.WasPressedThisFrame()) nearestService.Interact();
             else if (nearestCrew != null && interactAction.WasPressedThisFrame()) nearestCrew.Interact();
             else if (nearestNavigation != null && interactAction.WasPressedThisFrame())
             {

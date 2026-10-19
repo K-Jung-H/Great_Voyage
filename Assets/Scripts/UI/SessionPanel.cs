@@ -22,6 +22,7 @@ namespace GreatVoyage
         private Text errorLabel;
         [SerializeField, Tooltip("개발 씬 전용 선원·침대·자원 재준비 버튼.")]
         private Button crewResetButton;
+        [SerializeField] private PlayerSleep sleep;
         private IDisposable pause;
 
         // Role: 정지 메뉴의 버튼을 연결한다.
@@ -41,6 +42,7 @@ namespace GreatVoyage
             int day = (int)Math.Floor(days) + 1;
             int minute = (int)((days - Math.Floor(days)) * 1440d);
             clockLabel.text = $"{day}일  {minute / 60:00}:{minute % 60:00}" + (session.IsPaused ? "  · 정지" : "");
+            if (sleep != null && !string.IsNullOrEmpty(sleep.Status)) clockLabel.text += "\n" + sleep.Status;
             errorLabel.text = session.ErrorMessage ?? "";
             errorLabel.gameObject.SetActive(!string.IsNullOrEmpty(session.ErrorMessage));
         }

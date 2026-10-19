@@ -31,9 +31,37 @@ MonoBehaviour:
     displayName: "\uC815\uBE44 \uC120\uC6D0"
     specialty: 1
     primaryDuty: 1
+    navigationExperience: 0
     availability: 0
     floorId: deck-1
     position: {x: -3.5, y: -1.5}
+    velocity: {x: 0, y: 0}
+    repathRemaining: 0
+    health: 100
+    happiness: 100
+    hunger: 0
+    energy: 100
+    activity: 0
+    targetId: 
+    remainingSeconds: 0
+    destination:
+      floorId: 
+      position: {x: 0, y: 0}
+    nextWaypoint:
+      floorId: 
+      position: {x: 0, y: 0}
+    hasWorkPosition: 0
+    workPosition: {x: 0, y: 0}
+    wanderSequence: 0
+  additionalCandidates:
+  - id: hire-navigator-001
+    displayName: "\uC77C\uB4F1 \uD56D\uD574\uC0AC"
+    specialty: 2
+    primaryDuty: 2
+    navigationExperience: 1
+    availability: 0
+    floorId: deck-1
+    position: {x: -2.5, y: -1.5}
     velocity: {x: 0, y: 0}
     repathRemaining: 0
     health: 100

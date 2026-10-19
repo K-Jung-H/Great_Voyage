@@ -12,8 +12,8 @@ namespace GreatVoyage
         private SpriteRenderer[] renderers;
         private bool visible;
         public Vector2 InteractionPosition => body.position;
-        public string Prompt => $"[E] {state.displayName} 주업무: {(state.primaryDuty == CrewDuty.None ? "없음 → 정비" : "정비 → 없음")}";
-        public bool Available => simulation != null && simulation.IsReady && state.availability == CrewAvailability.Ready && state.specialty == CrewSpecialty.Maintenance;
+        public string Prompt => $"[E] {state.displayName} 주업무: {(state.primaryDuty == CrewDuty.None ? "없음 → " + (state.specialty == CrewSpecialty.Navigation ? "항해" : "정비") : "근무 → 없음")}";
+        public bool Available => simulation != null && simulation.IsReady && state.availability == CrewAvailability.Ready && (state.specialty == CrewSpecialty.Maintenance || CrewSimulation.QualifiedNavigator(state));
         public bool IsSimulated => body != null && body.simulated;
 
         // Role: 표시·물리 인스턴스를 저장 가능한 선원 상태에 연결한다.
@@ -85,7 +85,7 @@ namespace GreatVoyage
         // Role: 선원 직접 상호작용으로 주 업무를 전환한다.
         public void Interact()
         {
-            if (Available) simulation.SetDuty(state.id, state.primaryDuty == CrewDuty.None ? CrewDuty.Maintenance : CrewDuty.None);
+            if (Available) simulation.SetDuty(state.id, state.primaryDuty == CrewDuty.None ? (state.specialty == CrewSpecialty.Navigation ? CrewDuty.Navigation : CrewDuty.Maintenance) : CrewDuty.None);
         }
     }
 }

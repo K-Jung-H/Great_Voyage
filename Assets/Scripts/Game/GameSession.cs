@@ -23,6 +23,11 @@ namespace GreatVoyage
         private bool allowCrewPrototypeReset;
 
         [SerializeField, Tooltip("항구 거래·계약. 기존 개발 씬에서는 생략 가능.")] private EconomySession economy;
+        [SerializeField] private JournalSession journal;
+        [SerializeField] private PlayerSleep sleep;
+        public bool IsSleeping => sleep != null && sleep.IsSleeping;
+        public double EventBoundary { get; private set; } = double.PositiveInfinity;
+        public event Action EventBoundaryReached;
         // Role: 경제 시스템이 연결된 경우 출항 전 미정산 상태를 검사한다.
         public bool CanDepart() => economy == null || economy.CanDepart();
 
@@ -62,10 +67,19 @@ namespace GreatVoyage
                 if (!navigation.ValidPlayerPosition(new Vector2(state.playerX, state.playerY)))
                     throw new InvalidDataException("저장 위치가 현재 공간의 경계 밖에 있습니다.");
                 if (crew == null) throw new InvalidOperationException("선원 시뮬레이션 참조가 연결되지 않았습니다.");
+                if ((journal == null) != (sleep == null)) throw new InvalidDataException("일지와 취침 참조는 함께 연결해야 합니다.");
+                if (journal != null) state.journal = journal.Initialize(state.journal);
                 state.crew = crew.Initialize(state.crew);
                 if (economy != null) state.economy = economy.Initialize(state.economy);
                 else if (state.economy != null) throw new InvalidDataException("경제 저장을 복원할 시스템 참조가 없습니다.");
                 state.economyEnabled = economy != null;
+                if (journal != null)
+                {
+                    player.position = new Vector2(state.playerX, state.playerY);
+                    state.sleep = sleep.Initialize(state.sleep);
+                }
+                else if (state.journalEnabled) throw new InvalidDataException("일지 저장을 복원할 시스템이 없습니다.");
+                state.journalEnabled = journal != null;
                 player.position = new Vector2(state.playerX, state.playerY);
                 player.linearVelocity = Vector2.zero;
                 IsReady = true;
@@ -86,11 +100,46 @@ namespace GreatVoyage
         {
             if (IsReady && !IsPaused)
             {
-                float seconds = Time.unscaledDeltaTime;
-                state.elapsedSeconds += seconds;
-                crew.Advance(seconds, state.elapsedSeconds);
+                float budget = Mathf.Min(Time.unscaledDeltaTime, .25f) * (sleep != null ? sleep.TimeScale : 1);
+                bool fast = IsSleeping;
+                while (budget > .000001f && !IsPaused)
+                {
+                    float step = Mathf.Min(budget, .05f);
+                    if (sleep != null) step = sleep.LimitStep(step);
+                    step = (float)Math.Min(step, Math.Max(0, EventBoundary - state.elapsedSeconds));
+                    if (step <= .000001f)
+                    {
+                        if (EventBoundary <= state.elapsedSeconds + .00001)
+                        { EventBoundary = double.PositiveInfinity; EventBoundaryReached?.Invoke(); if (IsSleeping) sleep.Wake(); break; }
+                        sleep?.Advance(0); break;
+                    }
+                    Vector2 previous = navigation.WorldPosition;
+                    bool moving = !navigation.IsDocked;
+                    float consumed = navigation.AdvanceTime(step);
+                    state.elapsedSeconds += consumed;
+                    crew.Advance(consumed, state.elapsedSeconds);
+                    if (fast) crew.AdvanceSleepMovement(consumed);
+                    int day = (int)(state.elapsedSeconds / SecondsPerDay) + 1;
+                    if (moving) journal?.ObserveMovement(previous, navigation.WorldPosition, sleep != null ? sleep.RecordDay(day) : day,
+                        sleep != null && sleep.State.mode != PlayerRest.Awake);
+                    bool arrived = moving && navigation.IsDocked;
+                    if (arrived) { journal?.Arrive(navigation.DockedPort); sleep?.Wake(); }
+                    else sleep?.Advance(consumed);
+                    navigation.NotifyArrival();
+                    budget -= consumed;
+                    if (arrived || (fast && !IsSleeping) || consumed <= 0) break;
+                }
             }
         }
+
+        // Role: 다음 단계 사건 시스템이 정확한 발생 시각에 진행을 중단하도록 예약한다.
+        public void ScheduleEventBoundary(double elapsed)
+        {
+            if (IsReady && !double.IsNaN(elapsed) && !double.IsInfinity(elapsed) && elapsed >= state.elapsedSeconds) EventBoundary = elapsed;
+        }
+
+        // Role: 기록 이후 사용자 상호작용을 취침 이월 자격에 반영한다.
+        public void MarkInteraction() => journal?.MarkInteraction();
 
         // Role: 정지 등록 즉시 현재 물리 이동을 멈춘다.
         private void StopPlayerWhenPaused()

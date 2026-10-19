@@ -16,6 +16,9 @@ namespace GreatVoyage
         [SerializeField, Tooltip("항구 입장 위치. Cell 단위.")] private Vector2 shoreEntry = Vector2.zero;
         [SerializeField, Tooltip("개발 항구의 플레이어 영역. Cell 단위.")] private Rect shoreBounds = new Rect(-6, -3, 12, 6);
         [SerializeField, Tooltip("항해 위치·조타·입항 상태 HUD.")] private Text statusLabel;
+        [SerializeField] private JournalSession journal;
+        [SerializeField] private CrewSimulation crew;
+        private bool arrivalPending;
         private NavigationState state;
         private string playthroughId;
         public bool IsReady => state != null && session.IsReady;
@@ -24,6 +27,12 @@ namespace GreatVoyage
         public string DockedPort => state?.dockedPort;
         public int CompletedVoyages => state?.completedSequence ?? 0;
         public int PortCount => definition.ports.Length;
+        public int VoyageSequence => state?.voyageSequence ?? 0;
+        public string DeparturePort => state?.departurePort;
+        public Vector2 WorldPosition => state?.position ?? Vector2.zero;
+        public float Heading => state?.heading ?? 0;
+        public PortDefinition[] Ports => definition.ports;
+        public bool NeedsNavigator => journal != null && journal.AutopilotRequested && !IsDocked && !IsSteering;
         // Role: 경제 정의의 항구 ID를 검증한다.
         public bool HasPort(string id) => !string.IsNullOrEmpty(id) && Port(id) != null;
         // Role: 정산 후 출항 요청을 기존 출항 검사로 처리한다.
@@ -93,7 +102,7 @@ namespace GreatVoyage
             if (!session.IsPaused)
             {
                 Keyboard keys = Keyboard.current;
-                if (IsSteering && keys != null)
+                if (IsSteering && !session.IsSleeping && keys != null)
                 {
                     float turn = (keys.aKey.isPressed || keys.leftArrowKey.isPressed ? 1 : 0) - (keys.dKey.isPressed || keys.rightArrowKey.isPressed ? 1 : 0);
                     state.heading = Mathf.Repeat(state.heading + turn * definition.turnSpeed * delta, 360);
@@ -102,7 +111,6 @@ namespace GreatVoyage
                     if (IsDocked && forward) Depart();
                     if (!IsDocked) state.speed = Mathf.Clamp(state.speed + ((forward ? 1 : 0) - (slow ? 1 : 0)) * definition.acceleration * delta, 0, definition.maxSpeed);
                 }
-                if (!IsDocked) Advance(delta);
             }
             PortDefinition dock = Port(state.dockedPort);
             string mode = dock != null ? $"{dock.displayName} · 입항 · {(IsAboard ? "승선 중" : "항구")}" : "항해 중";
@@ -120,10 +128,38 @@ namespace GreatVoyage
             state.departureCleared = false;
             state.voyageSequence++;
             state.speed = definition.maxSpeed;
+            journal?.BeginVoyage();
+        }
+
+        // Role: 공통 세션 시간으로 항해와 자동 조타를 진행하고 실제 소모 시간을 반환한다.
+        public float AdvanceTime(float seconds)
+        {
+            if (IsDocked) return seconds;
+            if (NeedsNavigator && crew != null && crew.HelmsmanReady)
+            {
+                if (journal.TryGetHeading(state.position, out float heading))
+                {
+                    float turn = Mathf.Abs(Mathf.DeltaAngle(state.heading, heading));
+                    state.heading = Mathf.MoveTowardsAngle(state.heading, heading, definition.turnSpeed * seconds);
+                    state.heading = Mathf.Repeat(state.heading, 360);
+                    float speed = Mathf.Lerp(definition.maxSpeed, .5f, Mathf.InverseLerp(10, 80, turn));
+                    state.speed = Mathf.MoveTowards(state.speed, speed, definition.acceleration * seconds);
+                }
+                else state.speed = 0;
+            }
+            return Advance(seconds);
+        }
+
+        // Role: 시간·일지·취침 갱신이 끝난 후 계약을 포함한 입항 알림을 한 번 전달한다.
+        public void NotifyArrival()
+        {
+            if (!arrivalPending) return;
+            arrivalPending = false;
+            VoyageCompleted?.Invoke(playthroughId + ":" + state.voyageSequence, state.dockedPort);
         }
 
         // Role: 세계 좌표를 이동하고 이동 선분의 첫 유효 항구에서 자동 입항한다.
-        private void Advance(float delta)
+        private float Advance(float delta)
         {
             Vector2 previous = state.position;
             float radians = state.heading * Mathf.Deg2Rad;
@@ -148,13 +184,14 @@ namespace GreatVoyage
                 if (state.completedSequence != state.voyageSequence)
                 {
                     state.completedSequence = state.voyageSequence;
-                    VoyageCompleted?.Invoke(playthroughId + ":" + state.voyageSequence, destination.id);
+                    arrivalPending = true;
                 }
-                return;
+                return delta * Mathf.Clamp01(earliest);
             }
             PortDefinition departure = Port(state.departurePort);
             if (Vector2.Distance(next, departure.position) > departure.departureRadius) state.departureCleared = true;
             if (next == previous && state.speed > 0) state.speed = 0;
+            return delta;
         }
 
         // Role: 긴 프레임에도 항구를 건너뛰지 않도록 선분과 원의 첫 교차 비율을 구한다.
@@ -200,6 +237,8 @@ namespace GreatVoyage
 
         // Role: 저장된 위치가 현재 공간의 경계 안에 있는지 검사한다.
         public bool ValidPlayerPosition(Vector2 position) => IsAboard ? ship.ValidPosition(ship.ActiveFloor, position) : Finite(position) && Inside(shoreBounds, position / ship.CellSize);
+        // Role: 지도와 계획점의 해역 좌표를 검증한다.
+        public bool ValidWorldPosition(Vector2 position) => Finite(position) && Inside(definition.bounds, position);
 
         // Role: 항구 또는 현재 층의 표현·충돌체만 활성화한다.
         private void ApplySpace()

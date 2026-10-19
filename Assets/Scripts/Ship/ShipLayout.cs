@@ -26,6 +26,7 @@ namespace GreatVoyage
         private GameSession session;
         [SerializeField, Tooltip("현재 층 표시.")]
         private Text floorLabel;
+        [SerializeField] private PlayerSleep playerSleep;
 
         private ShipState state;
         private bool aboard = true;
@@ -453,6 +454,8 @@ namespace GreatVoyage
             Vector2 position = floor.origin + new Vector2(item.x, item.y) + (Vector2)kind.size * .5f;
             instance.transform.localPosition = position;
             instance.transform.localScale = new Vector3(kind.size.x, kind.size.y, 1);
+            if (kind.usableAsBed && playerSleep != null)
+                instance.AddComponent<BedInteraction>().Bind(playerSleep, this, item.id);
             facilityViews.Add(item.id, instance);
             SpriteRenderer[] renderers = instance.GetComponentsInChildren<SpriteRenderer>(true);
             var colors = new Color[renderers.Length];

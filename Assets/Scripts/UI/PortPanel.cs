@@ -20,6 +20,9 @@ namespace GreatVoyage
         private PortService service;
         private int quantity = 1;
         private ContractPayment payment;
+        private int candidateIndex;
+        private Button nextCandidate;
+        private string CandidateId => economy.Candidates[candidateIndex % economy.Candidates.Length].id;
 
         // Role: 개발용 서비스 화면을 구성하고 행동 요청을 경제 규칙에 연결한다.
         private void Awake()
@@ -38,7 +41,8 @@ namespace GreatVoyage
             paymentButton = ActionButton("선불/후불", 400, 485, () => payment = payment == ContractPayment.Prepaid ? ContractPayment.Deferred : ContractPayment.Prepaid);
             buy = ActionButton("구매", 24, 550, () => economy.Buy(quantity));
             sell = ActionButton("선택 수량 판매", 24, 550, () => economy.Sell(quantity));
-            hire = ActionButton("고용", 24, 550, () => economy.Hire(quantity, payment));
+            hire = ActionButton("고용", 24, 550, () => economy.Hire(quantity, payment, CandidateId));
+            nextCandidate = ActionButton("다음 후보", 600, 485, () => candidateIndex = (candidateIndex + 1) % economy.Candidates.Length);
             pay = ActionButton("후불 전액 지급", 200, 550, PayFirstDebt);
             confirm = ActionButton("정산 후 출항", 400, 550, () => { if (economy.State.gameOver) session.SaveAndQuit(); else economy.SettleAndDepart(); });
             close = ActionButton("닫기 / 출항 취소", 660, 550, Close);
@@ -60,8 +64,8 @@ namespace GreatVoyage
                 details.text += $"구매가 {economy.Port.buyPrice}  |  판매가 {economy.SalePrice}  |  상인 재고 {state.markets.Find(p => p.portId == economy.Port.portId).stock}\n";
             if (tavern)
             {
-                CrewState candidate = economy.Candidate();
-                details.text += candidate == null ? "현재 고용 가능한 후보 없음\n" : $"후보: {candidate.displayName} · 정비 특기\n체력 {candidate.health:0} / 기력 {candidate.energy:0} / 행복 {candidate.happiness:0}\n";
+                CrewState candidate = economy.Candidate(CandidateId);
+                details.text += candidate == null ? "선택한 후보는 현재 고용할 수 없습니다. 다음 후보로 전환하세요.\n" : $"후보: {candidate.displayName} · {(candidate.specialty == CrewSpecialty.Navigation ? "항해 특기 · 경력 " + candidate.navigationExperience : "정비 특기")}\n체력 {candidate.health:0} / 기력 {candidate.energy:0} / 행복 {candidate.happiness:0}\n";
             }
             foreach (EmploymentContract contract in state.contracts.Where(c => c.status == ContractStatus.Active || c.debt > 0 || c == state.contracts.LastOrDefault()).TakeLast(3))
                 details.text += $"{contract.id} · {contract.status} · {(contract.payment == ContractPayment.Prepaid ? "선불" : "후불")} 총액 {contract.totalPrice} · 잔여 {contract.remainingVoyages}회 · 미지급 {contract.debt}\n";
@@ -71,6 +75,7 @@ namespace GreatVoyage
             buy.gameObject.SetActive(service == PortService.Merchant);
             sell.gameObject.SetActive(service == PortService.Broker || settlement);
             hire.gameObject.SetActive(tavern); paymentButton.gameObject.SetActive(tavern);
+            nextCandidate.gameObject.SetActive(tavern); nextCandidate.interactable = enabled;
             pay.gameObject.SetActive(tavern || settlement); confirm.gameObject.SetActive(settlement);
             foreach (Button button in new[] { buy, sell, hire, pay, confirm, paymentButton, quantityDown, quantityUp }) button.interactable = enabled;
             if (state.gameOver) { confirm.interactable = true; confirm.GetComponentInChildren<Text>().text = "저장 후 종료"; }

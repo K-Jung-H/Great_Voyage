@@ -6,6 +6,8 @@ namespace GreatVoyage
     public sealed class CrewSettings : ScriptableObject
     {
         public string id = "standard-crew";
+        [Tooltip("대표 방향타 업무의 층 ID.")] public string helmFloor = "deck-1";
+        [Tooltip("방향타 옆 접근 지점(Cell). 배치가 바뀌면 함께 조정한다.")] public Vector2 helmPosition = new Vector2(2.5f, 1.5f);
         [Tooltip("표시·충돌·상호작용용 Prefab. 시뮬레이션 상태는 별도로 관리한다.")] public CrewView prefab;
         [Tooltip("정식 새 게임은 빈 배열. 선원은 이후 고용 시스템에서 추가한다.")] public CrewState[] initialCrew = new CrewState[0];
         [Tooltip("초기 항해 식량 수량. 무역 상품과 구분한다.")] public int initialFood;

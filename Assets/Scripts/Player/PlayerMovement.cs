@@ -37,7 +37,7 @@ namespace GreatVoyage
         // Role: 입력을 정규화해 충돌이 처리되는 물리 속도로 전달한다.
         private void FixedUpdate()
         {
-            if (inputBlocked || (session != null && session.IsPaused)) { body.linearVelocity = Vector2.zero; return; }
+            if (inputBlocked || (session != null && (session.IsPaused || session.IsSleeping))) { body.linearVelocity = Vector2.zero; return; }
             Vector2 desired = Vector2.ClampMagnitude(moveAction.ReadValue<Vector2>(), 1f) * moveSpeed;
             Vector2 force = Vector2.ClampMagnitude((desired - body.linearVelocity) / Time.fixedDeltaTime, acceleration) * body.mass;
             body.AddForce(force, ForceMode2D.Force);
