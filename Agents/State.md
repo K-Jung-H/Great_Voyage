@@ -158,3 +158,26 @@
 - 사용자 원문: 3단계 통과 커밋 진행
 - 공통 Cell 보완을 포함한 3단계 사용자 직접 테스트 통과. 기존 확인 대기 상태를 대체하며 대표 기능 완료로 기록한다. 추가 에이전트 테스트 없음.
 - codex/ship-floors-facilities에서 3단계 코드·정의 자산·Prefab·씬·문서를 `함선 층·시설 및 공통 Cell 규격 구현`으로 커밋한다. 푸시·main 병합·4단계 착수는 수행하지 않는다.
+
+## 4단계 진행 요청 — 2026-10-19
+
+- 3단계 커밋 e3a6ba6 완료 및 사용자 테스트 통과. 4단계 수동 항해·출입항 진행 요청 수신.
+- codex/manual-navigation 브랜치를 e3a6ba6에서 생성해 진행하는 승인 대기. 기존 Queue 커밋 결과 기록 보존. 상세 범위와 새 항해 코드/자산 생성 제안은 Queue stage4-navigation 참조.
+- 현재는 기획/구조 확인과 계획 보고만 완료했으며 항해 구현 미착수.
+
+## 4단계 구현 결과 — 2026-10-19
+
+- 승인 후 e3a6ba6에서 codex/manual-navigation 생성, 기존 Queue/State 미커밋 기록 보존. 푸시·main 병합·커밋 없음.
+- NavigationState/NavigationDefinition/NavigationSession/NavigationPoint 및 meta, PrototypeSea 자산을 추가했다. GameSession/SaveData/SaveService/ShipLayout/PlayerInteraction, CaptainsCabin 및 StarterShip의 갑판 차단·예약 영역을 연결했다. 설계·제작 좌표 규약은 Architecture의 4단계 항목 참조.
+- 1층 갑판 파란 방향타는 (3.5,1.5), 왼쪽 (2.5,1.5)에서 E. 녹색 하선 지점은 (5.5,-2.5), 왼쪽 (4.5,-2.5)에서 E. 항구의 녹색 승선 지점은 (0,-2), 접근 지점 (0,-1). 모두 Cell 단위다. 항해 HUD는 우측 상단이다.
+- 조타 E → W 출항/가속, A/D 회전, S 감속, E/Esc 조타 종료. 최초 기본 방향0도에서 W로 항구 A→B 이동 가능. 항구 A=(0,0), B=(30,0), 입항 반경3/출항지 이탈 반경5. 입항 중에만 승하선하며 조타 종료 후 항해는 계속된다.
+- 저장 v3에 항해/승하선/완료 순번을 보존한다. v1/v2는 기존 위치·시간·층을 유지하고 항해만 A 정박/승선으로 초기화한다. 실제 기존 저장 파일은 직접 변경·삭제하지 않았다.
+- recompile_status completed. 현재 console_status groundTruth compilationFailed=false, compiling=false, consoleErrors=0/Warnings=0. 누적 캡처 error=6은 이전 작업 값이며 현재 오류와 구분한다.
+- 읽기 eval 참조 확인: missingScripts=0, missingReferences=[], navigationPoints=3, portCount=2, A=(0,0), B=(30,0), sceneDirty=false, compilationFailed=false. 기능 테스트/Play Mode/빌드 미실행.
+- 사용자 확인 대기: 방향타 조작/선내 이동 차단·종료, A→B 자동 입항과 완료 수1회, 승하선, 출항지 이탈 전 즉시 재입항 방지·이탈 후 귀환, 항해 중/항구에서 저장·복원, 메뉴 정지와 층 이동의 항해 좌표 독립성. 통과 전 5단계 진행하지 않는다.
+
+## 4단계 완료 및 커밋·푸시 요청 — 2026-10-19
+
+- 사용자 원문: 4단계 통과, 커밋 및 푸시 진행
+- 사용자 직접 테스트 통과로 4단계 대표 기능 완료. 이전 사용자 확인 대기 상태를 대체한다. 에이전트 추가 테스트 없음. 5단계 미착수.
+- 현재 codex/manual-navigation의 4단계 코드·설정 자산·씬·문서를 `수동 항해·출입항 및 저장 복원 구현`으로 커밋하고 origin의 동일 브랜치에 일반 푸시한다. main 병합·다른 브랜치 변경 없음.

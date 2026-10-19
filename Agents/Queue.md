@@ -925,3 +925,24 @@ GreatVoyage.GameSession:Awake () (at Assets/Scripts/Game/GameSession.cs:56)
 - completed: git branch/status/diff --stat/diff --cached --stat 확인. 브랜치 codex/ship-floors-facilities, 기존 스테이징 없음, 변경은 3단계 코드/자산/씬/문서. Rules의 커밋 지시 범위 확인. 출력의 반복 줄바꿈 경고는 생략.
 - completed: 사용자 테스트 통과를 State/RoadMap에 반영. 에이전트 추가 테스트 없음.
 - started: 3단계 관련 파일을 명시하여 git add 후 git commit -m '함선 층·시설 및 공통 Cell 규격 구현'. 이후 git status 및 log로 결과 확인. 푸시·main 병합 없음. 커밋 실행 결과는 실행 후 이 세트에 이어 기록한다.
+- completed: 최초 git add/commit은 .git/index.lock Permission denied(exit 1)로 변경 없이 실패. 권한 확장 후 같은 명시 파일 목록 add 성공, commit 성공(exit 0): e3a6ba6 `함선 층·시설 및 공통 Cell 규격 구현`, 29 files changed. 푸시 없음. 이 실행 결과 기록은 커밋 후 추가된 로컬 미커밋 기록이다.
+
+## stage4-navigation — 2026-10-19
+- 사용자 원문: 4단계 진행.
+- completed (소급 요약): git branch/rev-parse/status/diff/cached 확인. codex/ship-floors-facilities, e3a6ba6. 미커밋 변경은 직전 커밋 결과 Queue 1줄이며 보존한다. Rules/State/RoadMap/Architecture와 GameDesign 항해 규칙 확인. 대량 병렬 출력 일부 생략/절단으로 4단계 본문 및 기획 6.1 재조회.
+- 계획: 수동 항해·출입항 대표 기능. 선착장/방향타/개발 항구2개/고정 해역/별도 세계 위치·방향·속도/HUD/저장·복원/안정 항해완료 ID. 자동조타·세계 생성·바람·계약 제외.
+- pending: e3a6ba6에서 codex/manual-navigation 브랜치 생성 승인 및 항해 시스템의 필요한 코드/자산 생성 범위 확인. 기존 Queue 변경 그대로 보존 예정. 구현/브랜치 생성/기능 테스트 미실행.
+- 사용자 승인 원문: 제안한 브랜치와 범위로 진행
+- completed: git switch -c codex/manual-navigation e3a6ba6 성공(exit 0), Queue/State 변경 보존. CLI editor_status ready/stopped, projectPath D:/Great Voyage. 기존 저장/UI/이동 코드 확인.
+- started: NavigationState/NavigationDefinition/NavigationSession/NavigationPoint 및 meta, 개발용 해역 정의와 갑판 방향타/승하선/공유 항구 공간/HUD 추가. 기존 GameSession/SaveData/SaveService/ShipLayout/PlayerInteraction 연결. 저장 v3와 v1/v2 호환, 항해 ID·출항지 재입항 해제 상태 보존. 기존 저장 직접 변경 없음. 기능 테스트 제외.
+- completed: NavigationState/Definition/Session/Point 및 저장 v3·상호작용·층 표시 연결 코드 작성. 최초 컴파일 recompile_status=completed. 실제 기능 테스트 미실행.
+- started: CLI eval로 clean CaptainsCabin에서 항해 정의(항구 A=(0,0), B=(30,0), 입항3/이탈5, 최대속도4), 방향타·승하선 지점·개발 항구 공간·HUD 작성/참조 연결. ShipDefinition의 갑판 고정 차단/접근 예약 칸에 새 사물 반영. 이후 읽기 참조/컴파일 확인.
+- completed: Unity eval authoring 성공 diagnostics=[]. clean Edit Mode guard 및 중복 구성 방지 후 PrototypeSea 자산, Deck1 Helm/Gangway, Ship 밖 PrototypePort+BoardShip, NavigationStatus Text 생성. GameSession/PlayerInteraction/NavSession/Point 참조 연결. StarterShip deck-1 blocked (10,5,1,1)/(12,1,1,1), reserved (9,5,1,1)/(11,1,1,1) 추가. SaveAssets/SaveScene 성공. 긴 eval 원문은 전체 복사하지 않고 주요 API/좌표/조건을 요약함.
+- completed: 소스 diff와 CameraFollow 확인, console_status groundTruth compilationFailed=false/compiling=false/consoleErrors=0/Warnings=0. 누적 error=6은 이전 캡처. 읽기 eval에서 scene 모든 root의 Missing Script와 새 컴포넌트 직렬화 참조 검사: missingScripts=0, missingReferences=[], navigationPoints=3, portCount=2, A=(0,0), B=(30,0), sceneDirty=false. 런타임 메서드/Play Mode/기능 테스트 실행 없음.
+- completed: Architecture/RoadMap/State에 구현·조작·저장 호환·검증 범위와 사용자 확인 대기 기록. 5단계/커밋/푸시/병합/패키지 변경 없음.
+
+## stage4-commit-push — 2026-10-19
+- 사용자 원문: 4단계 통과, 커밋 및 푸시 진행
+- completed: git branch/rev-parse/status/diff --stat/diff --cached --stat/remote/log 확인. 현재 codex/manual-navigation, HEAD e3a6ba6, 스테이징 없음. 변경은 4단계 코드/자산/씬/문서이며 origin=https://github.com/K-Jung-H/Great_Voyage.git. 이전 미커밋 기록 포함 보존.
+- completed: State/RoadMap/Architecture에 사용자 테스트 통과 반영. 에이전트 추가 테스트 없음.
+- started: 4단계 파일 목록을 명시하여 git add 및 git commit -m '수동 항해·출입항 및 저장 복원 구현'. 성공 후 git push -u origin codex/manual-navigation. 강제 푸시·main 병합·다음 단계 없음. 실행 결과는 같은 세트에 추가한다.

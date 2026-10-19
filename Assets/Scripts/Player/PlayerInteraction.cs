@@ -12,6 +12,8 @@ namespace GreatVoyage
         private float interactionRange = 1.25f;
         [SerializeField, Tooltip("상호작용 거리를 Unity 단위로 환산할 함선.")]
         private ShipLayout ship;
+        [SerializeField, Tooltip("조타 입력과 승하선을 관리하는 항해 세션.")]
+        private NavigationSession navigation;
         [SerializeField, Tooltip("정지 중 새 게임 상호작용을 차단할 세션.")]
         private GameSession session;
 
@@ -36,15 +38,27 @@ namespace GreatVoyage
         private void Update()
         {
             if (journal == null || ship == null) return;
-            movement.SetInputBlocked(journal.IsOpen);
+            bool steering = navigation != null && navigation.IsSteering;
+            movement.SetInputBlocked(journal.IsOpen || steering);
             if (journal.IsOpen || (session != null && session.IsPaused))
             {
                 journal.ShowPrompt(false);
                 return;
             }
+            if (steering)
+            {
+                journal.ShowPrompt(false);
+                if (interactAction.WasPressedThisFrame() || (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame))
+                {
+                    navigation.EndSteering();
+                    movement.SetInputBlocked(false);
+                }
+                return;
+            }
 
             JournalDesk nearest = null;
             Stairway nearestStair = null;
+            NavigationPoint nearestNavigation = null;
             float range = interactionRange * ship.CellSize;
             float nearestDistance = range;
             Vector2 origin = transform.position;
@@ -53,19 +67,27 @@ namespace GreatVoyage
             {
                 JournalDesk desk = candidates[i].GetComponentInParent<JournalDesk>();
                 Stairway stair = candidates[i].GetComponentInParent<Stairway>();
-                if (desk == null && stair == null) continue;
-                Vector2 point = desk != null ? desk.InteractionPosition : stair.InteractionPosition;
-                Transform target = desk != null ? desk.transform : stair.transform;
+                NavigationPoint navigationPoint = candidates[i].GetComponentInParent<NavigationPoint>();
+                if (navigationPoint != null && !navigationPoint.Available) navigationPoint = null;
+                if (desk == null && stair == null && navigationPoint == null) continue;
+                Vector2 point = desk != null ? desk.InteractionPosition : stair != null ? stair.InteractionPosition : navigationPoint.InteractionPosition;
+                Transform target = desk != null ? desk.transform : stair != null ? stair.transform : navigationPoint.transform;
                 float distance = Vector2.Distance(origin, point);
                 if (distance > nearestDistance || !CanReach(target, point)) continue;
                 nearest = desk;
                 nearestStair = stair;
+                nearestNavigation = navigationPoint;
                 nearestDistance = distance;
             }
 
-            journal.ShowPrompt(nearest != null || nearestStair != null,
-                nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
-            if (nearestStair != null && interactAction.WasPressedThisFrame()) nearestStair.Travel();
+            journal.ShowPrompt(nearest != null || nearestStair != null || nearestNavigation != null,
+                nearestNavigation != null ? nearestNavigation.Prompt : nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
+            if (nearestNavigation != null && interactAction.WasPressedThisFrame())
+            {
+                nearestNavigation.Interact();
+                movement.SetInputBlocked(navigation != null && navigation.IsSteering);
+            }
+            else if (nearestStair != null && interactAction.WasPressedThisFrame()) nearestStair.Travel();
             else if (nearest != null && interactAction.WasPressedThisFrame())
             {
                 journal.Open();

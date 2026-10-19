@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 89e49b0041bfd8e46b78fe63a9770058, type: 3}
+  m_Name: PrototypeSea
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.NavigationDefinition
+  id: prototype-sea
+  ports:
+  - id: port-a
+    displayName: "\uAC1C\uBC1C \uD56D\uAD6C A"
+    position: {x: 0, y: 0}
+    arrivalRadius: 3
+    departureRadius: 5
+  - id: port-b
+    displayName: "\uAC1C\uBC1C \uD56D\uAD6C B"
+    position: {x: 30, y: 0}
+    arrivalRadius: 3
+    departureRadius: 5
+  bounds:
+    serializedVersion: 2
+    x: -100
+    y: -100
+    width: 200
+    height: 200
+  maxSpeed: 4
+  acceleration: 4
+  turnSpeed: 60

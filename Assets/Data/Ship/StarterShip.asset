@@ -26,9 +26,25 @@ MonoBehaviour:
       y: 2
       width: 1
       height: 1
+    - x: 10
+      y: 5
+      width: 1
+      height: 1
+    - x: 12
+      y: 1
+      width: 1
+      height: 1
     reserved:
     - x: 3
       y: 2
+      width: 1
+      height: 1
+    - x: 9
+      y: 5
+      width: 1
+      height: 1
+    - x: 11
+      y: 1
       width: 1
       height: 1
   - id: deck-2

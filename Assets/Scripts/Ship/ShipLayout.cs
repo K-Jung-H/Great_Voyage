@@ -28,6 +28,8 @@ namespace GreatVoyage
         private Text floorLabel;
 
         private ShipState state;
+        private bool aboard = true;
+        public string ActiveFloor => state.activeFloor;
         public float CellSize => definition.cellSize;
         private static readonly Vector2Int[] Steps = { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
 
@@ -221,7 +223,7 @@ namespace GreatVoyage
         // Role: 계단으로 층을 이동하고 방문한 층의 지역 위치를 복원한다.
         public void Travel(string targetFloor)
         {
-            if (state == null || session == null || !session.IsReady || session.IsPaused || targetFloor == state.activeFloor) return;
+            if (!aboard || state == null || session == null || !session.IsReady || session.IsPaused || targetFloor == state.activeFloor) return;
             FloorDefinition target = Floor(targetFloor);
             if (target == null) return;
             RememberPosition();
@@ -239,8 +241,15 @@ namespace GreatVoyage
         // Role: 데이터는 유지한 채 현재 층의 표시와 충돌체만 활성화한다.
         private void ShowFloor()
         {
-            foreach (FloorView view in views) view.root.SetActive(view.floorId == state.activeFloor);
-            if (floorLabel != null) floorLabel.text = Floor(state.activeFloor).displayName;
+            foreach (FloorView view in views) view.root.SetActive(aboard && view.floorId == state.activeFloor);
+            if (floorLabel != null) floorLabel.text = aboard ? Floor(state.activeFloor).displayName : "항구 선착장";
+        }
+
+        // Role: 함선 밖에서는 모든 층의 표현과 충돌을 비활성화한다.
+        public void SetAboard(bool value)
+        {
+            aboard = value;
+            ShowFloor();
         }
 
         // Role: 저장된 시설 배치에 대응하는 표현 인스턴스를 만든다.
