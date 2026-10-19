@@ -20,6 +20,8 @@ namespace GreatVoyage
         private Button quitButton;
         [SerializeField, Tooltip("저장 오류 메시지.")]
         private Text errorLabel;
+        [SerializeField, Tooltip("개발 씬 전용 선원·침대·자원 재준비 버튼.")]
+        private Button crewResetButton;
         private IDisposable pause;
 
         // Role: 정지 메뉴의 버튼을 연결한다.
@@ -28,6 +30,7 @@ namespace GreatVoyage
             openButton.onClick.AddListener(Open);
             resumeButton.onClick.AddListener(Close);
             quitButton.onClick.AddListener(session.SaveAndQuit);
+            if (crewResetButton != null) crewResetButton.onClick.AddListener(session.RestoreCrewPrototype);
             menuRoot.SetActive(false);
         }
 
@@ -66,6 +69,7 @@ namespace GreatVoyage
             openButton.onClick.RemoveListener(Open);
             resumeButton.onClick.RemoveListener(Close);
             if (session != null) quitButton.onClick.RemoveListener(session.SaveAndQuit);
+            if (session != null && crewResetButton != null) crewResetButton.onClick.RemoveListener(session.RestoreCrewPrototype);
         }
     }
 }

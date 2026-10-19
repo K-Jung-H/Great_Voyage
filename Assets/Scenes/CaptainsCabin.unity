@@ -5295,6 +5295,7 @@ GameObject:
   - component: {fileID: 1057149353}
   - component: {fileID: 1057149352}
   - component: {fileID: 1057149354}
+  - component: {fileID: 1057149355}
   m_Layer: 0
   m_Name: Ship
   m_TagString: Untagged
@@ -5367,6 +5368,22 @@ MonoBehaviour:
     width: 12
     height: 6
   statusLabel: {fileID: 1669205307}
+--- !u!114 &1057149355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1057149351}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 91228024f139d6349a4067814b0a3b23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.CrewSimulation
+  settings: {fileID: 11400000, guid: 96bb002b3e9350c4393a069e8ed0edc4, type: 2}
+  session: {fileID: 1408712378}
+  ship: {fileID: 1057149352}
+  statusLabel: {fileID: 0}
 --- !u!1 &1085117902
 GameObject:
   m_ObjectHideFlags: 0
@@ -6336,6 +6353,8 @@ MonoBehaviour:
   spaceId: captains-cabin
   ship: {fileID: 1057149352}
   navigation: {fileID: 1057149354}
+  crew: {fileID: 1057149355}
+  saveSlot: cabin-session
 --- !u!4 &1408712379
 Transform:
   m_ObjectHideFlags: 0

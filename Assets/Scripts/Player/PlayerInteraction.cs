@@ -59,6 +59,7 @@ namespace GreatVoyage
             JournalDesk nearest = null;
             Stairway nearestStair = null;
             NavigationPoint nearestNavigation = null;
+            CrewView nearestCrew = null;
             float range = interactionRange * ship.CellSize;
             float nearestDistance = range;
             Vector2 origin = transform.position;
@@ -68,21 +69,25 @@ namespace GreatVoyage
                 JournalDesk desk = candidates[i].GetComponentInParent<JournalDesk>();
                 Stairway stair = candidates[i].GetComponentInParent<Stairway>();
                 NavigationPoint navigationPoint = candidates[i].GetComponentInParent<NavigationPoint>();
+                CrewView crew = candidates[i].GetComponentInParent<CrewView>();
+                if (crew != null && !crew.Available) crew = null;
                 if (navigationPoint != null && !navigationPoint.Available) navigationPoint = null;
-                if (desk == null && stair == null && navigationPoint == null) continue;
-                Vector2 point = desk != null ? desk.InteractionPosition : stair != null ? stair.InteractionPosition : navigationPoint.InteractionPosition;
-                Transform target = desk != null ? desk.transform : stair != null ? stair.transform : navigationPoint.transform;
+                if (desk == null && stair == null && navigationPoint == null && crew == null) continue;
+                Vector2 point = desk != null ? desk.InteractionPosition : stair != null ? stair.InteractionPosition : navigationPoint != null ? navigationPoint.InteractionPosition : crew.InteractionPosition;
+                Transform target = desk != null ? desk.transform : stair != null ? stair.transform : navigationPoint != null ? navigationPoint.transform : crew.transform;
                 float distance = Vector2.Distance(origin, point);
                 if (distance > nearestDistance || !CanReach(target, point)) continue;
                 nearest = desk;
                 nearestStair = stair;
                 nearestNavigation = navigationPoint;
+                nearestCrew = crew;
                 nearestDistance = distance;
             }
 
-            journal.ShowPrompt(nearest != null || nearestStair != null || nearestNavigation != null,
-                nearestNavigation != null ? nearestNavigation.Prompt : nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
-            if (nearestNavigation != null && interactAction.WasPressedThisFrame())
+            journal.ShowPrompt(nearest != null || nearestStair != null || nearestNavigation != null || nearestCrew != null,
+                nearestCrew != null ? nearestCrew.Prompt : nearestNavigation != null ? nearestNavigation.Prompt : nearestStair != null ? nearestStair.Prompt : "[E] 항해 일지 열기");
+            if (nearestCrew != null && interactAction.WasPressedThisFrame()) nearestCrew.Interact();
+            else if (nearestNavigation != null && interactAction.WasPressedThisFrame())
             {
                 nearestNavigation.Interact();
                 movement.SetInputBlocked(navigation != null && navigation.IsSteering);

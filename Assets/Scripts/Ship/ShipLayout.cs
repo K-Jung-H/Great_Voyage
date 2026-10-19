@@ -29,7 +29,10 @@ namespace GreatVoyage
 
         private ShipState state;
         private bool aboard = true;
+        private readonly Dictionary<string, GameObject> facilityViews = new Dictionary<string, GameObject>();
+        private readonly Dictionary<string, Color[]> facilityColors = new Dictionary<string, Color[]>();
         public string ActiveFloor => state.activeFloor;
+        public IReadOnlyList<FacilityState> Facilities => state.facilities;
         public float CellSize => definition.cellSize;
         private static readonly Vector2Int[] Steps = { Vector2Int.right, Vector2Int.up, Vector2Int.left, Vector2Int.down };
 
@@ -77,6 +80,11 @@ namespace GreatVoyage
                     throw new InvalidDataException("층 화면이 연결되지 않았습니다.");
             }
             ids.Clear();
+            foreach (FloorDefinition floor in definition.floors)
+                if (floor.connectedFloors != null)
+                    foreach (string connected in floor.connectedFloors)
+                        if (connected == floor.id || Floor(connected) == null)
+                            throw new InvalidDataException("계단의 논리 층 연결이 유효하지 않습니다.");
             foreach (FacilityDefinition facility in definition.facilities)
                 if (facility == null || string.IsNullOrEmpty(facility.id) || !ids.Add(facility.id) || facility.size.x <= 0 || facility.size.y <= 0 || facility.prefab == null || facility.maxDurability <= 0)
                     throw new InvalidDataException("시설 정의가 유효하지 않습니다.");
@@ -199,6 +207,188 @@ namespace GreatVoyage
         // Role: 시설 종류 ID에 대응하는 정의를 찾는다.
         private FacilityDefinition Kind(string id) => Array.Find(definition.facilities, f => f.id == id);
 
+        // Role: 안정 시설 ID로 런타임 상태를 조회한다.
+        public FacilityState GetFacility(string id) => state.facilities.Find(f => f.id == id);
+
+        // Role: 시설 종류의 크기·기능·수리 조건을 조회한다.
+        public FacilityDefinition GetFacilityDefinition(string id) => Kind(id);
+
+        // Role: 해당 층의 표시 여부를 상태에서 판단한다.
+        public bool IsFloorVisible(string id) => aboard && state.activeFloor == id;
+
+        // Role: 선원 Cell 좌표가 실제 통행 가능한 칸인지 검사한다.
+        public bool IsWalkablePosition(string id, Vector2 position)
+        {
+            FloorDefinition floor = Floor(id);
+            return floor != null && !float.IsNaN(position.x) && !float.IsNaN(position.y) && !float.IsInfinity(position.x) && !float.IsInfinity(position.y)
+                && Walkable(floor, Vector2Int.FloorToInt(position - floor.origin), state.facilities);
+        }
+
+        // Role: 선원용 계단 진입점의 Cell 좌표를 반환한다.
+        public Vector2 EntryPosition(string id) => Floor(id).entry;
+
+        // Role: 현재 층의 배회 후보를 논리 칸 중심으로 정렬한다.
+        public Vector2 CellCenter(string id, Vector2 position)
+        {
+            FloorDefinition floor = Floor(id);
+            return floor.origin + (Vector2)Vector2Int.FloorToInt(position - floor.origin) + Vector2.one * .5f;
+        }
+
+        // Role: 개발용 재준비 요청에서 시설 초기 상태와 표현을 다시 만든다.
+        public void RestoreInitialFacilities()
+        {
+            foreach (GameObject view in facilityViews.Values) { view.SetActive(false); Destroy(view); }
+            facilityViews.Clear();
+            facilityColors.Clear();
+            state.facilities = NewState().facilities;
+            foreach (FacilityState item in state.facilities) CreateView(item);
+            RefreshFacilityViews();
+        }
+
+        // Role: 경로 전체를 재탐색하지 않고 인접 계단 연결만 확인한다.
+        public bool AreFloorsConnected(string from, string to)
+        {
+            FloorDefinition floor = Floor(from);
+            return floor?.connectedFloors != null && Array.IndexOf(floor.connectedFloors, to) >= 0;
+        }
+
+        // Role: 비활성 층에서도 원형 선원과 고정 장애물의 여유 공간을 검사한다.
+        public bool HasCrewClearance(string floorId, Vector2 position, float radius)
+        {
+            FloorDefinition floor = Floor(floorId);
+            if (floor == null || position.x - radius < floor.origin.x || position.y - radius < floor.origin.y
+                || position.x + radius > floor.origin.x + floor.size.x || position.y + radius > floor.origin.y + floor.size.y) return false;
+            Vector2Int minimum = Vector2Int.FloorToInt(position - Vector2.one * radius - floor.origin);
+            Vector2Int maximum = Vector2Int.FloorToInt(position + Vector2.one * radius - floor.origin);
+            for (int x = minimum.x; x <= maximum.x; x++)
+                for (int y = minimum.y; y <= maximum.y; y++)
+                {
+                    var cell = new Vector2Int(x, y);
+                    if (!InRects(floor.blocked, cell) && !Occupied(floorId, cell, state.facilities)) continue;
+                    Vector2 lower = floor.origin + (Vector2)cell;
+                    Vector2 nearest = Vector2.Max(lower, Vector2.Min(position, lower + Vector2.one));
+                    if ((position - nearest).sqrMagnitude < radius * radius) return false;
+                }
+            return true;
+        }
+
+        // Role: Nav 재탐색 없이 짧은 이동 선분의 정적 통행 가능 여부를 검사한다.
+        public bool IsCrewSegmentClear(string floorId, Vector2 from, Vector2 to, float radius)
+        {
+            int samples = Mathf.Max(1, Mathf.CeilToInt(Vector2.Distance(from, to) / Mathf.Max(.05f, radius * .5f)));
+            for (int i = 1; i <= samples; i++)
+                if (!HasCrewClearance(floorId, Vector2.Lerp(from, to, (float)i / samples), radius)) return false;
+            return true;
+        }
+
+        // Role: 시설 주변 접근점의 Cell 좌표를 반환한다.
+        public bool TryGetAccessCell(string id, out Vector2 position)
+        {
+            bool found = TryGetAccessPosition(id, out position);
+            position /= CellSize;
+            return found;
+        }
+
+        // Role: 재탐색 없이 시설 외곽 접근점에 도착했는지 검사한다.
+        public bool IsAtFacilityAccess(string id, Vector2 position, float tolerance)
+        {
+            FacilityState item = GetFacility(id);
+            if (item == null) return false;
+            FloorDefinition floor = Floor(item.floorId);
+            FacilityDefinition kind = Kind(item.definitionId);
+            var area = new RectInt(item.x, item.y, kind.size.x, kind.size.y);
+            foreach (Vector2Int cell in area.allPositionsWithin)
+                foreach (Vector2Int step in Steps)
+                {
+                    Vector2Int next = cell + step;
+                    if (!area.Contains(next) && Walkable(floor, next, state.facilities)
+                        && Vector2.Distance(position, floor.origin + (Vector2)next + Vector2.one * .5f) <= tolerance) return true;
+                }
+            return false;
+        }
+
+        // Role: 고정 순서 BFS로 연결된 층 목록을 구한다.
+        public bool TryGetFloorRoute(string from, string to, out List<string> route)
+        {
+            route = new List<string>();
+            if (Floor(from) == null || Floor(to) == null) return false;
+            var parents = new Dictionary<string, string> { [from] = null };
+            var queue = new Queue<string>(); queue.Enqueue(from);
+            while (queue.Count > 0)
+            {
+                string current = queue.Dequeue();
+                if (current == to) break;
+                foreach (string next in Floor(current).connectedFloors ?? Array.Empty<string>())
+                    if (!parents.ContainsKey(next)) { parents.Add(next, current); queue.Enqueue(next); }
+            }
+            if (!parents.ContainsKey(to)) return false;
+            for (string current = to; current != null; current = parents[current]) route.Add(current);
+            route.Reverse();
+            return true;
+        }
+
+        // Role: 시설·고정 장애물을 피하는 Cell 중심 경로를 구한다.
+        public bool TryFindPath(string floorId, Vector2 from, Vector2 to, out List<Vector2> path)
+        {
+            path = new List<Vector2>();
+            FloorDefinition floor = Floor(floorId);
+            if (floor == null) return false;
+            Vector2Int start = Vector2Int.FloorToInt(from - floor.origin);
+            Vector2Int goal = Vector2Int.FloorToInt(to - floor.origin);
+            if (!Walkable(floor, start, state.facilities) || !Walkable(floor, goal, state.facilities)) return false;
+            var parents = new Dictionary<Vector2Int, Vector2Int> { [start] = start };
+            var queue = new Queue<Vector2Int>(); queue.Enqueue(start);
+            while (queue.Count > 0 && !parents.ContainsKey(goal))
+            {
+                Vector2Int current = queue.Dequeue();
+                foreach (Vector2Int step in Steps)
+                {
+                    Vector2Int next = current + step;
+                    if (Walkable(floor, next, state.facilities) && !parents.ContainsKey(next))
+                    { parents.Add(next, current); queue.Enqueue(next); }
+                }
+            }
+            if (!parents.ContainsKey(goal)) return false;
+            for (Vector2Int current = goal; ; current = parents[current])
+            {
+                path.Add(floor.origin + (Vector2)current + Vector2.one * .5f);
+                if (current == start) break;
+            }
+            path.Reverse();
+            if ((path[0] - from).sqrMagnitude < .000001f) path.RemoveAt(0);
+            return true;
+        }
+
+        // Role: 기능이 남아 있는 시설의 부분 손상만 수리한다.
+        public bool RepairFacility(string id, float amount)
+        {
+            FacilityState item = GetFacility(id);
+            FacilityDefinition kind = item == null ? null : Kind(item.definitionId);
+            if (kind == null || !kind.repairable || item.durability <= 0 || item.durability >= kind.maxDurability || float.IsNaN(amount) || float.IsInfinity(amount) || amount <= 0) return false;
+            item.durability = Mathf.Min(kind.maxDurability, item.durability + amount);
+            return true;
+        }
+
+        // Role: 내구도에 따른 색을 갱신하고 제거된 시설의 표현을 정리한다.
+        public void RefreshFacilityViews()
+        {
+            var removed = new List<string>();
+            foreach (var pair in facilityViews)
+            {
+                FacilityState item = GetFacility(pair.Key);
+                if (item == null) { Destroy(pair.Value); removed.Add(pair.Key); continue; }
+                float brightness = .25f + .75f * item.durability / Kind(item.definitionId).maxDurability;
+                SpriteRenderer[] renderers = pair.Value.GetComponentsInChildren<SpriteRenderer>(true);
+                Color[] colors = facilityColors[pair.Key];
+                for (int i = 0; i < renderers.Length; i++)
+                {
+                    Color color = colors[i];
+                    renderers[i].color = new Color(color.r * brightness, color.g * brightness, color.b * brightness, color.a);
+                }
+            }
+            foreach (string id in removed) { facilityViews.Remove(id); facilityColors.Remove(id); }
+        }
+
         // Role: 층 지역 좌표를 점유 격자 좌표로 변환한다.
         private Vector2Int Cell(FloorDefinition floor, Vector2 position) => Vector2Int.FloorToInt(position / CellSize - floor.origin);
 
@@ -263,6 +453,11 @@ namespace GreatVoyage
             Vector2 position = floor.origin + new Vector2(item.x, item.y) + (Vector2)kind.size * .5f;
             instance.transform.localPosition = position;
             instance.transform.localScale = new Vector3(kind.size.x, kind.size.y, 1);
+            facilityViews.Add(item.id, instance);
+            SpriteRenderer[] renderers = instance.GetComponentsInChildren<SpriteRenderer>(true);
+            var colors = new Color[renderers.Length];
+            for (int i = 0; i < renderers.Length; i++) colors[i] = renderers[i].color;
+            facilityColors.Add(item.id, colors);
         }
     }
 }
