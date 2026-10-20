@@ -1,5 +1,12 @@
 # State
 
+## 최신 상태 — S2~S7 및 후속 수정 커밋·main 반영·푸시 완료 — 2026-10-20
+
+- 사용자 명시 지시로 현재까지의 구현·자산·리소스·기록 전체를 `1ef8527`에 커밋했다(229파일). S2~S7 공통 기반, Scene 정리/루트 Scene 소유, 저장 초기화 Editor 도구, TMP/Noto/OFL, 타일 분류, 거래/고용 UI 및 Domain Reload/AutoHide 수정을 포함한다. ignored Temp/Library/Logs·실제 저장 파일은 제외했다.
+- fetch 결과 main/작업 브랜치는 기존 ac7d7b8과 동일했고, main을 1ef8527로 fast-forward했다. origin/main 및 origin/codex/game-foundation-reconstruction 푸시 모두 성공했다. 이 완료 기록은 후속 문서 커밋으로 두 브랜치에 동기화한다. 최종 사용 브랜치는 main이다.
+- 기존 컴파일/정적 검사 통과와 기능 미검증 경계는 그대로다. Play/Edit Mode 기능 테스트·저장 초기화/IO를 이번 Git 작업에서 실행하지 않았다. S1~S7 골격 완료 판정은 보류한다.
+- 다음 우선순위: 연속 Play 진입/종료의 Selectable 예외와 목록0/영역 내/초과/축소의 스크롤바 표시 → 새 슬롯 생성/정상 종료/재시작·초기화 백업 → S1~S7 통합 순환(이동/층/항구/거래/고용/계약/선원/일지/취침) → 저장 복원·예외 회귀/결함 수정. 검증 사실을 반영한 뒤 구조/기능 게이트를 판정하고 8단계는 별도 결정한다.
+
 ## 최신 상태 — Selectable 오류 경로·스크롤바 조건부 표시 수정 — 2026-10-20
 
 - 사용자 보고의 Selectable/Scrollbar.OnDisable IndexOutOfRange와 Editor 로그의 Reload Domain disabled 진입을 대조했다. 설치 UGUI2.6.0 Selectable.ResetStaticsOnLoad가 전역 목록/count를 초기화하고 개별 m_EnableCalled는 남는 경로가 오류와 부합한다. ProjectSettings/EditorSettings의 DisableDomainReload만 해제(options1→0), 패키지/Library 수정·private 상태 우회는 하지 않았다. 재현/해결 확정은 Play 검증 전까지 미확인이다.
