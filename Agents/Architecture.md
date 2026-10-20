@@ -208,3 +208,7 @@ Assets/Editor/SaveResetWindow.cs는 런타임 포함 없이 개발 슬롯만 관
 Editor Enter Play Mode Options의 DisableDomainReload를 해제하여 Domain/Scene Reload를 복원했다. 설치 UGUI Selectable의 정적 초기화와 개체 등록 상태가 분리되는 OnDisable 예외 경로를 피하기 위한 변경이며 패키지 코드는 수정하지 않는다. 실제 연속 Play 재현 검증은 남아 있다.
 
 모든 Scene UI ScrollRect22개(소유 UI Prefab16개)에 AutoHide를 적용하고 초기 빈 Frame의 스크롤바 객체는 숨긴다. ReplaceRows는 강제로 표시하지 않고 빈 목록 숨김/레이아웃 갱신만 요청하며 ScrollRect가 content와 viewport의 실제 bounds로 표시를 결정한다. AutoHideAndExpandViewport로 구도를 바꾸지 않았다. 기능 테스트·저장 변경 없이 정적 검사/컴파일만 확인했다.
+
+## 기능 검증 및 책상 검색 보완 — 2026-10-20
+
+[VerificationReport](VerificationReport.md)에 승인된 실제 Play/대표 통합·저장 경계 결과를 기록했다. 검사 범위에서 기능 미검증 상태를 갱신하며 전체 마우스/기기/장기·실제 이전 저장 수용으로 확대하지 않는다. StarterShipWorld의 JournalDesk InteractionPoint에 검색용 CircleCollider2D Trigger(.2)를 추가했다. 고체 본체와 접근점이 떨어진 구조에서도 InteractionController의 거리/차폐 조회가 대상을 찾게 하는 표현 연결 보완이며, 원본 JournalDesk Prefab·규칙·좌표/저장은 유지한다. 실제 E열기/닫기·입력 복귀와 재정적 검사 통과.
