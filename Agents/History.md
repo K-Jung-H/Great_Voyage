@@ -953,3 +953,21 @@ GreatVoyage.GameSession:Awake () (at Assets/Scripts/Game/GameSession.cs:56)
 - started: git push -u origin codex/manual-navigation 실행. 승인된 동일 브랜치 일반 푸시만 수행.
 - completed: git push -u origin codex/manual-navigation 성공(exit 0). 원격 새 브랜치 생성, origin/codex/manual-navigation 추적 설정. main 변경·PR 생성 없음. 커밋·푸시 결과를 추가한 Queue만 로컬 미커밋으로 유지한다.
 
+
+## merge-stages-1-to-4 — 2026-10-19
+- 사용자 원문: 1,2,3,4 단계에서 생성된 브랜치를 main에 merge 해, 브랜치 병합까지 진행하라는건 아니야.
+- 설명 요청: main 병합과 병합하지 않는다는 표현이 충돌하여 확인 요청.
+- 사용자 확인 원문: 브랜치까지 병합해.
+- completed: git status/branch/log graph/diff/cached/remote 확인. 네 단계가 836150b→61873c2→e3a6ba6→8276144의 단일 조상 관계. main=4fca610, 현재 codex/manual-navigation=8276144. 미커밋은 직전 커밋·푸시 실행 결과 Queue뿐. 기존 기록 보존.
+- started: Queue만 git stash push로 임시 보존, git switch main, git merge --ff-only codex/manual-navigation으로 1~4단계 모두 포함, 보존 기록 복원. 이후 각 단계 ancestor 검사와 상태 확인. 브랜치 삭제·강제 변경·추가 테스트 없음. main 푸시는 이번 병합 지시에 포함된 별도 명시적 요청이 없어 실행하지 않는다.
+- completed: git stash push -m 'preserve execution records before stages 1-4 merge' -- Agents/Queue.md 성공, git switch main 성공, git merge --ff-only codex/manual-navigation 성공(exit 0): Updating 4fca610..8276144 / Fast-forward. 대량 파일 목록은 생략.
+- completed: git stash pop 'stash@{0}' 충돌 없이 성공, 임시 stash 0dec755 제거. 4개 브랜치별 git merge-base --is-ancestor <branch> main 모두 exit 0. main HEAD=8276144, 로컬 origin/main 대비 ahead 5. 기존 브랜치 보존, 새 병합 커밋/기능 테스트/푸시 없음.
+- completed: State에 통합 상태 반영. Queue/State만 로컬 미커밋 기록으로 유지. 사용자 변경 손실 없음.
+
+
+## push-integrated-main — 2026-10-19
+- 사용자 원문: main도 푸시해
+- completed: git status/log/remote/cached stat 확인. main HEAD=8276144, origin/main 대비 ahead 5, 스테이징 없음. Queue/State의 기존 미커밋 실행 기록 보존.
+- started: git push origin main. 기존 커밋만 일반 푸시하며 별도 커밋/강제 푸시 없음.
+- completed: git push origin main 성공(exit 0), origin/main 965ecf6→8276144. 새 커밋 없음. 미커밋 Queue/State 기록은 푸시 범위에 포함되지 않는다.
+

@@ -9,6 +9,9 @@ namespace GreatVoyage
         [SerializeField, Tooltip("플레이어 위치를 따라가는 반응 속도.")]
         private float followSpeed = 8f;
 
+        // Role: Prefab 밖의 캐릭터 참조를 공통 Composition에서 연결한다.
+        public void BindTarget(Transform player) => target = player;
+
         // Role: 물리 보간된 플레이어 위치를 부드럽게 따라간다.
         private void LateUpdate()
         {

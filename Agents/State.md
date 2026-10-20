@@ -1,5 +1,52 @@
 # State
 
+## 최신 상태 — U0 미니게임 제외 Frame 제작·정적 검사 완료 — 2026-10-20
+
+- 사용자 승인: 미니게임은 우선 무시하고 제작 범위 승인. F20 Host/내부 모두 이번 범위에서 제외하며 U0 수용을 막지 않는다. 이전 미니게임 설계 확정 차단·제작 승인 대기 기록을 대체한다.
+- [ReconstructionPlan15절](ReconstructionPlan.md) 참조. UI Prefab 기존3개 보완+신규29개(화면17/반복 항목11/월드 표시1), 합계32개. 신규60파일은 Prefab/meta58개+폴더meta2개. 실제 Canvas는 기존 UIRoot 컴포넌트이며 HUD/Context/Screens/Modals/Transitions/SystemModals/EventSystem으로 구성했다.
+- GameRoot 중첩 UIRoot635객체·Button82·ScrollRect23, 필수 참조/누락 스크립트/Renderer/직렬화 끊김 검사 오류0. S1 일지/Close/Prompt/EventSystem 연결 보존. 미래 화면은 사전 배치·기본 비활성이며 기능·Controller는 미연결이다.
+- UI 구조 미리보기와 반복 행/하위 뷰를 Preview Scene에서 확인, 게임 기능 호출/기능 테스트 없음. 컴파일 up_to_date, failed=false, errors/warnings 빈 배열. 기존209개 파일 중 UI Prefab3개만 변경,206개 동일. 게임 C#·Scene·월드·저장·패키지·설정은 이번 작업에서 불변이다.
+- 사용자 Editor PortPrototype active/clean/stopped 유지. codex/game-foundation-reconstruction, HEAD 0e9c96d 유지. 스테이징·커밋·푸시·병합 없음.
+- 다음은 별도 승인된 S1 기능 검증. U0 Frame 구조 완료를 S1 골격/전체 기능 완료로 확대하지 않는다. S2 자동 진행 없음. 영문 임시 문구/미술/OS폰트 의존·실제 입력/포커스·후속 바인딩 미검증. 아래 제목들은 작업 당시 이력이다.
+## 최신 상태 — 전체 UI Frame 선행 계획 개정, 승인 대기 — 2026-10-20
+
+- 최신 사용자 요청에 따라 ReconstructionPlan6·8·9·10·14절과 RoadMap을 개정했다. 전체 UI Frame U0 선행 → S1 기능 검증 → S2~S7 순차 연결. 8~12단계 화면도 Frame은 U0 대상이며 기능은 기존 순서를 유지한다.
+- F01~F21 화면/하위 패널/월드 표시, 도안 대응·Hierarchy·Prefab·소유권·생명주기·정적 완료 기준과 S1 보완 목록은 [ReconstructionPlan](ReconstructionPlan.md) 참조. 기존 S1 결과는 아래 기록 그대로 보존하며 전체 Frame 완료를 의미하지 않는다.
+- 미니게임 내부 Frame은 원본 기획 미정이므로 결정 필요. 도안 없는 화면의 구체 배치는 승인 전 제안. U0 실제 제작·기능 테스트·S2 진행은 아직 승인되지 않았다. 다음 행동은 개정 설계·제작 범위 및 미정 항목을 사용자에게 보고하고 승인받는 것이다.
+- 브랜치 codex/game-foundation-reconstruction, HEAD 0e9c96d 유지. 이번 작업은 계획·상태·Queue 문서만 변경하며 기존 게임 파일 변경은 보존한다. 코드·Scene·Prefab 수정, 컴파일·기능 테스트·커밋·푸시·병합은 수행하지 않는다.
+- 아래 ‘최신 상태’ 제목들은 각 작업 당시의 이력이다. 이전 S1 테스트 승인 요청보다 이번 계획 승인 절차를 먼저 따른다.
+
+## 최신 상태 — S1 구현·정적 검사 완료, 기능 검증 대기 — 2026-10-20 (Asia/Seoul)
+
+- 사용자 승인으로 `codex/game-foundation-reconstruction` 생성/전환. HEAD `0e9c96d7b41f836ba0df664c7d0f4805ff35541f` 유지, 기존 미커밋 지침/감사 문서 보존, 스테이징 변경·커밋·푸시·병합 없음. 전체 설계는 향후 기준안이며 이번 실행은 S1에 한정했다.
+- [ReconstructionPlan 13절](ReconstructionPlan.md)의 실제 Hierarchy/파일 목록/게이트 참조. Game.unity + 공통 GameRoot/StarterShipWorld/UIRoot/GameHud/JournalScreen 5개 Prefab, 입력·상호작용·화면 흐름 코드 6개 추가. 기존 PlayerMovement/JournalDesk/CameraFollow에 최소 연결부를 추가했다. Build Settings에 Game을 활성 첫 Scene으로 등록하고 SampleScene/입력 설정은 보존했다.
+- 기존 Scene/Prefab·SO·저장 코드는 불변. 추적 게임/패키지/설정 182개 해시 비교에서 178개 불변, 변경 4개는 위 코드 3개+Build Settings다. 새 실행은 저장 파일을 읽거나 쓰지 않으며 시간/저장·다층·항구·경제·일지 기능 확장은 S2 이후에 남긴다.
+- Unity 6000.6.4f1 컴파일 완료/오류 없음. 신규 Prefab 5개에서 중첩 포함 컴포넌트520·객체 참조1919 정적 조회, 검사 오류0. Game Scene은 공통 Prefab 하나다. 마지막 Editor는 ready/stopped, 원래 PortPrototype clean/active 상태 유지. Console에는 제작 중 사용한 native 설정 저장 API의 persistent-object 오류2건이 남았고 원인 확인 후 해당 경로를 중단했다. 게임 컴파일 실패가 아니며 로그를 지우지 않았다.
+- 게이트: A/B/C S1 정적 통과, D 정적 연결 통과/실행 미확인, E 기존 보호 확인/새 저장 S2 미구현, F 절차 준수/기능 대기. **S1 골격 완료 보류**. Play/Edit Mode 기능 테스트·저장 변환·S2 이후 작업은 하지 않았다.
+- 다음 승인 요청은 Game.unity의 S1 Play Mode 범위: 초기화·연속/대각 이동·벽 충돌·카메라·책상 거리/차폐·일지 E/버튼/ESC·UI 이동 차단/복귀·반복·3개 해상도 구획 확인 및 종료. 상세 성공 기준은 ReconstructionPlan 13절. S2로 자동 진행하지 않는다.
+- Queue `reconstruction-s1-20261020` 참조. 아래 최신/과거 제목은 각 작업 당시 기록이다.
+
+## 최신 상태 — 1~7단계 구조 감사·재설계안 — 2026-10-20 (Asia/Seoul)
+
+- 사용자 요청으로 [ReconstructionPlan](ReconstructionPlan.md)에 R0 디스크 정적 감사와 R1 승인 전 설계안을 작성했다. 기준 브랜치/HEAD는 `codex/journal-autopilot-sleep` / `0e9c96d7b41f836ba0df664c7d0f4805ff35541f`이며 기존 미커밋 지침/문서 변경을 보존했다.
+- 실제 스크립트33개·3개 개발 Scene 직렬화·4개 Prefab·정의 자산·저장/빌드 등록을 조사하고 원본 기획과 D01~D12, E01~E04/E07~E11, G01~G03을 대조했다. Pipeline 인스턴스가 없어 Editor 메모리·미저장 상태·현재 컴파일·실제 렌더링/기능은 미확인이다. 새 Editor 실행/Play/테스트는 하지 않았다.
+- 현 구성은 A/B/C/D 미통과, 새 구성에 대한 E 미확인으로 판단했다. 주요 대상은 공통 실행 구성·항구 구역/포털·Editor UI와 목록 Prefab·인물/재고 원본·규칙/표현/진행/저장 경계다. 기존 기능 테스트 사실은 보존하며 개별 결과를 새로 추정하지 않는다.
+- 제안: Game.unity + GameRoot/UIRoot + 공간 Prefab, GameState 및 ID 기반 인물/재고, 명시적 초기화/입항/저장 경계, 기존 v1~v8를 읽는 별도 변환과 새 v9 출력 후보. 모두 승인 전이며 정의·최종 게임 규칙을 변경한 것이 아니다.
+- 다음: 사용자가 목표 구성·파일/자산 전환 범위·저장 보호 정책·`codex/game-foundation-reconstruction` 브랜치와 첫 S1 묶음을 승인하면 해당 범위부터 진행한다. 브랜치 생성/전환·코드·Scene·Prefab 수정·저장 변환·컴파일·기능 테스트·커밋·푸시 없음. 기능 테스트는 단계별 별도 승인 후 수행한다.
+- Queue `reconstruction-r0-r1-20261020` 참조. Queue 상한 때문에 가장 오래된 `merge-stages-1-to-4` 세트를 원문 그대로 History에 이관했다. 아래의 이전 최신 요약과 진행 이력은 각 작업 당시 기록이며 이번 상태를 대체하지 않는다.
+
+## 최신 상태 요약 — 2026-10-20 (Asia/Seoul)
+
+- 현재 브랜치 `codex/journal-autopilot-sleep`, HEAD `0e9c96d7b41f836ba0df664c7d0f4805ff35541f` (`roadmap step 7 complete`, 2026-10-19)을 Git으로 확인했다. 7단계 사용자 직접 수정·테스트·커밋 사실은 이번 사용자 지시로 확인했다. 개별 테스트 시나리오·결과·범위는 미확인이며 모든 기능·저장 호환 통과로 추정하지 않는다. 커밋 제목 자체도 테스트 증거가 아니다.
+- 아래 7단계 미커밋·Map 수정 후 재확인 대기 등은 당시 기록이다. 7단계 커밋과 사용자 테스트 사실은 위 최신 확인으로 갱신하되, 과거 오류와 미확인 시나리오 이력은 삭제하지 않는다.
+- 새 AGENTS/Rules/RoadMap 및 ArchitectureStandards 적용 상태에서 문서 역할·승인/정적 조회/기능 테스트 경계·기획 단계 대응·후속 검증 범위를 정리한다. 원본 기획과 ArchitectureStandards는 보존한다. 이번 문서 정비는 미커밋이며 기존 지침 반영 변경도 보존한다.
+- 새 기준의 1~7단계 구조·통합 게이트는 미확인이다. 다음 개발 작업은 RoadMap R0 실제 구조 감사 → R1 목표 Scene/UI·저장 호환 전환안 및 승인 확인이다. 이번 문서 수정 요청으로 재구성 구현이나 기능 테스트를 실행하지 않으며 8단계로 진행하지 않는다.
+- 이번 범위는 문서 정비와 정적 문서 대조다. Unity 실제 구조 감사·컴파일·기능 테스트·커밋·푸시는 수행하지 않는다. 상세 실행 기록은 Queue의 `directives-consistency-20261020`을 참조한다.
+
+## 과거 진행 기록
+
+아래 본문은 원래 순서·내용을 보존한다. 기준일·'현재'·'다음 행동'·미커밋·승인 대기 표현은 각 기록 당시 상태이며, 최신 요약·현재 사용자 지시·실제 Git보다 우선하지 않는다. 과거 승인·실행 예정은 새 작업의 실행 허가가 아니다.
+
 기준일: 2026-10-18 (Asia/Seoul)
 
 ## 현재 상태

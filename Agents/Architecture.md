@@ -1,5 +1,32 @@
 # Architecture
 
+## 최신 구조 보충 — U0 UI Frame — 2026-10-20
+
+- 최신 사용자 승인으로 미니게임을 제외한 전체 UI Frame을 Editor Prefab으로 제작했다. 상세 자산별 목록·소유권·게이트는 [ReconstructionPlan15절](ReconstructionPlan.md)을 따른다. 아래 S1/과거 프로토타입 기록은 당시 구조다.
+- 실제 Game.unity→GameRoot→UIRoot 연결은 그대로다. UIRoot 자체가 Canvas/Scaler/Raycaster를 가지며 HUD, Context, Screens, Modals, Transitions, SystemModals, EventSystem을 소유한다. SystemModals는 전환보다 앞이다. 새 화면은 기본 숨김이고 S1 Journal 진입/닫기 연결은 유지한다.
+- UI Prefab 총32개: 기존 UI3개 수정, 신규 화면17/Items11/World UnitStatusBars1. Game Scene/GameRoot/Player/Crew·런타임 C#·저장은 수정하지 않았다. UnitStatusBars는9단계 인물 바인딩용 자산으로 준비했다.
+- UIRoot Controller는 아직 S1 일지 입력만 담당한다. 새 화면의 Controller·데이터·pause/포커스·도메인 연결은 계획된 기능 단계에서 구현한다. 화면이 상태·저장을 소유하지 않으며 런타임 전체 화면 생성 코드는 추가하지 않았다.
+- 정적 구조·S1 참조·컴파일 확인 완료, 기능 미검증. 이는 미니게임 제외 Frame 구조 수용이며 전체 게임 기능/저장 통합 완료가 아니다.
+## 최신 실제 구조 — S1 공통 실행 기반 — 2026-10-20 (Asia/Seoul)
+
+- 사용자 승인 범위는 `codex/game-foundation-reconstruction` 브랜치와 [ReconstructionPlan](ReconstructionPlan.md) S1뿐이다. 전체 설계는 향후 기준안이며 S2 이후·저장 변환·기능 테스트는 미승인이다. HEAD `0e9c96d` 유지, 기존 미커밋 문서 보존.
+- 실제 `Assets/Scenes/Game.unity`는 공통 `Assets/Prefabs/Game/GameRoot.prefab` 하나를 포함한다. Systems(GameComposition) / World(StarterShipWorld의 선실) / Characters(기존 Player 중첩) / Cameras / UIRoot로 수명을 분리했다. 신규 UI는 UIRoot·GameHud·JournalScreen의 Editor 제작 Prefab이고 D01/D03 기본 구획·이미지·스크롤·닫기 버튼을 직렬화했다. 전체 Hierarchy·파일별 목록·게이트는 ReconstructionPlan 13절 참조.
+- GameComposition이 GameInput/GameFlow를 생성·해제하고 기존 CameraFollow/JournalDesk를 명시적으로 연결한다. GameFlow는 IInteractable 조회/요청, UI 표시, PlayerMovement 입력 차단을 조율한다. UI는 게임 상태·파일 IO를 소유하지 않는다. 새 실행에는 기존 GameSession/항해/선원/경제를 초기화하지 않으며 GameState·시간·저장은 S2에서 연결한다.
+- 기존 모터의 AddForce/정규화/가속도 제한·물리 구성, 카메라 추적, Player/JournalDesk의 자산을 재사용했다. PlayerMovement는 기존 Scene용 자체 입력/세션 참조를 보존하고 새 인스턴스에서 공통 입력을 사용한다. 기존 PlayerInteraction은 새 GameRoot 인스턴스에서만 비활성이고 기존 원본 Scene/Prefab은 바꾸지 않았다.
+- 5개 신규 Prefab의 정적 구조/참조 검사와 Unity 컴파일 통과. 기능 검증은 미실행이므로 S1 골격 완료·전체 1~7 통합 완료로 기록하지 않는다. 기존 저장 v1~v8/SaveData/SaveService 및 기존 자산 GUID 보존. 기존 독립 프로토타입·PortPanel의 표준 차이는 후속 승인 단계의 전환 대상이다.
+- 아래 기록은 당시의 구현/감사 내용으로 보존한다. 새 구조 표준·현재 사용자 승인 범위보다 우선하지 않는다.
+
+## 문서 역할 및 최신 확인 — 2026-10-20 (Asia/Seoul)
+
+- 이 문서는 기존 구현·설계 경위의 기록이다. 신규 구현·재구성은 ArchitectureStandards, 게임 요구는 GameDesign, 절차·권한은 AGENTS/Rules, 실행 단계는 RoadMap을 따른다. 아래의 과거 프로토타입 선택·최종 구조 유보·개발 씬 단독 실행을 신규 표준으로 적용하지 않는다.
+- 확인 브랜치는 `codex/journal-autopilot-sleep`, HEAD는 `0e9c96d7b41f836ba0df664c7d0f4805ff35541f` (`roadmap step 7 complete`, 2026-10-19)이다. 7단계 사용자 직접 수정·테스트·커밋 사실은 2026-10-20 사용자 지시로 확인했다. 개별 테스트 결과·범위는 미확인이며 새 구조·통합 게이트는 미확인이다. 이번에는 Unity 실제 구조를 재감사하지 않았다.
+- Agents에는 ArchitectureStandards가 추가되어 역할별 문서가 8개다. 아래의 7개 문서·구현 전 main·7단계 미커밋/테스트 대기 등의 표현은 당시 상태다. 현재 상태는 이 요약과 State 및 실제 Git을 함께 확인한다.
+- 기존 기능·ID·저장 호환을 보존하며 RoadMap R0 감사 후 R1 목표 구성·전환 계획을 제시한다. 독립 개발 씬, UI 제작 방식, 규칙/표현 책임 결합은 감사 대상이며 문서 기록만으로 실제 자산의 표준 준수 여부를 확정하지 않는다.
+
+## 과거 구현·조사 기록
+
+아래 기존 본문은 당시 이력 그대로 보존한다. 절 제목의 '현재'·'확정'과 향후 작업 표현도 해당 기록 시점의 의미이며, 최신 지침·사용자 승인·현존 사실을 대체하지 않는다.
+
 ## 현재 실제 구조
 
 - 루트에 README.md 및 Unity용 .gitignore가 있으며 에이전트 진입점은 AGENTS.md다.

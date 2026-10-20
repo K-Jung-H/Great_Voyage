@@ -4,22 +4,6 @@
 
 기록 원본은 이 문서와 History.md다. 수동 기록·이관 규칙은 Rules.md 참조. 이전 기록은 작업 세트 경계를 유지해 History로 이관한다.
 
-## merge-stages-1-to-4 — 2026-10-19
-- 사용자 원문: 1,2,3,4 단계에서 생성된 브랜치를 main에 merge 해, 브랜치 병합까지 진행하라는건 아니야.
-- 설명 요청: main 병합과 병합하지 않는다는 표현이 충돌하여 확인 요청.
-- 사용자 확인 원문: 브랜치까지 병합해.
-- completed: git status/branch/log graph/diff/cached/remote 확인. 네 단계가 836150b→61873c2→e3a6ba6→8276144의 단일 조상 관계. main=4fca610, 현재 codex/manual-navigation=8276144. 미커밋은 직전 커밋·푸시 실행 결과 Queue뿐. 기존 기록 보존.
-- started: Queue만 git stash push로 임시 보존, git switch main, git merge --ff-only codex/manual-navigation으로 1~4단계 모두 포함, 보존 기록 복원. 이후 각 단계 ancestor 검사와 상태 확인. 브랜치 삭제·강제 변경·추가 테스트 없음. main 푸시는 이번 병합 지시에 포함된 별도 명시적 요청이 없어 실행하지 않는다.
-- completed: git stash push -m 'preserve execution records before stages 1-4 merge' -- Agents/Queue.md 성공, git switch main 성공, git merge --ff-only codex/manual-navigation 성공(exit 0): Updating 4fca610..8276144 / Fast-forward. 대량 파일 목록은 생략.
-- completed: git stash pop 'stash@{0}' 충돌 없이 성공, 임시 stash 0dec755 제거. 4개 브랜치별 git merge-base --is-ancestor <branch> main 모두 exit 0. main HEAD=8276144, 로컬 origin/main 대비 ahead 5. 기존 브랜치 보존, 새 병합 커밋/기능 테스트/푸시 없음.
-- completed: State에 통합 상태 반영. Queue/State만 로컬 미커밋 기록으로 유지. 사용자 변경 손실 없음.
-
-## push-integrated-main — 2026-10-19
-- 사용자 원문: main도 푸시해
-- completed: git status/log/remote/cached stat 확인. main HEAD=8276144, origin/main 대비 ahead 5, 스테이징 없음. Queue/State의 기존 미커밋 실행 기록 보존.
-- started: git push origin main. 기존 커밋만 일반 푸시하며 별도 커밋/강제 푸시 없음.
-- completed: git push origin main 성공(exit 0), origin/main 965ecf6→8276144. 새 커밋 없음. 미커밋 Queue/State 기록은 푸시 범위에 포함되지 않는다.
-
 ## stage5-crew-work-life — 2026-10-19
 - 사용자 원문: 5단계 진행.
 - completed (소급 요약): git branch/rev-parse/status/diff/cached 확인. main 및 origin/main=8276144, 미커밋 Queue/State 실행 기록 보존. Rules/State/RoadMap/Architecture, GameDesign 선원 업무·생활 및 시설 수리 규칙, ShipState/FacilityDefinition/SaveData 확인. 병렬 출력 일부 절단, 관련 5단계 본문과 기획 핵심은 확인함.
@@ -143,3 +127,25 @@
 - 사용자 원문: 적용해.
 - started: 기존 7단계 미커밋 변경 보존. JournalMap에 RequireComponent(CanvasRenderer) 선언을 추가하고 Unity API로 기존 PortPrototype의 Map에 누락된 CanvasRenderer만 추가한다. 씬 전체 재생성·Play Mode 테스트·커밋/푸시 없이 컴파일 및 컴포넌트 연결 확인을 수행한다.
 - completed: JournalMap에 RequireComponent(typeof(CanvasRenderer)) 추가. recompile_status completed. Unity eval로 clean PortPrototype의 Map에 Undo.AddComponent<CanvasRenderer> 추가/저장 성공: CanvasRenderer=True; added=True; dirty=False; compilationFailed=False. console_status groundTruth 현재 오류0/경고0. 누적 캡처2000건은 현재 컴파일 결과와 구분. Play/클리핑 기능 테스트 미실행, 커밋·푸시 없음.
+
+## directives-consistency-20261020 — 2026-10-20 (Asia/Seoul)
+- 사용자 요청 요약: 앞선 분석의 문서 모순·모호성을 최소 수정. 원본 기획·새 구조 표준·기존 이력 보존, GameDesign 역할/단계 대응·Rules 승인/Editor 조회·RoadMap 수용 범위·Architecture/State 최신 상태 구분. 7단계 사용자 직접 수정·테스트·커밋 사실 반영, 미확인 결과 추정 금지. 코드/Scene/Prefab·기능 테스트·커밋·푸시 제외.
+- started: git status/HEAD/log/diff stat/cached stat, 지침 및 Queue 관련 기록 조회 완료(exit 0). codex/journal-autopilot-sleep HEAD=0e9c96d7b41f836ba0df664c7d0f4805ff35541f, 제목 roadmap step 7 complete. 기존 AGENTS/Rules/RoadMap 수정과 ArchitectureStandards 신규 상태 보존. 7단계 직접 수정·테스트는 최신 사용자 지시로 확인하며 개별 결과는 미확인. 사전 조회는 소급 요약이고 긴 출력 일부 잘림. 9개 문서의 원본 바이트를 세션 메모리에 보관했으며 파일 백업은 생성하지 않았다. apply_patch로 문서 수정 후 원문/이력 보존·참조·Diff를 대조한다.
+- completed: 문서 수정·대조 명령 모두 exit 0. GameDesign 안내부의 역할/권한/단계 대응만 변경; Rules 승인 범위·정적 조회/Editor 열기/자산 제작/기능 테스트 경계와 미해결 참조 문구 명료화; RoadMap 필수/후속 연결점과 2·6·7단계 검증 범위 구분; Architecture/State 상단 최신 요약 추가. 원본 바이트 대조로 GameDesign final-spec-begin 이후 전부 및 Architecture/State 기존 본문·Queue 기존 기록 보존, AGENTS/ArchitectureStandards/History 불변 확인. 로컬 Markdown 링크31개 유효, git diff --check exit0. 7개 지침 재대조에서 지적된 규칙 충돌은 해소; 7단계 개별 테스트와 신규 구조/통합 게이트는 미확인 유지. HEAD/스테이징 불변, 게임 코드·Unity 자산 변경 및 Unity 실행·컴파일·기능 테스트·커밋·푸시 없음. 이번 세트 포함 Queue100개 이벤트로 FIFO 이관 불필요. 도구 인자·긴 출력은 핵심 요약이며 전체 원문 기록이 아니다.
+## reconstruction-r0-r1-20261020 — 2026-10-20 (Asia/Seoul)
+- 사용자 요청 요약: 1~7단계 실제 구조·기획/도안 대비 감사 후 최종 게임용 Scene/UI/시스템/상태/저장 재설계안과 단계별 전환·위험·승인 범위 작성. 승인 전 코드/Scene/Prefab 대규모 변경·삭제·기능 테스트·커밋·푸시 금지.
+- started: 지침·기존 상태 및 관련 Queue, 실제 Git·스크립트·정의·Build Settings 읽기 조사. HEAD=0e9c96d, 기존 문서 변경 보존. 기존 unity.exe 일반 실행은 액세스 거부(exit1), 승인된 읽기 도움말은 성공(exit0). editor_status/명령 조회는 Pipeline 인스턴스 없음(exit1). Editor 새 실행/재설치/Play 없이 저장된 직렬화 자료로 계속 감사한다. python PATH 없음; 기존 PowerShell/.NET로 조사한다. Queue100개 상한 유지를 위해 가장 오래된 merge-stages-1-to-4 작업 세트 전체를 History 끝에 원문 복사·일치 확인 후 Queue에서 제거했다. 긴 도구 출력은 핵심 요약이며 전체 원문 수집이 아니다. 설계 결과는 Agents/ReconstructionPlan.md에 작성하고 State·동일 Queue 세트로 연결할 계획이다.
+- completed: R0 정적 감사 및 R1 설계안 Agents/ReconstructionPlan.md 작성, State 최신 요약 연결. 33개 게임 스크립트·3개 개발 Scene YAML/직렬화 참조·4개 Prefab·SO/저장/빌드 설정·원본 기획 및 D12장/E9장/G3장 직접 대조. 주요 미통과 A/B/C/D, E 미확인. 공통 GameRoot/Scene·공간/Editor UI Prefab·인물/재고 원본·규칙/표현/저장 분리와 명시 복원/입항 순서, v1~v8→v9 후보 변환/원본 보호, 파일별 목록·S1~7/R4 검증·위험·승인 항목을 제시했다. Unity Pipeline 없음으로 메모리/렌더링/현재 컴파일 미확인, 기능 미실행. 원본 md CRLF와 기록된 LF 해시는 줄바꿈 차이이며 LF 정규화 해시 일치. 도중 rg PowerShell wildcard 경로 오류는 -g glob으로 수정; 작성 후 소규모 patch 문맥 실패2회는 변경 없이 원인을 확인하고 순서 수정해 성공. 검증 exit0: 보고서 로컬 링크20개·표14개·코드펜스 정합, git diff --check, Assets/Packages/ProjectSettings diff 없음, HEAD/스테이징 불변. AGENTS/Rules/ArchitectureStandards/GameDesign/Architecture/RoadMap 해시가 조사 중 값과 일치. 이번 변경은 보고서·State·Queue 및 FIFO History 이관뿐이며 코드/Scene/Prefab/저장·브랜치/기능 테스트/컴파일/커밋/푸시 변경 없음. 사용자 목표안/새 브랜치/S1 범위 승인 대기. 이후 결과는 승인된 단계별 검증으로만 갱신한다.
+## reconstruction-s1-20261020 — 2026-10-20 (Asia/Seoul)
+- 사용자 요청 요약: codex/game-foundation-reconstruction 생성 및 S1만 승인. 구현 전 목표 Hierarchy/Prefab/책임 대조, 공통 기반·Editor UI·기존 로직/저장/참조 보존, 파괴적 변경 별도 승인. 정적 구조/컴파일 허용, 기능 테스트 별도 승인. 실제 구조·파일/재사용·A~F/미검증 보고, S2/커밋/푸시/병합 금지.
+- started: Git status/HEAD/diff/cached 및 지침/설계/원본 S1 절·D01/D03 대조(긴 출력 일부 잘림), 대상 Editor ready/stopped·PortPrototype clean 확인. 현 HEAD 0e9c96d와 미커밋 문서 보존. git switch -c는 sandbox .git 권한으로 실패했으며 상태 확인 후 승인된 같은 브랜치 생성에 도구 권한을 적용해 성공. Unity commands의 잘못된 옵션·Windows rg wildcard 오류는 help/실제 경로로 교정. S1 신규 자산/코드·기존 호환 연결부와 시간/저장 S2 유보를 사전 보고. 이 started 항목은 앞선 도구 작업의 소급 요약이며 원문 전체 로그가 아니다.
+- completed: S1 코드6개·Prefab5개·Game Scene 신규 및 Unity 생성 meta, 기존 PlayerMovement/JournalDesk/CameraFollow 연결부 수정, Game 활성 첫 Build Scene 등록. 신규 자산은 Temp/S1 일회성 도구를 Unity run_script로 별도 제작 Scene에서 저장하고 원래 Scene 복원. 기능 호출 없음. 컴파일 completed/failed=false/errors=[]; 정적 조회 도구는 Unity 6의 구형 InstanceID 오류를 EntityId로 교정 후 성공: 520컴포넌트·1919참조·검사오류0, GameRoot 단일. Build Settings API는 메모리만 변경; native 저장2회는 persistent-object 거부로 파일 불변/임시 파일 없음 확인, 경로/직렬화/GUID 대조 후 승인된 설정3줄만 직접 반영. Console의 해당 오류2건은 보존, 코드 컴파일 실패와 구분. 기존182개 게임/패키지/설정 해시 대조178개 불변, 변경4개는 코드3개와 Build Settings뿐; 기존 Scene/Prefab/SO/저장·Packages 불변. 최종 Editor ready/stopped·PortPrototype clean/active, HEAD 동일·cached 없음. ReconstructionPlan13/Architecture/State에 실제 구성·파일·A~F·기능 대기 기록. Queue98개 이벤트로 FIFO 이관 불필요. 기능 테스트·사용자 저장 접근/변환·S2·커밋/푸시/병합 없음. S1 Play 검증 별도 승인 대기.
+
+## ui-frame-first-plan-20261020 — 2026-10-20 (Asia/Seoul)
+- started: 사용자 요청 요약: 전체 UI Frame을 초기 선행 구축하고 기능은 단계별 연결하도록 S1~S7 계획 재검토. 전체 목록/Hierarchy/도안/Prefab/소유권·완료 기준과 S1 차이를 작성, 계획 문서만 수정 후 승인 요청. Git/Rules/Standards/State·GameDesign/도안·RoadMap/ReconstructionPlan 및 S1 Prefab 직렬화 읽기 대조. 기존 미커밋 변경 보존. 도구 출력은 핵심 요약이며 긴 출력 일부 잘림.
+- completed: ReconstructionPlan6·8·9·10·14절과 최신 안내, RoadMap 선행 기반 개정; State 최신 상태 추가, 과거 기록 보존. U0 전체 Frame→S1 검증→S2~S7 연결, 후속8~12 Frame 포함 F01~F21·Hierarchy·반복 행·소유권·수명·U-A~U-E 구조 기준 작성. S1 기본 구획과 정식 Frame의 차이 명시. 미니게임 내부 미정/도안 없는 배치 승인 필요 유지. 게임/패키지/설정209개 파일 전후 SHA256·목록 완전 일치, 로컬 링크40개·코드펜스 오류0, git diff --check 통과(기존 LF/CRLF 경고만), HEAD 0e9c96d 유지·cached 비어 있음. 이번 변경4문서뿐, Queue100개 이벤트로 이관 불필요. Unity 실행·컴파일·기능 테스트·게임 파일 변경·커밋·푸시·병합 없음. 개정 설계 및 U0 제작 범위 승인 대기.
+## u0-frame-authoring-20261020 — 2026-10-20
+- started: 사용자 원문: 미니게임은 우선 무시할 것 제작 범위 승인. F20 Host/내부를 제외한 U0 제작 승인으로 반영. 기존 Git 변경·HEAD 보존, Rules/Standards/State·계획/도안·S1 자산 조회. Unity CLI 일반 실행 액세스 거부 후 권한 적용 조회 성공, Editor ready/stopped·PortPrototype clean 확인. Temp/U0에 기존209개 파일 해시 보관. UI Prefab·반복 행 제작 및 S1 참조 보존, 기능/저장/S2/테스트/Git 작업 제외. Queue 상한 유지 위해 oldest push-integrated-main 세트 원문을 History에 복사·일치 확인 후 이관. 긴 출력은 핵심 요약.
+- completed: Unity Editor API로 UI Prefab 기존3개 보완·신규29개(화면17/반복11/월드1) 및 meta 생성, 신규파일60개 전부 UI 아래. 현재 UI32개, UIRoot635객체/Button82/ScrollRect23. GameRoot의 S1 참조4개 및 전체 직렬화 비영 참조·스크립트/UI 필수 구성 검사 오류0.209개 사전 해시 중 UI3개만 변경·206개 동일; 게임 코드/Scene/월드/SO/저장/Packages/설정 불변. 세 해상도·행/하위 뷰 정적 Preview 확인, 컴파일 up_to_date/failed=false/errors=[]/warnings=[]. 초기 도구 HUD 이름 조회 실패 후 통합만 교정; Preview 컬링·EntityId null 검사 오판 교정; 문서 명령 smart-quote 파싱 실패는 무변경 확인 후 here-string/patch로 작성. ReconstructionPlan15/State/Architecture/RoadMap에 미니게임 제외 승인·실제 구조·미검증 기록. Editor PortPrototype active/clean/stopped 유지, HEAD0e9c96d/cached 불변. 기능 테스트·S2·저장 접근·커밋·푸시·병합 없음. Temp/U0 도구/미리보기는 Editor 전용 일회성 산출물, 런타임 미포함. 도구 출력은 핵심 요약이고 긴 참조 오판 출력은 잘림. S1 기능 검증 별도 승인 대기.
+## commit-foundation-main-20261020 — 2026-10-20
+- started: 사용자 요청: 현재까지 진행을 커밋하여 main 반영, 후속 지시로 푸시까지 승인. codex/game-foundation-reconstruction HEAD0e9c96d, main8276144, 스테이징 비어 있음. 지침 개정/감사·재설계/S1/U0 자산 전체 변경 확인, diff --check 통과. main은 현 HEAD의 조상으로 선원/거래/7단계 기존3커밋도 통합된다. 기능 미검증 상태 유지. 작업 커밋 후 main fast-forward 및 원격 상태 확인·푸시 예정. Temp/Library 등 ignored 산출물 제외. 명령/출력 핵심 요약.
