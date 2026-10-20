@@ -14,39 +14,40 @@ namespace GreatVoyage
         private GameSession session;
         [SerializeField, Tooltip("새 공통 실행에서는 Composition이 입력을 공급한다. 기존 Scene은 자체 입력을 유지한다.")]
         private bool useSharedInput;
-
         public bool UsesSharedInput => useSharedInput;
-        private GameInput sharedInput;
 
+        private GameInput sharedInput;
+        private float cellSize = 1;
+        public void BindCellSize(float size) => cellSize = size;
         private Rigidbody2D body;
         private InputAction moveAction;
         private bool inputBlocked;
-
         // Role: 이동 입력과 물리 컴포넌트를 준비한다.
         private void Awake()
         {
             body = GetComponent<Rigidbody2D>();
             body.bodyType = RigidbodyType2D.Dynamic;
-            if (useSharedInput) return;
+            if (useSharedInput)
+                return;
             moveAction = new InputAction("Move", InputActionType.Value);
-            moveAction.AddCompositeBinding("2DVector")
-                .With("Up", "<Keyboard>/w").With("Down", "<Keyboard>/s")
-                .With("Left", "<Keyboard>/a").With("Right", "<Keyboard>/d");
-            moveAction.AddCompositeBinding("2DVector")
-                .With("Up", "<Keyboard>/upArrow").With("Down", "<Keyboard>/downArrow")
-                .With("Left", "<Keyboard>/leftArrow").With("Right", "<Keyboard>/rightArrow");
+            moveAction.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/w").With("Down", "<Keyboard>/s").With("Left", "<Keyboard>/a").With("Right", "<Keyboard>/d");
+            moveAction.AddCompositeBinding("2DVector").With("Up", "<Keyboard>/upArrow").With("Down", "<Keyboard>/downArrow").With("Left", "<Keyboard>/leftArrow").With("Right", "<Keyboard>/rightArrow");
         }
 
         // Role: 활성화된 플레이어의 이동 입력을 받는다.
         private void OnEnable() => moveAction?.Enable();
-
         // Role: 입력을 정규화해 충돌이 처리되는 물리 속도로 전달한다.
         private void FixedUpdate()
         {
-            if (inputBlocked || (session != null && (session.IsPaused || session.IsSleeping))) { body.linearVelocity = Vector2.zero; return; }
+            if (inputBlocked || (session != null && (session.IsPaused || session.IsSleeping)))
+            {
+                body.linearVelocity = Vector2.zero;
+                return;
+            }
+
             Vector2 direction = useSharedInput ? sharedInput?.Move ?? Vector2.zero : moveAction.ReadValue<Vector2>();
-            Vector2 desired = Vector2.ClampMagnitude(direction, 1f) * moveSpeed;
-            Vector2 force = Vector2.ClampMagnitude((desired - body.linearVelocity) / Time.fixedDeltaTime, acceleration) * body.mass;
+            Vector2 desired = Vector2.ClampMagnitude(direction, 1f) * moveSpeed * cellSize;
+            Vector2 force = Vector2.ClampMagnitude((desired - body.linearVelocity) / Time.fixedDeltaTime, acceleration * cellSize) * body.mass;
             body.AddForce(force, ForceMode2D.Force);
         }
 
@@ -54,13 +55,14 @@ namespace GreatVoyage
         public void SetInputBlocked(bool blocked)
         {
             inputBlocked = blocked;
-            if (body == null) body = GetComponent<Rigidbody2D>();
-            if (blocked) body.linearVelocity = Vector2.zero;
+            if (body == null)
+                body = GetComponent<Rigidbody2D>();
+            if (blocked)
+                body.linearVelocity = Vector2.zero;
         }
 
         // Role: 공통 입력을 명시적으로 연결한다. 기존 Scene의 입력 수명에는 관여하지 않는다.
         public void BindInput(GameInput input) => sharedInput = input;
-
         // Role: 비활성화된 플레이어의 입력과 잔여 이동을 정리한다.
         private void OnDisable()
         {

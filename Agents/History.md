@@ -971,3 +971,18 @@ GreatVoyage.GameSession:Awake () (at Assets/Scripts/Game/GameSession.cs:56)
 - started: git push origin main. 기존 커밋만 일반 푸시하며 별도 커밋/강제 푸시 없음.
 - completed: git push origin main 성공(exit 0), origin/main 965ecf6→8276144. 새 커밋 없음. 미커밋 Queue/State 기록은 푸시 범위에 포함되지 않는다.
 
+
+## stage5-crew-work-life — 2026-10-19
+- 사용자 원문: 5단계 진행.
+- completed (소급 요약): git branch/rev-parse/status/diff/cached 확인. main 및 origin/main=8276144, 미커밋 Queue/State 실행 기록 보존. Rules/State/RoadMap/Architecture, GameDesign 선원 업무·생활 및 시설 수리 규칙, ShipState/FacilityDefinition/SaveData 확인. 병렬 출력 일부 절단, 관련 5단계 본문과 기획 핵심은 확인함.
+- 계획: 선원 저장 상태·Cell 경로 이동·정비 자격/자재/시설 선점과 해제·부분 파손 침대 수리·식사/취침 우선·휴식·화면 밖 진행. 동일 Prefab 선원2명 개발 구성으로 중복 선점 확인 가능하게 구성. 정식 새 게임 선원0명 유지, 별도 개발 씬/저장 슬롯으로 기존 저장과 분리. 코드/설정/Prefab/개발 씬 추가 및 기존 시설/저장 연결. 기능 테스트 자동 실행 없음.
+- pending: main 8276144에서 codex/crew-work-life 생성 및 위 새 파일/자산 범위 승인 대기. 기존 Queue/State 미커밋 변경은 그대로 보존 예정. 구현·브랜치 생성·테스트 미실행.
+- 사용자 승인 원문: 제안한 브랜치와 범위로 진행
+- completed: git switch -c codex/crew-work-life 8276144 성공, 기존 Queue/State 보존. CLI editor_status ready/stopped, D:/Great Voyage 확인. ShipLayout/GameSession/정의/수리 A16 규칙 검토.
+- started: CrewState(행동/경로/진행시간), CrewSettings(개발 수치/초기 선원), CrewSimulation(고정 간격 상태 갱신/선점), CrewView(물리 표시/주업무 상호작용) 추가. ShipLayout에 논리 경로/층 연결/시설 조회·수리 API, GameSession에 선원 초기화·갱신·저장 슬롯, 저장 v4 호환 연결. 별도 CrewPrototype 씬/정의/저장 슬롯과 Prefab 추가. 기능 테스트 자동 실행 없음.
+- completed: CrewState/Settings/Simulation/View, ShipLayout 경로·시설 API 및 GameSession/저장 v4/상호작용 연결 작성. recompile_status completed, console_status 현재 compilationFailed=false/오류0/경고0. 누적 error=6은 과거 캡처. 追加 patch는 기존 줄 불일치로 처음 실패해 변경 없이 중단, 정확한 문맥으로 재적용 성공. 로드 시 제거된 대상·막힌 잔여 경로는 작업 취소/선점 해제하도록 보완.
+- started: 기존 clean CaptainsCabin에 기본 빈 선원 시스템 연결, Crew Prefab/StandardCrew/PrototypeCrew/별도 Ship 정의 및 CrewPrototype 씬 추가. 원본 씬은 닫지 않고 개발 씬을 사본으로 저장해 additive 작성 후 닫는다. 기존 실제 저장 파일 직접 변경 없음. 이후 최종 컴파일/참조 확인만 수행.
+- completed: CLI eval authoring 성공 diagnostics=[]. Crew Prefab(Kinematic Rigidbody2D/CircleCollider2D/Sprite/CrewView), StandardCrew(0명)/PrototypeCrew(2명·식량2·도구8)/PrototypeShip(침대2개·첫 내구도20) 생성. 기존 clean CaptainsCabin에 빈 선원 시스템 연결/저장, saveAsCopy로 CrewPrototype 작성, additive로 전용 슬롯/설정/HUD 연결 후 저장·개발 씬만 닫고 원본 활성 유지. Bed 수리/취침 플래그 및 층 연결 데이터를 Unity API로 설정. 긴 eval 원문은 전체 복사하지 않고 작업 API/값/순서로 요약함.
+- completed: 최종 console_status 현재 compilationFailed=false/compiling=false/오류0/경고0. 읽기 OpenPreviewScene 확인 후 ClosePreviewScene: Missing Script 0, 필수 참조 누락 [], 기본 선원0/개발2, 침대2/초기20, 자원2/8, 저장 슬롯 cabin-session/crew-prototype, HUD 연결true, activeScene CaptainsCabin/dirty=false. 상태 초기화·경로 계산·수리·Play Mode 등 기능 실행은 하지 않았다.
+- completed: Architecture/RoadMap/State에 실제 구조/자원·선점 복원/개발 씬 사용/미구현 범위와 사용자 기능 확인 대기 기록. 실제 저장 파일 직접 변경·삭제 없음. 커밋·푸시·main 병합·6단계 착수 없음.
+

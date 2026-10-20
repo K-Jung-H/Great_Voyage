@@ -1,5 +1,31 @@
 # Architecture
 
+## 현재 구성 — Scene 소유 루트·TMP·타일 통행 분류 — 2026-10-20
+
+최신 사용자 지시에 따라 GameRoot는 Game.unity 소유 일반 객체이며 바깥 Prefab 자산은 제거했다. 중첩 공간/캐릭터/UI Prefab은 재사용 단위로 유지한다. 과거 공통 GameRoot.prefab 중심 설명보다 이 안내와 [ReconstructionPlan18절](ReconstructionPlan.md)의 실제 결과가 우선한다. 기획/새 개발 표준은 바꾸지 않았다.
+
+UI32개 Prefab은 TMP_Text(TextMeshProUGUI)/TMP_InputField와 사전 직렬화된 NotoSansKR SDF를 사용한다. OS 폰트 런타임 생성은 제거했다. 거래/대행인/고용 Frame 및 상품 행은 도안에 맞춰 재제작했고 기존 경제 규칙을 연결한다. 구 프로토타입의 미사용 Text 코드까지 전면 수정하지 않았다.
+
+시설 정의의 Passability와 층의 SpecialTileDefinition이 통행 분류 원본이다. ShipModel은 중복 배치 점유와 통행 장애물을 별도로 판정하며 SpecialTileView가 같은 정의를 고체 Collider에 적용한다. 기존 blocked는 잠금/고정 차단 경계, reserved는 통행 가능·배치 금지 경계로 유지한다. 현재7개 고정 특수 타일/2개 시설의 물리 연결을 정적으로 확인했다. 실제 이동/거래/고용/TMP입력·저장 회귀는 미검증이다.
+
+
+## 현재 Scene·개발 도구 정리 — 2026-10-20
+
+사용자 명시 요청으로 SampleScene/CaptainsCabin/CrewPrototype/PortPrototype와 meta를 삭제하고 Assets/Scenes/Game.unity만 남겼다. Build Settings도 Game 단독이다. 이전 ‘구 Scene 보존/회귀 Scene’ 설명은 당시 이력이며 현재 실행 구성은 단일 Game이다. 구 로직·정의·기본 Prefab·레거시 읽기 호환은 삭제하지 않았다. 빈 Dock/Services·Crossroads/Services만 제거해 실제 GameRoot896객체가 되었다. 계획된 UI Frame 및 참조된 진입/상호작용점은 유지한다.
+
+Assets/Editor/SaveResetWindow.cs는 런타임 포함 없이 개발 슬롯만 관리한다. 메뉴 Great Voyage/Development/Save Data → 현재 ReconstructionStart 또는 선택한 GameStartProfile의 reconstruction- 슬롯을 표시 → Play/컴파일 종료 및 legacySourceCopy 비어 있음 확인 → 사용자 확인 → json/tmp/bak를 SaveResetBackups에 복사·SHA256 대조 → 원본 슬롯 파일 제거. 기존 사용자/Player/프로토타입 저장·ReconstructionImports는 대상으로 삼지 않는다. 실제 초기화/기능 검증은 아직 실행하지 않았다.
+
+
+## 현재 구조 — S2~S7 재구성 구현, 기능 검증 대기 — 2026-10-20
+
+[ReconstructionPlan 16절](ReconstructionPlan.md#16-s2s7-일괄-재구성-구현-결과--2026-10-20)이 실제 파일·계층·소유권·게이트의 최신 근거다. 이전 절은 각 작업 당시 구현 기록이다. 기존 프로토타입 선택을 새 표준보다 우선하지 않는다.
+
+- 단일 Game Scene→GameRoot→GameComposition/GameRuntime/SimulationLoop/GameFlow. WorldView가 2층+항구5구역·공유 캐릭터 표현을 소유한다. GameState/InventoryState/인물 등록부가 상태의 원본, ShipModel/NavigationRules/CrewBrain/EconomyRules/JournalRules/RestSession이 규칙을 담당한다.
+- CrewMovement는 ICrewBody 물리 포트, ReservationService는 선점, SaveCoordinator는 독립 v9 DTO/슬롯, LegacySaveAdapter는 명시 복사본 변환 경계다. 구 SaveService/GameSession 등은 기존 Scene용으로 보존하며 Game에는 GameSession 인스턴스가 없다.
+- Editor에서 제작한 UIRoot의 HUD/Context/Screens/Modals/Transitions/SystemModals와 단일 EventSystem을 유지한다. ScreenView/ListItemView 직렬화 키, ScreenStack 정지/포커스, 책임별 Controller로 연결한다. 기본 화면 런타임 생성 없음. 미래 화면 Frame과 미니게임 제외 정책 유지.
+- 신규28코드/6Prefab/6SO 및 meta, 기존6코드/23Prefab 변경. 기존 Scene/원본 Data/meta·Packages/ProjectSettings 불변. A/B/C 정적 통과, D/E 실행 미확인. 컴파일 오류/경고0은 기능 통과를 뜻하지 않는다. S1~S7 일괄 기능 검증 및 실제 저장/복원·회귀가 남아 있다.
+
+
 ## 최신 구조 보충 — U0 UI Frame — 2026-10-20
 
 - 최신 사용자 승인으로 미니게임을 제외한 전체 UI Frame을 Editor Prefab으로 제작했다. 상세 자산별 목록·소유권·게이트는 [ReconstructionPlan15절](ReconstructionPlan.md)을 따른다. 아래 S1/과거 프로토타입 기록은 당시 구조다.
@@ -176,3 +202,9 @@
 - 8단계 연결점: GameSession.ScheduleEventBoundary/EventBoundaryReached, JournalSession.ObserveEvent, PlayerSleep.BeginWatch. 예약 시각에서 진행 예산을 잘라 사건 처리를 호출하고, 불침번으로 전환하지 않은 수면은 중단한다. BeginWatch는 기상/순찰/침대 복귀/미충족 상태를 지원한다. 실제 사건 발생·이벤트 아이콘 데이터 생성·시작 체크포인트/난수 재현은 8단계에서 구현하며 이번에 사건을 자동 생성하지 않았다.
 - SaveData v8의 journalEnabled/journal/sleep가 일지·조타·취침을 저장한다. v7 이하는 새 일지 상태로 확장하고 기존 인물/함선/항해/계약을 보존한다. 이전 저장에 존재하지 않았던 이동 기록은 소급 생성하지 않는다. 복원은 항해→일지→선원 선점→경제→플레이어 위치/취침 순으로 연결해 방향타 선점과 불침번 순찰 시작 위치를 검증한다.
 - 컴파일·직렬화 참조 확인만 수행했다. 실제 일지 조작·AI 조타·취침 이동·저장 복원·이월 규칙의 기능 테스트는 사용자 확인 대기다.
+
+### 스크롤바 표시와 Editor 초기화 수정 — 2026-10-20
+
+Editor Enter Play Mode Options의 DisableDomainReload를 해제하여 Domain/Scene Reload를 복원했다. 설치 UGUI Selectable의 정적 초기화와 개체 등록 상태가 분리되는 OnDisable 예외 경로를 피하기 위한 변경이며 패키지 코드는 수정하지 않는다. 실제 연속 Play 재현 검증은 남아 있다.
+
+모든 Scene UI ScrollRect22개(소유 UI Prefab16개)에 AutoHide를 적용하고 초기 빈 Frame의 스크롤바 객체는 숨긴다. ReplaceRows는 강제로 표시하지 않고 빈 목록 숨김/레이아웃 갱신만 요청하며 ScrollRect가 content와 viewport의 실제 bounds로 표시를 결정한다. AutoHideAndExpandViewport로 구도를 바꾸지 않았다. 기능 테스트·저장 변경 없이 정적 검사/컴파일만 확인했다.

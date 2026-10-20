@@ -1,5 +1,38 @@
 # State
 
+## 최신 상태 — Selectable 오류 경로·스크롤바 조건부 표시 수정 — 2026-10-20
+
+- 사용자 보고의 Selectable/Scrollbar.OnDisable IndexOutOfRange와 Editor 로그의 Reload Domain disabled 진입을 대조했다. 설치 UGUI2.6.0 Selectable.ResetStaticsOnLoad가 전역 목록/count를 초기화하고 개별 m_EnableCalled는 남는 경로가 오류와 부합한다. ProjectSettings/EditorSettings의 DisableDomainReload만 해제(options1→0), 패키지/Library 수정·private 상태 우회는 하지 않았다. 재현/해결 확정은 Play 검증 전까지 미확인이다.
+- EconomyScreens.ReplaceRows의 스크롤바 무조건 enabled/interactable 설정 제거, 양 축 AutoHide·빈 목록 즉시 숨김·항목 교체 뒤 레이아웃 갱신 요청. UI Prefab16개(중첩 합44개 ScrollRect) 및 Game의22개 ScrollRect에 AutoHide·초기 bar GameObject 비활성을 저장했다. 기존 UI 구획/Viewport 크기는 보존하며 필요한 경우에만 내용 크기로 표시한다.
+- 컴파일 completed/failed=false/errors=[]/warnings=[]. 22개 설정/초기 상태/참조 및 전체 구조 검사 오류0, 기존915객체/2704컴포넌트/20447참조·457UI키 유지. Game clean/stopped, HEAD ac7d7b8/cached 보존. 기능 테스트·Play 진입·저장 IO·커밋/푸시 없음. 다음 검증은 연속 Play 진입/종료·UI 닫기/행 교체와 0개/영역 내/영역 초과/축소 시 스크롤바 전환이다.
+
+## 최신 상태 — Scene 소유 GameRoot·TMP·특수 타일·거래/고용 UI 개정 — 2026-10-20
+
+- 사용자 지시에 따라 GameRoot 바깥 Prefab 연결 해제 후 Game.unity가 조립을 직접 소유한다. 미저장 Scene 변경은 사용자 ‘현재 Editor 변경을 보존하여 함께 저장’ 승인 후 보존했다. 중첩 콘텐츠 Prefab은 유지하고 무참조 GameRoot.prefab/meta 제거. 이전 Prefab 중심 기록은 과거 이력이다.
+- 사용자 직접 설치 TMP 리소스/Settings/셰이더 정상 조회 후 UI32개 Prefab·Scene TMP 전환, 직렬화 재연결. Game TMP 텍스트342/입력6·기존 UGUI Text/InputField0. NotoSansKR 원본/OFL·동적 SDF/재질/source를 동봉, UIRoot OS 폰트 생성 제거. Packages 의존성 불변.
+- TilePassability Impassable/Passable 분류를 고정 SpecialTileDefinition/시설 정의에 추가. 점유 검사는 통과형도 유지, 경로/여유 공간은 차단형만 장애물. SpecialTileView9개가 동일 정의로 고체 Collider9개 제어. 잠금 차단과 기존 통행/저장 ID는 보존. 계단 진입2개 통과형, 고정사물5/침대2 차단형. 변경은 다음 초기화에 적용.
+- Merchant/Broker/Hiring와 ProductRow를 D04/D05·본문에 맞춰 재제작. 일러스트/외형은 임시, 협상·평가·주민 요청 미구현 표시 유지. 실제 구조/파일/오류 교정·A~F는 [ReconstructionPlan18절](ReconstructionPlan.md) 참조.
+- Editor Game active/clean/stopped, Scene root 비Prefab/Composition1. 전체 정적 검사915객체/2704컴포넌트/20447참조/457UI키·26점·7구역 오류0/경고0. TMP/목록/폰트/타일 바인딩 별도 검사 오류0, 컴파일 오류/경고0. 세 화면3해상도 정적 Preview. 기능 테스트·Save/Load/초기화·Git 변경 명령 미실행. S1~S7 골격 완료는 계속 보류한다. 브랜치/HEAD ac7d7b8·기존 미커밋 변경 보존.
+
+
+## 최신 상태 — Scene 정리·Editor 저장 초기화 도구 — 2026-10-20
+
+- 사용자 요청으로 미사용 SampleScene/CaptainsCabin/CrewPrototype/PortPrototype Scene 및 meta 4쌍 삭제. Game 외 자산의 직접 의존성에 해당 Scene이 없음을 확인했다. 깨끗한 활성 PortPrototype를 Game으로 전환한 후 삭제했다. Build Settings는 Game만 유지하며 입력 설정은 보존한다. 이전 ‘구 Scene 보존’은 당시 기록이며 이번 명시 삭제 지시가 대체한다.
+- Dock/Crossroads의 기능 참조 없는 빈 Services 객체2개 삭제. 미래 UI Frame·진입/접근점·원본 Prefab/정의·기존 코드/저장 형식은 유지한다. GameRoot896객체/2673컴포넌트/17600참조·536UI키·26접근점·7구역, 정적 오류0/경고0. Game active/clean/stopped.
+- Assets/Editor/SaveResetWindow.cs 신규. 메뉴 Great Voyage > Development > Save Data에서 프로필을 선택해 대상 경로/파일을 확인하고 확인 대화상자를 거쳐 Editor reconstruction 슬롯 json/tmp/bak만 백업·SHA256 검증 후 초기화한다. Play/컴파일 중 또는 Legacy Source Copy 설정 시 차단. 백업은 persistentDataPath/SaveResetBackups에 유지. 기존 Player/프로토타입 저장·가져오기 원본 보존.
+- 컴파일 오류/경고0. 실제 초기화·Save/Load 기능 테스트는 수행하지 않았다. 브랜치/HEAD ac7d7b8 및 기존 미커밋 구현 보존, 커밋/푸시/병합 없음. 다음은 S1~S7 일괄 기능 검증과 새 도구의 초기화/백업/재시작 검증이다.
+
+
+## 최신 상태 — S2~S7 구현·정적 검사 완료, 전체 기능 검증 대기 — 2026-10-20
+
+- 최신 사용자 지시로 S1 검증을 S2~S7 뒤 일괄 검증으로 이관하고 전 단계 구현을 승인받았다. Editor 연결·실전 게임 Hierarchy 관리 요청을 반영했다. 이 묶음의 단계별 기능 선행 게이트 유보이며 기능 통과/골격 완료를 의미하지 않는다. 아래 과거 ‘S2 미승인’ 문구는 당시 기록이다.
+- 현재 `codex/game-foundation-reconstruction`, HEAD `ac7d7b84b78d0fbc5f21e6d50999cda4db76b444`. 기존 승인 브랜치 재사용. 스테이징·커밋·푸시·병합 없음. 실제 구조·파일별 목록·보존/위험·게이트는 [ReconstructionPlan 16절](ReconstructionPlan.md#16-s2s7-일괄-재구성-구현-결과--2026-10-20) 참조.
+- GameRuntime/Loop·단일 상태/재고/인물·v9 저장, 함선/항구 7구역, 선원 규칙/물리 분리, 경제/계약/정산, 일지/자동항해/취침을 공통 Game 구성과 기존 U0 Frame에 연결했다. 새 코드28개·Prefab6개·SO6개 및 meta 포함 신규83파일. 기존269개 중29개 변경/240개 불변. 기존 Scene·원본 Data/기본 캐릭터 Prefab·설정/패키지/meta 보존, 사용자 저장 읽기/쓰기/변환 실행 없음.
+- Unity6000.6.4f1 Editor 제작/정적 조회: Game Scene root1/Composition1/구 GameSession0, GameRoot898객체·2675컴포넌트·17612직렬화 참조·536 UI키·26상호작용점·7구역, 정적 검사 오류0/경고0. 컴파일 up_to_date/failed=false/errors=[]/warnings=[]. 사용자 PortPrototype active/clean/stopped 유지. 누락된 ListItemView 직렬화/저장 실패를 독립 스크립트·명시 저장 성공 검사로 교정하고 재확인했다.
+- A/B/C 정적 통과, D 통합 연결·E 보존/저장 정책 정적 확인이나 실행 미확인, F 검증 구분 준수. **S1~S7 골격 완료 보류**. 기능 테스트/빌드 미실행. 기존 구 Scene의 과거 런타임 UI는 보존되지만 새 Game은 사용하지 않는다.
+- 다음: 전체 이동/입력/정지·층/항구·선원·거래/계약·일지/취침·실제 저장/복원/이전 복사본 변환을 일괄 검증한다. 기능 테스트는 아직 수행하지 않는다. legacy 인물 중복 스냅샷 충돌 거부·1MB 상한·장기 진행·임시 미술/문구·개발용 고정 시작 프로필의 한계를 유지한다. 미니게임/8단계 자동 진행 없음.
+
+
 ## 최신 상태 — S1/U0 커밋·main 반영·푸시 완료 — 2026-10-20
 
 - 사용자 명시 승인에 따라 지침 개정·구조 감사/계획·S1 공통 기반·미니게임 제외 U0 Frame을 e9b9da6으로 커밋했다(101파일). Temp 등 ignored 산출물 제외.

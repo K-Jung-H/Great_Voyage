@@ -9,38 +9,48 @@ namespace GreatVoyage
         private float interactionRange = 1.25f;
         [SerializeField, Tooltip("상호작용 대상과 시야를 막는 물리 계층.")]
         private LayerMask interactionMask = ~0;
-
+        private float cellSize = 1;
+        public void BindCellSize(float size) => cellSize = size;
         private readonly List<Collider2D> candidates = new List<Collider2D>(16);
         private readonly List<RaycastHit2D> obstacles = new List<RaycastHit2D>(16);
-
         // Role: 유형별 분기 없이 거리와 차폐 조건을 만족하는 가장 가까운 대상을 조회한다.
         public IInteractable FindTarget()
         {
-            var filter = new ContactFilter2D { useTriggers = false };
+            var filter = new ContactFilter2D
+            {
+                useTriggers = true
+            };
             filter.SetLayerMask(interactionMask);
-            Physics2D.OverlapCircle(transform.position, interactionRange, filter, candidates);
+            float range = interactionRange * cellSize;
+            Physics2D.OverlapCircle(transform.position, range, filter, candidates);
             IInteractable nearest = null;
-            float distanceLimit = interactionRange;
+            float distanceLimit = range;
             foreach (Collider2D candidate in candidates)
             {
                 IInteractable target = candidate.GetComponentInParent<IInteractable>();
-                if (target == null || !target.Available || target.InteractionRoot.IsChildOf(transform)) continue;
+                if (target == null || !target.Available || target.InteractionRoot.IsChildOf(transform))
+                    continue;
                 float distance = Vector2.Distance(transform.position, target.InteractionPosition);
-                if (distance > distanceLimit || !CanReach(target, filter)) continue;
+                if (distance > distanceLimit || !CanReach(target, filter))
+                    continue;
                 nearest = target;
                 distanceLimit = distance;
             }
+
             return nearest;
         }
 
         private bool CanReach(IInteractable target, ContactFilter2D filter)
         {
+            filter.useTriggers = false;
             Physics2D.Linecast(transform.position, target.InteractionPosition, filter, obstacles);
             foreach (RaycastHit2D obstacle in obstacles)
             {
                 Transform hit = obstacle.collider.transform;
-                if (!hit.IsChildOf(transform) && !hit.IsChildOf(target.InteractionRoot)) return false;
+                if (!hit.IsChildOf(transform) && !hit.IsChildOf(target.InteractionRoot))
+                    return false;
             }
+
             return true;
         }
     }

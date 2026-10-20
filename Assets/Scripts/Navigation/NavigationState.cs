@@ -17,5 +17,6 @@ namespace GreatVoyage
         public Vector2 boardingPosition;
         public int voyageSequence;
         public int completedSequence;
+        public double voyageStartedAt = -1;
     }
 }

@@ -1,5 +1,10 @@
 # 1~7단계 구조 감사 및 재구성 설계안
 
+현재 구조 우선 안내 — GameRoot의 Scene 소유 전환, TMP, 특수 타일 분류와 거래/고용 UI는 **18절**이 최신이다. 이전16·17절 및 아래 승인 상태는 각 작업 당시 기록으로 보존한다.
+
+최신 상태 — 2026-10-20: 사용자 명시 승인으로 **S2~S7 구현·정적 검사·컴파일 완료**, **S1~S7 일괄 기능 검증 대기**. 현재 실제 결과와 위험/파일 목록은 **16절**이 우선한다. 이전 승인 대기/미승인 표기는 당시 기록이다. 일반 개발 규칙·기획은 변경하지 않았으며 이번 묶음만 단계별 기능 검증 선행을 유보했다. 미니게임/8단계/기능 테스트/새 Git 작업은 제외한다.
+
+
 작성: 2026-10-20 (Asia/Seoul). 상태: **R0 정적 감사 결과 + R1 승인 전 제안**. 아래 새 파일명·타입명·Scene/Prefab 구성은 구현안이며 확정 규범이나 구현 완료 기록이 아니다. 이 문서 작성으로 코드·자산 변경, 테스트, 브랜치, 커밋·푸시가 승인되지는 않는다.
 
 최신 갱신 — 2026-10-20: 사용자가 전체 설계를 향후 기준안으로 사용하되 **새 브랜치와 S1 구현만 승인**했다. 실제 S1 구현과 검증 결과는13절에 보존한다. 최신 UI Frame 선행 요청에 따라6·8·9·10절은 개정안이며14절이 현재 승인 요청이다. 12절은 최초 승인 요청의 과거 기록이다. S2 이후·저장 변환·기능 테스트·커밋·푸시·병합은 승인되지 않았다.
@@ -492,7 +497,7 @@ Assets/Scenes/Game.unity
 | [JournalDesk.cs](../Assets/Scripts/Interaction/JournalDesk.cs) | 기존 접근점 유지, IInteractable 및 OpenRequested 추가 |
 | [CameraFollow.cs](../Assets/Scripts/Camera/CameraFollow.cs) | 기존 추적 유지, 명시적 BindTarget 추가 |
 | [Game.unity](../Assets/Scenes/Game.unity) | 신규. GameRoot Prefab 단일 진입 |
-| [GameRoot.prefab](../Assets/Prefabs/Game/GameRoot.prefab) | 신규. 시스템·World·Characters·Cameras·UIRoot 조립 및 명시 참조 |
+| `GameRoot.prefab` (당시 자산,18절에서 제거) | 신규. 시스템·World·Characters·Cameras·UIRoot 조립 및 명시 참조 |
 | [StarterShipWorld.prefab](../Assets/Prefabs/World/StarterShipWorld.prefab) | 신규. 선실 바닥/벽·기존 책상·진입점 |
 | [UIRoot.prefab](../Assets/Prefabs/UI/UIRoot.prefab) | 신규. Canvas/Scaler/입력·HUD/Journal 중첩·화면 참조 |
 | [GameHud.prefab](../Assets/Prefabs/UI/GameHud.prefab) | 신규. D01 구획 및 공통 프롬프트 |
@@ -609,3 +614,154 @@ Game.unity → GameRoot → UIRoot (Canvas + CanvasScaler + GraphicRaycaster + �
 - 임시 그래픽·영문 문구 사용. 기존 OS 폰트 의존, 최종 로컬라이제이션/폰트/미술은 남아 있다. 정적 미리보기는 입력·기기별 렌더·모달 정지·저장 검증을 대체하지 않는다.
 - 새 Controller 직렬화 필드는 담당 단계에서 추가한다. 현 UIRoot는 S1 일지 계약만 구현하고 다른 화면의 진입·중첩 포커스는 아직 실행하지 않는다. F21의 캐릭터 바인딩은9단계다.
 - 기능 테스트·S2·커밋·푸시·병합은 별도 승인 없이 수행하지 않는다. 미니게임은 향후 재개 지시 때 기획/내부 Frame 설계를 확인한다.
+## 16. S2~S7 일괄 재구성 구현 결과 — 2026-10-20
+
+**현재: 구현·정적 구조 검사·컴파일 완료, S1~S7 통합 기능 검증 대기. 골격 완료 판정은 보류한다.** 사용자가 S1 검증을 전체 구현 뒤로 이관하고 S2~S7 전부 구현하도록 명시 승인했다. 따라서 이 묶음에서만 기존 단계별 기능 검증 선행 조건을 유보한다. 과거 절의 ‘S2 미승인/자동 진행 금지’는 당시 기록이며 이번 승인 범위에서는 이 절을 따른다. 8단계·미니게임·기능 테스트·새 커밋/푸시/병합 승인은 포함하지 않는다.
+
+브랜치 `codex/game-foundation-reconstruction`, 기준 HEAD `ac7d7b84b78d0fbc5f21e6d50999cda4db76b444`. 기존 승인 브랜치를 재사용했으며 현재 변경은 미커밋이다. 활성화된 Unity 6000.6.4f1 Editor에 연결해 Prefab/SO 제작·직렬화 연결·Preview 조회를 수행했다. 사용자 PortPrototype Scene은 active/clean/stopped로 보존했다.
+
+### 단계별 실제 반영
+
+| 단계 | 반영한 책임·대표 연결 | 기능 완료와 구별할 사항 |
+|---|---|---|
+| S2 | GameRuntime/GameState, 단일 PauseService와 SimulationLoop, 공통 ScreenStack, 저장/정상 종료/오류 모달, 독립 v9 SaveCoordinator | 시간·정지·원자 저장·실패 재시도·복원은 실행 미검증 |
+| S3 | 순수 ShipModel, 명시적인 양끝 StairLinkDefinition, 2층 공간/시설/침대, 층별 위치와 내구도 표시, 층 전환 삽화 영역 | Cell 단위/월드 좌표 변환·계단·선점·수리 회귀 검증 필요 |
+| S4 | NavigationRules, 조타 입력/Context, 항해·입항 순번, 승하선, 항구 5구역 연결과 구역별 위치 보존 | 실제 항로/입항 경계·정지/가속·재탑승 검증 필요 |
+| S5 | CrewBrain 규칙과 CrewMovement 물리 표현 분리, ReservationService, 공통 선원 Prefab, 실제 CrewDetails 상태/허용 업무 선택 | 화면 밖 이동·충돌·욕구/식사/수리·업무 지속·선점 회귀 필요 |
+| S6 | 단일 InventoryState, 인물 등록부·ID 계약 참조, Merchant/Broker/Hiring/Contracts/Settlement/Tavern Controller와 기존 Frame 연결 | 구매/판매·선불/후불·N회·재고용·정산/취소·게임 오버 검증 필요 |
+| S7 | JournalRules/JournalChart/Controller, 실제 지도·기록·메모·계획선 연결, RestSession·취침 Context·공통 시간/항해 연결 | 자동 기록/자동항해 자격·취침/불침·입항 시각·중도 복원 검증 필요 |
+
+### 실제 Scene·Hierarchy·Prefab 관리
+
+```text
+Assets/Scenes/Game.unity                         (파일 자체 보존)
+└─ GameRoot                                     (중첩 Prefab)
+   ├─ Systems [GameComposition → GameRuntime / SimulationLoop / GameFlow]
+   ├─ World [WorldView]
+   │  ├─ Ship [StarterShipWorld.prefab]
+   │  │  └─ Floors / deck-2 선장실, deck-1 갑판
+   │  │     └─ Geometry / Facilities / Links      (층별 역할 구분)
+   │  └─ Port / Dock / Crossroads / TownDistrict / Market / Tavern
+   ├─ Characters / Player / 동적 CrewCharacter 인스턴스
+   ├─ Cameras / MainCamera
+   └─ UIRoot [Canvas, ScreenStack 및 화면 Controller]
+      ├─ HUD / Context / Screens / Modals / Transitions / SystemModals
+      └─ EventSystem                            (공유 1개)
+```
+
+위 표기는 책임별 요약이다. 실제 직렬화 area ID는 `deck-2`, `deck-1`, `dock`, `crossroads`, `town`, `market`, `tavern`이다. 구역별 root/entry/bounds, 시설 ID별 표시 객체, 26개 상호작용 접근점과 포털 목적지를 명시했다. 서로 다른 항구는 같은 공간 Prefab을 사용하며 상태를 portId로 구별한다. 계단·포털은 WorldInteraction을 각 공간에 사전 배치하고, 별도 단일 컴포넌트용 Prefab을 기계적으로 늘리지 않았다. AreaView/FacilityViewBinding은 WorldView.cs의 직렬화 데이터로 유지한다.
+
+D02 및 D08~D12 도안에 대응하여 부두의 바다/육지/접안, 교차로의 주도로/분기, 마을의 주점/호수/조선소 자리, 시장의 상하 노점/우측 중개소, 주점의 테이블/카운터/출입구를 배치했다. 미래 조선소·시청 등 서비스는 자리를 유지하고 비활성 접근점으로 구별했다. 최종 미술·문구는 임시이며 영문 공간 표지가 남아 있다.
+
+U0의 전체 화면 Frame을 유지하고 S2~S7 담당 화면만 연결했다. 기본 화면/레이아웃/버튼을 런타임 생성하지 않는다. 동적 목록은 사전 제작 ItemTemplate Prefab만 인스턴스화한다. 지도 메시와 실제 선원 표현은 데이터에 따른 동적 요소다. 미래 협상·요청·전투·망원경 등은 Frame을 유지한 미연결 범위이며 미니게임은 계속 제외한다. 동일 Screens 부모 안에서는 열린 화면을 마지막 형제로 올리고 SystemModals 계층은 별도로 유지한다.
+
+### 데이터·책임·의존성 및 기존 로직 재사용
+
+- Composition은 직렬화 참조 검증, 상태 복원→도메인→Controller→World 바인딩→입력 활성화 순서를 조율한다. Flow는 화면·공간·입력 전환만 담당한다. UI가 별도 게임 세션이나 저장 원본을 생성하지 않는다.
+- 기존 ShipLayout의 점유/경로/시설 유효성/수리, NavigationSession의 이동·최초 항구 교차·항해 순번, CrewSimulation의 행동/욕구/작업/이동, EconomySession의 가격·계약·정산, JournalSession의 기록/계획/자동항해, PlayerSleep의 취침/시간 경계 알고리즘을 새 책임으로 분리·재사용했다. 기능 동등성은 회귀 테스트 전까지 미확인이다.
+- 도메인 규칙에서 Transform·Instantiate·입력·전체 UI·직접 파일 IO를 분리했다. CrewBrain은 ICrewBody를 통해 물리/논리 이동 표현을 사용한다. 공용 ReservationService가 자원을 선점하고 InventoryState가 식량/수리도구/상품/항구 재고 및 금액의 원본이다.
+- 인물 등록부는 활동/만료 인물을 안정 ID로 보존하고 계약은 crewId를 참조한다. v9 DTO에는 과거 호환용 gold/cargo/food/tools/market.stock/formerCrew 중복 상태를 출력하지 않는다. 이전 상태 컨테이너의 필드는 구 Scene 호환 때문에 남아 있어도 새 저장의 원본이 아니다.
+- 단일 Loop가 소시간 예산과 취침 가속을 처리하고 입항 경계 뒤 일지·기상·경제 연결을 조율한다. 저장 요청은 합쳐 LateUpdate의 일관된 스냅샷으로 출력한다. 도메인별 독립 저장 파일은 만들지 않는다.
+- 확장: 상품은 ItemDefinition/카탈로그, 함선은 정의/계단/공간 바인딩, 항구는 portId별 상태와 공용 공간, 신규 업무는 CrewBrain 규칙 및 허용 업무 목록, 신규 화면은 U0 Frame의 Controller 바인딩을 확장한다. 8단계 이벤트는 시간 경계 연결점만 준비했고 이벤트 자체는 구현하지 않았다.
+
+### 저장 보호와 미해결 위험
+
+- 기존 SaveService와 v1~v8 파일은 변경·읽기·변환 실행하지 않았다. LegacySaveAdapter는 명시적으로 준비한 `persistentDataPath/ReconstructionImports` 아래 복사본만 허용하고 출처 경로/SHA256/버전/space를 기록하도록 구현했다. 기본 profile의 legacySourceCopy는 비어 있다.
+- 새 슬롯은 `reconstruction-` 접두사만 허용한다. v9 저장은 별도 DTO, CreateNew 임시 파일·디스크 flush·원자 교체와 backup을 사용하며 남은 tmp/bak·잘못된 데이터는 임의 복구/삭제하지 않는다. 저장 오류는 정지와 명시적 Retry로 처리한다.
+- 기존 공간 ID 3종/함선·선원 정의 ID 매핑을 유지했다. cellSize는 저장하고 변화 시 위치를 임의 변환하지 않고 명시 마이그레이션을 요구한다. 이전 항해 시작 시각을 알 수 없으면 HUD가 추정값을 표시하지 않는다.
+- 활동 인물과 과거 formerCrew에 동일 ID의 서로 다른 스냅샷이 있으면 보수적으로 가져오기를 거부한다. 실제 복사본으로 충돌/수량 보존 검증이 필요하다. 자동 병합·원본 덮어쓰기는 하지 않는다.
+- 1MB 저장 상한·장기 일지 증가 위험은 그대로 남는다. 저장 IO/강제 실패/재시작/장시간 진행은 미검증이다.
+- 시작 profile은 `fixedDevelopmentStart=true`로 명시한 대표 데이터이다. 최종 랜덤 시작/전체 유형·콘텐츠·기획 미정 수치는 기존 후속 단계에 남기며 이번 재구성으로 확정하지 않는다.
+
+### 파일별 변경 목록
+
+기존 추적 게임/패키지/설정 269파일의 SHA256 대조: **29개 변경, 240개 불변**. 신규 83파일에는 아래 C#28개·Prefab6개·SO6개 및 Unity meta/폴더 meta가 포함된다. 기존 Scene·원본 Data 자산·Player/Crew/Bed/JournalDesk 원본 Prefab·Packages/ProjectSettings·기존 meta/GUID는 불변이다.
+
+| 경로(Assets 기준) | 변경과 역할 |
+|---|---|
+| Scripts/Game/{GameState,GameStartProfile,GameRuntime,SimulationLoop}.cs | 신규: 상태·설정·공통 서비스·시간 |
+| Scripts/Ship/ShipModel.cs | 신규: 논리 함선 모델 |
+| Scripts/Navigation/{NavigationRules,JournalRules}.cs | 신규: 항해/일지 규칙 |
+| Scripts/Crew/{CrewBrain,CrewMovement,ReservationService}.cs | 신규: 규칙·물리 표현·선점 |
+| Scripts/Economy/{InventoryState,ItemDefinition,EconomyRules}.cs | 신규: 공통 재고·정의·경제 규칙 |
+| Scripts/Player/RestSession.cs | 신규: 취침 규칙 |
+| Scripts/Save/{LegacySaveAdapter,SaveCoordinator}.cs | 신규: 복사본 변환·v9 출력 |
+| Scripts/World/{WorldInteraction,WorldView}.cs | 신규: 접근점·구역/인물 표현 |
+| Scripts/UI/{ScreenView,ListItemView,ScreenStack,EconomyScreens,JournalScreenController,JournalChart,HudPresenter,SessionScreenController,ContextPresenter,CrewScreenController}.cs | 신규: Editor UI 참조와 표현/입력 연결 |
+| Scripts/Game/{GameComposition,GameFlow}.cs | 수정: 공통 구성/흐름 연결 |
+| Scripts/Interaction/InteractionController.cs, Scripts/Player/PlayerMovement.cs | 수정: 트리거 접근/고체 차폐, Cell 크기 대응; 구 Scene 기본 동작 보존 |
+| Scripts/Navigation/NavigationState.cs, Scripts/Ship/ShipDefinition.cs | 수정: 항해 시작 시각·명시 계단 정의 추가 |
+| Prefabs/Game/{GameRoot,CrewCharacter}.prefab | Root 수정·Crew 신규; 기존 원본 캐릭터 보존 |
+| Prefabs/World/StarterShipWorld.prefab | 수정: 갑판/시설/계단·항해 접근점 |
+| Prefabs/World/{Dock,Crossroads,TownDistrict,Market,Tavern}.prefab | 신규: 도안 대응 구역/포털 |
+| Prefabs/UI/{UIRoot,MerchantScreen,BrokerScreen,HiringScreen,ContractsScreen,SettlementModal,TavernServiceScreen,JournalScreen,SessionModals,CrewDetailsScreen}.prefab | 수정: Controller/ScreenView·목록/입력·필수 참조 연결 |
+| Prefabs/UI/Items/{BattleLogRow,ContractRow,CrewRow,DialogueChoice,FacilityRow,JournalHistoryItem,ProductRow,QuestRow,ResidentRequestRow,ShipRow,StatRow}.prefab | 수정: 공통 ListItemView를 독립 스크립트로 연결; 미래 기능 구현 아님 |
+| Data/Game/{ReconstructionStart,ReconstructionShip,ReconstructionStarterShip}.asset 및 Items/{cloth,food,repair-tools}.asset | 신규: 명시 fixture·기존 ID 대응 함선 정의·상품 카탈로그 |
+
+구 Scene의 GameSession/SaveService/PortPanel/JournalView/CrewSimulation 등은 회귀 비교용 기존 구현으로 보존했다. 그 안의 런타임 UI 생성은 과거 표준 충돌의 잔존 기록이며 Game Scene에서는 해당 세션/화면을 사용하지 않는다. 삭제/기존 Scene 전환을 이번에 수행하지 않았다.
+
+### 구조 게이트와 검사 근거
+
+| 게이트 | 판정·근거 |
+|---|---|
+| A 기획 | S2~S7 범위 정적 통과. D02/D08~D12 공간 및 U0 화면 도안 대응; 전체 게임 기능 완성 아님 |
+| B Editor 구조 | 정적 통과. 실제 Game Scene root1/GameComposition1/구 GameSession0. GameRoot898객체·2675컴포넌트, 7구역·26접근점 |
+| C 책임/참조 | 정적 통과. 직렬화 참조17612개·키 UI536개, 누락 스크립트/필수 참조·중복 형제명·목적지/접근점 고체 겹침·Scroll/template 검사 오류0/경고0. 실제 성능/상호작용 미확인 |
+| D 통합 | 정적 연결 통과 / 기능 미확인. 단일 Game 진입에서 S1~S7 연결, 실행/회귀 통과를 주장하지 않음 |
+| E 저장 | 기존 파일 보존·새 소유권/정책 정적 통과 / 변환·원자 IO·복원 기능 미확인 |
+| F 검증 | Unity recompile up_to_date, failed=false, errors=[]/warnings=[]. 기능 테스트 미실행, 골격 완료 보류 |
+
+7개 공간 Preview 렌더와 실제 Prefab 참조를 직접 확인했다. Temp/Reconstruction의 제작·검사 도구/해시/이미지는 ignored 일회성 Editor 산출물이며 런타임 빌드에 넣지 않는다. 제작 중 두 번째 MonoBehaviour를 같은 스크립트에 둔 탓에 ListItemView 직렬화가 누락되어 일부 Prefab 저장이 실패한 문제를 정적 검사에서 발견했다. 독립 ListItemView.cs로 분리하고 해당 신규 참조·실패한 저장을 재작성, SaveAsPrefabAsset 성공 반환값 및 최종 실파일 검사로 교정했다. 도구 진입점 오기/Unity null 판정/컴파일러 참조 문제 등은 수정·재실행했다. 과거 Console 오류를 지우거나 현재 기능 오류가 없다는 근거로 사용하지 않는다.
+
+### 다음 일괄 검증 범위 — 아직 실행하지 않음
+
+1. Game 진입/초기화, S1 이동·카메라·벽·책상·입력/닫기 및 U0 해상도/영역/포커스.
+2. 시간·화면 중첩 정지/복귀·오류 잠금·정상 종료; 실제 저장/재시작·tmp/bak 실패 경로.
+3. 2층 계단/좌표/시설 내구도, 선원 고용→업무·자원 선점→식사/수리·물리/화면 밖 이동.
+4. 조타→입항→승하선→항구5구역→거래/고용/계약→정산/출항, 취소·게임 오버·채무·재고 보존.
+5. 일지 기록/메모/계획·자격 있는 항해사 자동항해, 취침/불침→가속 입항·기상, 중도 저장 복원.
+6. 사용자 제공 복사본만으로 v1~v8 출처별 변환·ID/수량/계약 이력 대조, 구 Scene 기능 회귀.
+
+위 항목은 검증 계획이며 통과 사실이 아니다. 후속8단계로 진행하지 않는다. 사용자 일괄 검증 결과 또는 별도 승인된 기능 테스트의 실제 근거를 받은 뒤 S1~S7 골격 완료 여부를 갱신한다.
+
+## 17. 후속 정리 및 저장 초기화 도구 — 2026-10-20
+
+사용자의 ‘불필요 Scene/객체 제거·Save/Load 테스트용 초기화 기능’ 명시 요청으로, 16절까지 보존했던 SampleScene/CaptainsCabin/CrewPrototype/PortPrototype와 meta를 삭제했다. Game 이외의 자산에서 해당 Scene 직접 의존성이 없는 것을 확인했고 활성 PortPrototype가 clean/stopped임을 확인한 뒤 Game을 열었다. Game Scene/기존 참조 GUID는 유지하고 Build Settings는 Game 하나만 남겼다. Dock/Crossroads의 비어 있고 기능 참조 없는 Services 객체2개도 제거했다. 미래 UI Frame·접근점/진입점·기존 도메인 코드·원본 Prefab/SO와 저장 호환은 유지한다. 기존 Scene에서의 회귀 대신 단일 Game과 Git의 이전 기록을 근거로 회귀 범위를 판단한다.
+
+Editor 메뉴 **Great Voyage > Development > Save Data**를 추가했다(Assets/Editor/SaveResetWindow.cs). 기본 ReconstructionStart 또는 선택한 GameStartProfile의 Editor reconstruction 슬롯 파일·경로를 표시하고, 사용자 확인 뒤 json/json.tmp/json.bak만 별도 SaveResetBackups로 복사·SHA256 대조 후 제거한다. 백업 경로/manifest를 남겨 수동 복원이 가능하다. Play/컴파일 중 실행, 링크 경로, 프로토타입/Player 슬롯, Legacy Source Copy가 지정된 상태의 빈 게임 초기화를 차단한다. 다음 Game 시작 때 새 상태를 생성하며 런타임 상태를 살아 있는 채로 초기화하지 않는다. 전체 persistentDataPath 삭제·PlayerPrefs 전체 삭제·가져오기 원본 삭제는 하지 않는다.
+
+정적 재검사: GameRoot896객체·2673컴포넌트·17600참조·UI키536개·26접근점·7구역, 오류0/경고0. Unity 컴파일 오류/경고0. 실제 초기화·백업 복원·Save/Load·게임 기능 테스트는 미실행이다. 정적 조회/창 열기를 해당 기능 통과로 간주하지 않는다. S1~S7 골격 완료 판정은 계속 보류한다.
+
+## 18. Scene 소유 루트·TMP·타일 분류·거래/고용 UI 개정 — 2026-10-20
+
+사용자 최신 지시로 기존 공통 GameRoot의 Prefab화를 해소했다. 미저장 Game Scene 변경은 사용자에게 확인했고 ‘현재 Editor 변경을 보존하여 함께 저장’ 승인을 받은 뒤 저장했다. GameRoot의 바깥 Prefab 연결만 해제하여 Game.unity가 Systems/World/Characters/Cameras/UIRoot의 조립을 직접 소유하도록 했다. 중첩 공간·캐릭터·화면·반복 항목 Prefab과 직렬화 참조는 유지하고 참조자가 없어진 GameRoot.prefab/meta를 제거했다. 이전 절의 GameRoot Prefab 중심 설명은 과거 기록이다.
+
+### TMP 전환
+
+- 사용자 직접 설치 이후 TMP Settings/기본 폰트/모바일 SDF 셰이더와 Editor 응답을 확인했다. 기존 ugui2.6.0의 TMP 코드를 사용하며 Packages 의존성은 변경하지 않았다. 사용자가 설치한 필수 리소스를 다시 가져오거나 교체하지 않았다.
+- UI Prefab32개와 Scene의 실제 UI를 TextMeshProUGUI/TMP_InputField로 전환했다. ScreenView/ListItemView·HUD/Context·일지/경제 Controller·UIRoot의 직렬화 참조를 변환 전918개 참조 스냅샷에 근거해 재연결했다. 실제 Game에 TMP 텍스트342개/입력6개, 기존 UGUI Text/InputField0개다. 사용하지 않는 구 프로토타입 코드의 Text는 전면 리팩터링하지 않았다.
+- Assets/Fonts/NotoSansKR-VF.ttf 원본(로컬 설치본)과 저작권/OFL1.1을 동봉하고 NotoSansKR SDF.asset의 동적 다중 atlas·재질·source 참조를 저장했다. 새 UI는 이 자산을 직접 참조하며 UIRoot의 런타임 OS 폰트 생성을 제거했다. TMP Settings 기본 폰트도 이 자산이다. 최종 미술·폰트 굵기/현지화 세부 조정은 별도다.
+- 필수 리소스 가져오기 중 Editor 명령이 타임아웃되어 사용자 확인을 요청했고, 사용자가 직접 설치한 뒤 재개했다. 변환 도구의 파괴된 Text 접근/중첩 TextArea 경로/입력 초기화 순서 오류를 수정해 재실행했다. 상품 행 교체 후 남은 정산 화면의 사용하지 않는 null 키14개를 정리하고 필수 키를 재검사했다. 과거 Console 로그를 지우지 않았다.
+
+### 특수 타일의 점유와 통행
+
+| 대상 | 편집 경로 | 실제 적용 |
+|---|---|---|
+| 고정 특수 타일 | ReconstructionShip / ReconstructionStarterShip → Floors → Special Tiles → Passability | Impassable / Passable 두 분류, id/cells로 점유 영역과 연결 |
+| 시설 타일 유형 | FacilityDefinition → Passability | 기존 자산은 기본 Impassable, 배치 점유·내구도·역할은 분류와 독립 |
+| 표현 | StarterShipWorld 각 층의 SpecialTiles 및 시설의 SpecialTileView | 정의/시설 ID→고체 Collider 명시 참조. WorldView 바인딩에서 같은 분류로 고체 활성화/해제, 상호작용 Trigger 보존 |
+
+ShipModel의 배치 검사는 통과형도 점유로 인정해 중복 배치를 막고, 경로 탐색·통행 판정·선원 여유 공간은 통행 불가만 장애물로 취급한다. 잠금/고정 차단 영역은 기존 blocked 경계로 보존하므로 통과형이 잠금을 무시하지 않는다. 두 재구성 함선 정의의 기존 고정 사물 blocked를 같은 좌표의 분류된 특수 타일로 옮겼으며 초기 통행 상태는 보존했다. 고정 특수 타일7개(계단 진입2개 Passable, 계단 하우징/방향타/승하선 기둥/일지 책상5개 Impassable)와 시설 침대2개 Impassable, 총9개 View 바인딩/고체 Collider9개다. 실데이터의 저장 ID·시설 위치/내구도·항해/계약은 변경하지 않았다. 분류 변경은 다음 Game 초기화 때 적용되며 실제 이동/선점/저장 복원 회귀는 미검증이다.
+
+### 거래·고용 UI 재제작
+
+- MerchantScreen: D04의 좌측 상인/나가기, 중앙 배경, 우측 목록과 상단 보유액/선택 합계 및 하단 구매. ProductRow는 상품/재고/단가/수량을 구분하고 TMP 수량 입력과 세로 목록 Template을 재제작했다. 단일 대표 상품 규칙·상인 구매/대행인 판매 역할은 유지한다.
+- BrokerScreen: 판매 목록·합계·판매 버튼의 좌측2/3와 주민 거래 요청의 우측1/3을 분리했다. 요청 기능은 후속 단계로 표시하고 수락을 비활성화했다.
+- HiringScreen: D05의 좌측 전신 일러스트, 중앙 인게임 표현, 우측 상태/능력치와 하단 평가·1회 금액/횟수/총액·선불/후불, 최하단 취소/협상/고용을 분리했다. 고용 Controller의 후보/금액/N회/지급 방식 연결은 유지하고 선택 지급 방식을 표시한다. 미확정 평가 계산·행복/신뢰 변화·협상은 구현하거나 수치를 추정하지 않았다.
+- 세 화면은 Editor에 저장된 기본 Frame으로 구성했으며 전체 화면 런타임 생성은 없다. 일러스트/아바타는 교체 가능한 임시 표현이다. 데이터가 비어 있는 영역은 미연결/대기임을 표시한다.
+
+### 검증·남은 경계
+
+A/B/C 정적 구조 적합성 확인, D 통합 참조 확인/실행 미확인, E 저장 ID/기존 저장 보호 확인/실제 복원 미확인, F 컴파일·기능 구분 준수. 실제 Game Scene 정적 검사: root가 Prefab 아님/Composition1, 객체915·컴포넌트2704·직렬화 참조20447·UI키457·상호작용점26·구역7, 오류0/경고0. UI32개 Prefab의 TMP/입력/목록 필드와 폰트/source/재질, 특수 타일 ID·분류·고체 소유/활성 상태 대조 오류0. 컴파일 completed/failed=false/errors=[]/warnings=[]. 1600×900/1280×720/1920×1080의 세 화면 정적 Preview를 제작·직접 확인했다. 미리보기는 임시 비어 있는 Frame이며 실제 거래/고용 성공 증거가 아니다.
+
+Play/Edit Mode 기능 테스트·실제 Save/Load/초기화·커밋/푸시/병합은 수행하지 않았다. S1~S7 기능 검증/골격 완료는 계속 대기한다. 다음은 TMP 입력/스크롤·고용/거래·상태 표시, 통과형/차단형의 플레이어/선원 이동·고체/Trigger 일치 및 저장 복원 회귀를 실제 게임 흐름에서 검증하는 것이다.

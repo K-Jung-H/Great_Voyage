@@ -1,73 +1,194 @@
 using System;
+using UnityEngine;
 
 namespace GreatVoyage
 {
-    // S1 coordinates presentation and input only. Time, persistent state and saves join in S2.
     public sealed class GameFlow : IDisposable
     {
         private readonly GameInput input;
         private readonly PlayerMovement player;
         private readonly InteractionController interactions;
         private readonly UIRoot ui;
+        private readonly GameRuntime game;
+        private readonly WorldView world;
+        private readonly ScreenStack stack;
+        private readonly EconomyScreens economy;
+        private readonly JournalScreenController journal;
+        private readonly SessionScreenController session;
+        private readonly ContextPresenter context;
         private bool active;
-
-        public GameFlow(GameInput input, PlayerMovement player, InteractionController interactions, UIRoot ui)
+        public GameFlow(GameInput input, PlayerMovement player, InteractionController interactions, UIRoot ui, GameRuntime game, WorldView world, ScreenStack stack, EconomyScreens economy, JournalScreenController journal, SessionScreenController session, ContextPresenter context)
         {
             this.input = input;
             this.player = player;
             this.interactions = interactions;
             this.ui = ui;
-            ui.CloseRequested += CloseJournal;
+            this.game = game;
+            this.world = world;
+            this.stack = stack;
+            this.economy = economy;
+            this.journal = journal;
+            this.session = session;
+            this.context = context;
+            economy.SettlementConfirmed += AfterSettlement;
         }
 
         public void Activate()
         {
-            ui.Initialize();
             active = true;
-            player.SetInputBlocked(false);
             input.Enable();
         }
 
         public void Tick()
         {
-            if (!active) return;
-            if (ui.BlocksWorldInput)
+            if (!active || !game.IsReady)
+                return;
+            if (context.IsTransitioning)
             {
-                if (input.CancelPressed) CloseJournal();
+                player.SetInputBlocked(true);
+                ui.ShowPrompt(null);
                 return;
             }
-            IInteractable target = interactions.FindTarget();
+
+            player.SetInputBlocked(game.IsPaused || game.IsSleeping || game.Navigation.IsSteering);
+            if (stack.IsOpen)
+            {
+                ui.ShowPrompt(null);
+                if (input.CancelPressed)
+                    stack.CloseTop();
+                return;
+            }
+
+            if (game.IsPaused)
+                return;
+            if (game.Navigation.IsSteering)
+            {
+                ui.ShowPrompt("조타: WASD · E/ESC 종료");
+                if (input.CancelPressed || input.InteractPressed)
+                    game.Navigation.EndSteering();
+                else
+                    game.Navigation.Steer(input.Move, Mathf.Min(Time.unscaledDeltaTime, .25f));
+                return;
+            }
+
+            if (input.CancelPressed)
+            {
+                session.OpenMenu();
+                return;
+            }
+
+            if (game.IsSleeping)
+            {
+                ui.ShowPrompt(null);
+                return;
+            }
+
+            var target = interactions.FindTarget();
             ui.ShowPrompt(target?.Prompt);
-            if (input.InteractPressed && target != null) target.Interact();
+            if (input.InteractPressed && target != null)
+            {
+                target.Interact();
+                game.MarkInteraction();
+                game.RequestSave();
+            }
         }
 
         public void OpenJournal()
         {
-            if (!active || ui.BlocksWorldInput) return;
+            if (!active || game.IsPaused || game.IsSleeping)
+                return;
+            game.MarkInteraction();
+            journal.Open();
             player.SetInputBlocked(true);
-            ui.SetJournalVisible(true);
         }
 
-        private void CloseJournal()
+        public bool Available(WorldInteraction item)
         {
-            if (!active) return;
-            ui.SetJournalVisible(false);
-            player.SetInputBlocked(false);
+            if (!active || !game.IsReady || game.IsPaused || game.IsSleeping)
+                return false;
+            if (item.Action == WorldAction.DeferredService)
+                return false;
+            if (item.Action == WorldAction.Gangway || item.Action == WorldAction.BoardShip)
+                return game.Navigation.IsDocked;
+            if (item.Action == WorldAction.Bed)
+                return game.Rest.CanUseBed(item.TargetId);
+            return true;
+        }
+
+        public void Interact(WorldInteraction item)
+        {
+            world.CapturePlayer();
+            if (item.Action != WorldAction.Bed)
+                game.MarkInteraction();
+            switch (item.Action)
+            {
+                case WorldAction.Stair:
+                    if (game.Ship.Travel(item.TargetId, item.Destination * game.Ship.CellSize))
+                    {
+                        world.ApplySpace(true);
+                        game.RequestSave();
+                    }
+
+                    break;
+                case WorldAction.Helm:
+                    game.Navigation.BeginSteering();
+                    break;
+                case WorldAction.Gangway:
+                    game.Navigation.SetAboard(false);
+                    world.MoveArea("dock", item.Destination);
+                    break;
+                case WorldAction.BoardShip:
+                    game.Navigation.SetAboard(true);
+                    game.State.player.areaId = "aboard";
+                    game.State.player.position = game.Navigation.State.boardingPosition;
+                    world.ApplySpace(true);
+                    game.RequestSave();
+                    break;
+                case WorldAction.Portal:
+                    world.MoveArea(item.TargetId, item.Destination);
+                    break;
+                case WorldAction.Merchant:
+                    economy.Open("MerchantScreen");
+                    break;
+                case WorldAction.Broker:
+                    economy.Open("BrokerScreen");
+                    break;
+                case WorldAction.Tavern:
+                    economy.Open("TavernServiceScreen");
+                    break;
+                case WorldAction.Contracts:
+                    economy.Open("ContractsScreen");
+                    break;
+                case WorldAction.Bed:
+                    game.Rest.UseBed(item.TargetId);
+                    break;
+            }
+
+            player.SetInputBlocked(game.IsPaused || game.IsSleeping || game.Navigation.IsSteering);
+        }
+
+        private void AfterSettlement()
+        {
+            if (game.Economy.State.gameOver)
+                session.ShowGameOver();
+            else
+                game.Navigation.RequestDeparture();
         }
 
         public void Suspend()
         {
-            if (!active) return;
             active = false;
             input.Disable();
-            if (player != null) player.SetInputBlocked(true);
-            if (ui != null) { ui.SetJournalVisible(false); ui.ShowPrompt(null); }
+            if (player)
+                player.SetInputBlocked(true);
+            if (ui)
+                ui.ShowPrompt(null);
         }
 
         public void Dispose()
         {
             Suspend();
-            if (ui != null) ui.CloseRequested -= CloseJournal;
+            economy.SettlementConfirmed -= AfterSettlement;
         }
     }
 }
