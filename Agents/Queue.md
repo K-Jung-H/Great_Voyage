@@ -182,3 +182,7 @@
 ## commit-progress-main-20261022
 - started: 사용자 현재까지 전체 내용 커밋 및 main 반영 승인. codex/event-progression/main HEAD0af2421 동일, main 원격 추적 대비ahead1, worktree1·staged없음 확인. 기존 사건/전투/시설/선원/시장·견인/저장null수정·문서11~13재편/정리·Scene배치 및 동적TMP캐시 전체 대상. 신규 파일은 Assets 내부 코드/정의/Prefab/meta만 있으며 최대14.4KB, Temp/Library/Logs/실제슬롯 제외. 패키지/설정 변경 없음. 기존 원본폰트GUID/재질/Dynamic/multiatlas 설정 유지 확인. 관련 문서/C# whitespace 통과, Unity YAML 빈필드 후행공백은 자동 직렬화 형식으로 보존. 이전 컴파일/정적검사 결과와 기능 미검증 유지. 작업브랜치 커밋→main fast-forward→완료 기록 커밋 후 clean 확인한다. 푸시 미승인·기능테스트/슬롯 IO 없음. 긴 출력은 핵심 요약.
 - completed: 구현 커밋7164bbe 성공(158파일, 신규101); main 전환 및0af2421→7164bbe fast-forward 성공. 기존 main/작업 내용과158파일 전체를 보존, 단계 진행/미검증·저장 호환 경계 유지. State/RoadMap·본 완료 기록은 후속 문서 커밋으로 main에 담고 clean/구현 포함 여부를 확인한다. 원격 push/fetch·새 기능 테스트·실제 슬롯 IO 없음. Git/긴 출력은 핵심 요약.
+
+## push-main-20261022
+- started: 사용자 푸시 명시 지시. main ee6a895 clean/ahead3·원격origin·staged없음 확인.
+- completed: git push origin main 성공739df4a→ee6a895. 구현7164bbe·이전0af2421·기록ee6a895 포함. State/RoadMap과 본 푸시 결과 기록을 후속 문서 커밋으로 함께 푸시하고 최종 원격 일치/clean 확인한다. 게임 수정·기능테스트·슬롯 IO 없음. 출력 핵심 요약.
