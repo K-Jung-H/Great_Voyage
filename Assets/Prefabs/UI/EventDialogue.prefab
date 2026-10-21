@@ -1065,6 +1065,7 @@ GameObject:
   - component: {fileID: 4016267353106038172}
   - component: {fileID: 6346710872962223507}
   - component: {fileID: 8161911991958713055}
+  - component: {fileID: 5863944841090055335}
   m_Layer: 0
   m_Name: EventDialogue
   m_TagString: Untagged
@@ -1135,6 +1136,67 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5863944841090055335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7397951308437966799}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1036ecef62ddd4bb2d75188854149f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ScreenView
+  references:
+  - key: 
+    component: {fileID: 4016267353106038172}
+  - key: Title
+    component: {fileID: 3101679353260378756}
+  - key: Title
+    component: {fileID: 5612208774606342282}
+  - key: Availability
+    component: {fileID: 6337849203546190616}
+  - key: Availability
+    component: {fileID: 7196229339706549998}
+  - key: EventImage
+    component: {fileID: 6274615197070932919}
+  - key: EventImage/Placeholder
+    component: {fileID: 1056127527350919222}
+  - key: EventImage/Placeholder
+    component: {fileID: 5969853493673022806}
+  - key: Description
+    component: {fileID: 2644306739238613495}
+  - key: Description
+    component: {fileID: 7056624805369275546}
+  - key: ChoiceList
+    component: {fileID: 6290329688407548637}
+  - key: ChoiceList
+    component: {fileID: 5163414294111130780}
+  - key: ChoiceList/Viewport
+    component: {fileID: 4436873405920775168}
+  - key: ChoiceList/Viewport/Content
+    component: {fileID: 4393845156499689105}
+  - key: ChoiceList/Viewport/Content/ItemTemplate
+    component: {fileID: 7090008461527761809}
+  - key: ChoiceList/Viewport/Content/ItemTemplate
+    component: {fileID: 5893895905286540785}
+  - key: ChoiceList/Viewport/Content/ItemTemplate/Choice
+    component: {fileID: 8820855398541815136}
+  - key: ChoiceList/Viewport/Content/ItemTemplate/Choice
+    component: {fileID: 3899978867233693775}
+  - key: ChoiceList/Viewport/EmptyState
+    component: {fileID: 2260352914213708747}
+  - key: ChoiceList/Viewport/EmptyState
+    component: {fileID: 7965906716516570774}
+  - key: ChoiceList/Scrollbar
+    component: {fileID: 5222767259418110667}
+  - key: ChoiceList/Scrollbar/Handle
+    component: {fileID: 2431089483022936406}
+  - key: Result
+    component: {fileID: 7162240404522663641}
+  - key: Result
+    component: {fileID: 573714584665194544}
 --- !u!1 &7947038501359834057
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,8 +1641,35 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9a79c22f9ce561146b2633ad46565c24, type: 3}
+--- !u!114 &3899978867233693775 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8718954575497489802, guid: 9a79c22f9ce561146b2633ad46565c24, type: 3}
+  m_PrefabInstance: {fileID: 5683666837816331717}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &5893895905286540785 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2245928393273901108, guid: 9a79c22f9ce561146b2633ad46565c24, type: 3}
+  m_PrefabInstance: {fileID: 5683666837816331717}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!224 &7090008461527761809 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 3207888678119902804, guid: 9a79c22f9ce561146b2633ad46565c24, type: 3}
+  m_PrefabInstance: {fileID: 5683666837816331717}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &8820855398541815136 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 3785708282817945765, guid: 9a79c22f9ce561146b2633ad46565c24, type: 3}
   m_PrefabInstance: {fileID: 5683666837816331717}
   m_PrefabAsset: {fileID: 0}

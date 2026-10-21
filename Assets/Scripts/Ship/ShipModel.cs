@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace GreatVoyage
 {
     public sealed class ShipModel
     {
-        private readonly ShipDefinition definition;
+        private ShipDefinition definition;
+        public ShipDefinition Definition => definition;
         private readonly PlayerLocation player;
         public ShipModel(ShipDefinition definition, PlayerLocation player)
         {
@@ -22,6 +24,14 @@ namespace GreatVoyage
         public string ActiveFloor => state.activeFloor;
         public IReadOnlyList<FacilityState> Facilities => state.facilities;
         public float CellSize => definition.cellSize;
+        public float SailingFactor
+        {
+            get
+            {
+                var sails = state.facilities.Where(item => Kind(item.definitionId).role == FacilityRole.Sail).ToArray();
+                return sails.Length == 0 ? 1 : Mathf.Lerp(.35f, 1, sails.Average(item => item.sailDeployed ? item.durability / MaximumDurability(item) : 0));
+            }
+        }
 
         private static readonly Vector2Int[] Steps =
         {
@@ -35,12 +45,20 @@ namespace GreatVoyage
         {
             ValidateDefinition();
             state = saved ?? NewState();
+            state.unlockedTiles ??= new List<string>();
+            if (state.facilities == null)
+                throw new InvalidDataException("시설 목록이 누락되었습니다.");
+            foreach (var initial in definition.initialFacilities ?? Array.Empty<FacilityState>())
+                if ((!string.IsNullOrEmpty(initial.fixedTileId) && !state.facilities.Exists(item => item.fixedTileId == initial.fixedTileId && item.floorId == initial.floorId)) || (state.layoutVersion == 0 && Kind(initial.definitionId)?.essential == true && !state.facilities.Exists(item => item.definitionId == initial.definitionId)))
+                    state.facilities.Add(JsonUtility.FromJson<FacilityState>(JsonUtility.ToJson(initial)));
+            state.layoutVersion = 1;
             if (state.definitionId != definition.id || Floor(state.activeFloor) == null || state.facilities == null || state.visits == null)
                 throw new InvalidDataException("함선 또는 현재 층 상태가 유효하지 않습니다.");
             var ids = new HashSet<string>();
             var accepted = new List<FacilityState>();
             foreach (FacilityState item in state.facilities)
             {
+                if (item != null && item.level == 0) item.level = 1;
                 if (item == null || string.IsNullOrEmpty(item.id) || !ids.Add(item.id))
                     throw new InvalidDataException("시설 ID가 누락되거나 중복됩니다.");
                 if (!ValidatePlacement(item, accepted, out string reason))
@@ -91,7 +109,8 @@ namespace GreatVoyage
             var result = new ShipState
             {
                 definitionId = definition.id,
-                activeFloor = definition.startingFloor
+                activeFloor = definition.startingFloor,
+                layoutVersion = 1
             };
             if (definition.initialFacilities != null)
                 foreach (FacilityState item in definition.initialFacilities)
@@ -137,12 +156,20 @@ namespace GreatVoyage
             FacilityDefinition kind = Kind(item.definitionId);
             if (floor == null || kind == null || kind.allowedFloors == null || Array.IndexOf(kind.allowedFloors, item.floorId) < 0)
                 return false;
-            if (float.IsNaN(item.durability) || float.IsInfinity(item.durability) || item.durability < 0 || item.durability > kind.maxDurability)
+            if (item.level < 1 || item.level > kind.maximumLevel)
+                return false;
+            if (!string.IsNullOrEmpty(item.fixedTileId))
+            {
+                var fixedTile = Array.Find(floor.specialTiles ?? Array.Empty<SpecialTileDefinition>(), tile => tile.id == item.fixedTileId);
+                if (fixedTile == null || fixedTile.cells.position != new Vector2Int(item.x, item.y) || fixedTile.cells.size != kind.size)
+                    return false;
+            }
+            if (float.IsNaN(item.durability) || float.IsInfinity(item.durability) || item.durability < 0 || item.durability > kind.maxDurability * item.level)
                 return false;
             if (item.x < 0 || item.y < 0 || item.x > floor.size.x - kind.size.x || item.y > floor.size.y - kind.size.y)
                 return false;
             foreach (Vector2Int cell in new RectInt(item.x, item.y, kind.size.x, kind.size.y).allPositionsWithin)
-                if (InRects(floor.blocked, cell) || SpecialOccupied(floor, cell, false) || InRects(floor.reserved, cell) || Occupied(item.floorId, cell, occupied))
+                if (InRects(floor.blocked, cell) || SpecialOccupied(floor, cell, false, item.fixedTileId) || InRects(floor.reserved, cell) || Occupied(item.floorId, cell, occupied))
                     return false;
             reason = null;
             return true;
@@ -236,7 +263,47 @@ namespace GreatVoyage
         private static bool InRects(RectInt[] regions, Vector2Int cell) => regions != null && Array.Exists(regions, area => area.Contains(cell));
         // Role: 층 ID에 대응하는 정의를 찾는다.
         public FloorDefinition GetFloorDefinition(string id) => Floor(id);
-        private static bool SpecialOccupied(FloorDefinition floor, Vector2Int cell, bool blockingOnly) => floor.specialTiles != null && Array.Exists(floor.specialTiles, tile => tile.cells.Contains(cell) && (!blockingOnly || tile.passability == TilePassability.Impassable));
+        private bool SpecialOccupied(FloorDefinition floor, Vector2Int cell, bool blockingOnly, string ignored = null) => floor.specialTiles != null && Array.Exists(floor.specialTiles, tile => tile.id != ignored && tile.cells.Contains(cell) && !(tile.unlockable && state.unlockedTiles.Contains(floor.id + ":" + tile.id)) && (!blockingOnly || tile.unlockable || tile.passability == TilePassability.Impassable));
+        public bool IsTileBlocking(string floorId, string tileId)
+        {
+            var tile = Array.Find(Floor(floorId)?.specialTiles ?? Array.Empty<SpecialTileDefinition>(), value => value.id == tileId);
+            return tile != null && (tile.unlockable ? !state.unlockedTiles.Contains(floorId + ":" + tileId) : tile.passability == TilePassability.Impassable);
+        }
+
+        public bool TryEdit(FacilityState replacement, string removedId, out string reason)
+        {
+            reason = "시설 ID 또는 배치가 유효하지 않습니다.";
+            var old = GetFacility(removedId);
+            if (old != null && !string.IsNullOrEmpty(old.fixedTileId) && (replacement == null || replacement.x != old.x || replacement.y != old.y || replacement.floorId != old.floorId || replacement.definitionId != old.definitionId))
+            {
+                reason = "함선 고정 시설은 이동·제거할 수 없습니다.";
+                return false;
+            }
+            var proposed = state.facilities.Where(value => value.id != removedId).ToList();
+            if (replacement != null)
+            {
+                if (string.IsNullOrEmpty(replacement.id) || proposed.Exists(value => value.id == replacement.id) || !ValidatePlacement(replacement, proposed, out reason))
+                    return false;
+                proposed.Add(replacement);
+            }
+            foreach (var floor in definition.floors)
+                if (!CanReachFacilities(floor, proposed))
+                {
+                    reason = "시설 접근 경로를 막습니다.";
+                    return false;
+                }
+            state.facilities = proposed;
+            reason = null;
+            return true;
+        }
+
+        public void ChangeDefinition(ShipDefinition target, ShipState targetState)
+        {
+            var previousDefinition = definition;
+            var previousState = state;
+            try { definition = target; Initialize(targetState); }
+            catch { definition = previousDefinition; state = previousState; throw; }
+        }
         private FloorDefinition Floor(string id) => Array.Find(definition.floors, f => f.id == id);
         // Role: 시설 종류 ID에 대응하는 정의를 찾는다.
         private FacilityDefinition Kind(string id) => Array.Find(definition.facilities, f => f.id == id);
@@ -244,8 +311,11 @@ namespace GreatVoyage
         public FacilityState GetFacility(string id) => state.facilities.Find(f => f.id == id);
         // Role: 시설 종류의 크기·기능·수리 조건을 조회한다.
         public FacilityDefinition GetFacilityDefinition(string id) => Kind(id);
+        public float MaximumDurability(FacilityState item) => Kind(item.definitionId).maxDurability * item.level;
         // Role: 해당 층의 표시 여부를 상태에서 판단한다.
-        public bool IsFloorVisible(string id) => aboard && state.activeFloor == id;
+        private string presentationFloor;
+        public void SetPresentationFloor(string floorId) => presentationFloor = floorId;
+        public bool IsFloorVisible(string id) => (aboard || presentationFloor != null) && (presentationFloor ?? state.activeFloor) == id;
         // Role: 선원 Cell 좌표가 실제 통행 가능한 칸인지 검사한다.
         public bool IsWalkablePosition(string id, Vector2 position)
         {
@@ -416,9 +486,9 @@ namespace GreatVoyage
         {
             FacilityState item = GetFacility(id);
             FacilityDefinition kind = item == null ? null : Kind(item.definitionId);
-            if (kind == null || !kind.repairable || item.durability <= 0 || item.durability >= kind.maxDurability || float.IsNaN(amount) || float.IsInfinity(amount) || amount <= 0)
+            if (kind == null || !kind.repairable || item.durability <= 0 || item.durability >= MaximumDurability(item) || float.IsNaN(amount) || float.IsInfinity(amount) || amount <= 0)
                 return false;
-            item.durability = Mathf.Min(kind.maxDurability, item.durability + amount);
+            item.durability = Mathf.Min(MaximumDurability(item), item.durability + amount);
             return true;
         }
 

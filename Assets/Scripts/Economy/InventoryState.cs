@@ -31,6 +31,20 @@ namespace GreatVoyage
         public int Cargo { get => Get(cargoProductId); set => Set(cargoProductId, value); }
         public int Food { get => Get("food"); set => Set("food", value); }
         public int RepairTools { get => Get("repair-tools"); set => Set("repair-tools", value); }
+        public bool HasMeal => Get("fresh-fish") > 0 || Food > 0;
+        public bool ConsumeMeal()
+        {
+            if (Get("fresh-fish") > 0) { Set("fresh-fish", Get("fresh-fish") - 1); return true; }
+            if (Food <= 0) return false;
+            Food--; return true;
+        }
+        public void LandFreshFish()
+        {
+            int fresh = Get("fresh-fish");
+            if (fresh == 0) return;
+            if ((long)Get("fish") + fresh > int.MaxValue) throw new InvalidOperationException("Fish inventory limit reached");
+            Set("fish", Get("fish") + fresh); Set("fresh-fish", 0);
+        }
 
         public int Get(string product, string owner = "player") => items.Find(item => item.productId == product && item.ownerId == owner)?.quantity ?? 0;
         public void Set(string product, int quantity, string owner = "player")

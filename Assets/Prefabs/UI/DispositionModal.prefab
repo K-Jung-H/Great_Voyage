@@ -148,6 +148,7 @@ GameObject:
   - component: {fileID: 8226069602825039220}
   - component: {fileID: 1984320444988784707}
   - component: {fileID: 6373664838185612753}
+  - component: {fileID: 2462056987359549610}
   m_Layer: 0
   m_Name: DispositionModal
   m_TagString: Untagged
@@ -220,6 +221,93 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2462056987359549610
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 497758048045516675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1036ecef62ddd4bb2d75188854149f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ScreenView
+  references:
+  - key: 
+    component: {fileID: 8226069602825039220}
+  - key: Title
+    component: {fileID: 1840015177957388051}
+  - key: Title
+    component: {fileID: 6336439776560692996}
+  - key: Availability
+    component: {fileID: 4091600392050912333}
+  - key: Availability
+    component: {fileID: 7610517419518440965}
+  - key: SurvivingTargets
+    component: {fileID: 2026027500176064223}
+  - key: SurvivingTargets
+    component: {fileID: 7407736045299299515}
+  - key: SurvivingTargets/Viewport
+    component: {fileID: 7470950335361469405}
+  - key: SurvivingTargets/Viewport/Content
+    component: {fileID: 5897602901512524592}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate
+    component: {fileID: 2101826826375893363}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate
+    component: {fileID: 373329267571897815}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 3698739019329366429}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 8069200766390706437}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 7460519677752297880}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 7468277381378841664}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 1122849550569430321}
+  - key: SurvivingTargets/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 1149771457603009241}
+  - key: SurvivingTargets/Viewport/EmptyState
+    component: {fileID: 6527785572530104292}
+  - key: SurvivingTargets/Viewport/EmptyState
+    component: {fileID: 8675787475765420201}
+  - key: SurvivingTargets/Scrollbar
+    component: {fileID: 2708034122394257713}
+  - key: SurvivingTargets/Scrollbar/Handle
+    component: {fileID: 2988587626692102339}
+  - key: PrisonerCapacity
+    component: {fileID: 9035947101376455195}
+  - key: PrisonerCapacity
+    component: {fileID: 2969639900548771196}
+  - key: DispositionResult
+    component: {fileID: 2002234502920654201}
+  - key: DispositionResult
+    component: {fileID: 4257755723704101670}
+  - key: Capture
+    component: {fileID: 347707962843580489}
+  - key: Capture
+    component: {fileID: 3861067814762634262}
+  - key: Capture/Label
+    component: {fileID: 7160062036600531053}
+  - key: Capture/Label
+    component: {fileID: 3519485939209142395}
+  - key: Execute
+    component: {fileID: 5595162805849047859}
+  - key: Execute
+    component: {fileID: 5360695860351794708}
+  - key: Execute/Label
+    component: {fileID: 3473261004711859255}
+  - key: Execute/Label
+    component: {fileID: 81077236034264456}
+  - key: Pardon
+    component: {fileID: 4736559240553420404}
+  - key: Pardon
+    component: {fileID: 6267761713666167825}
+  - key: Pardon/Label
+    component: {fileID: 3836444764402855301}
+  - key: Pardon/Label
+    component: {fileID: 10551771877026912}
 --- !u!1 &525173900280050394
 GameObject:
   m_ObjectHideFlags: 0
@@ -2142,8 +2230,67 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+--- !u!114 &373329267571897815 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9113504626401784212, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 8887845969164469315}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!224 &1122849550569430321 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8413517290561755506, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 8887845969164469315}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1149771457603009241 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8404622752822132378, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 8887845969164469315}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &2101826826375893363 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7384997998640108848, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
   m_PrefabInstance: {fileID: 8887845969164469315}
   m_PrefabAsset: {fileID: 0}
+--- !u!224 &3698739019329366429 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5189122429031509470, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 8887845969164469315}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &7460519677752297880 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2080363750804901339, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 8887845969164469315}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7468277381378841664 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2086114836047206403, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 8887845969164469315}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &8069200766390706437 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1489697009268467014, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 8887845969164469315}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI

@@ -22,6 +22,10 @@ namespace GreatVoyage
         private TMP_Text wake;
         [SerializeField, Tooltip("후속 단계의 망원경 표시.")]
         private GameObject telescope;
+        [SerializeField, Tooltip("사전 제작된 망원경 관측 정보.")]
+        private TMP_Text observation;
+        private float observeUntil;
+        public void ObserveSea() => observeUntil = Time.unscaledTime + 4;
         [SerializeField, Tooltip("층 이동 삽화 Frame.")]
         private GameObject transition;
         [SerializeField, Tooltip("현재 임시 삽화의 층 식별 표시.")]
@@ -54,9 +58,12 @@ namespace GreatVoyage
             remaining = Mathf.Max(0, remaining - Time.unscaledDeltaTime);
             transition.SetActive(remaining > 0);
             bool steering = game.Navigation.IsSteering, sleeping = game.Rest.State.mode != PlayerRest.Awake;
-            root.SetActive(steering || sleeping);
+            bool observing = Time.unscaledTime < observeUntil || (game.Detection.HasLookout && game.Detection.HasTarget);
+            root.SetActive(steering || sleeping || observing);
             helm.SetActive(steering);
             rest.SetActive(sleeping);
+            telescope.SetActive(observing);
+            if (observing) observation.text = game.Detection.Observe();
             if (steering)
                 heading.text = $"방향 {game.Navigation.Heading:0}° · 속도 {game.Navigation.State.speed:0.0}";
             if (sleeping)

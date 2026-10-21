@@ -12,6 +12,9 @@ namespace GreatVoyage
         public int x;
         public int y;
         public float durability;
+        public bool sailDeployed = true;
+        public int level = 1;
+        public string fixedTileId;
     }
 
     [Serializable]
@@ -27,7 +30,17 @@ namespace GreatVoyage
     {
         public string definitionId;
         public string activeFloor;
+        public int layoutVersion;
+        public List<string> unlockedTiles = new List<string>();
         public List<FacilityState> facilities = new List<FacilityState>();
         public List<FloorVisit> visits = new List<FloorVisit>();
+    }
+
+    [Serializable]
+    public sealed class OwnedShipState
+    {
+        public string id;
+        public string portId;
+        public ShipState ship;
     }
 }

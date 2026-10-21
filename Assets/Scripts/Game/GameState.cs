@@ -35,6 +35,10 @@ namespace GreatVoyage
         public JournalState journal;
         public PlayerSleepState sleep;
         public InventoryState inventory = new InventoryState();
+        public EventState events = new EventState();
+        public List<PrisonerState> prisoners = new List<PrisonerState>();
+        public int prisonersFedDay;
+        public List<OwnedShipState> inactiveShips = new List<OwnedShipState>();
         public List<CrewState> characters = new List<CrewState>();
         public void Register(CrewState member)
         {

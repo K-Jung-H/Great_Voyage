@@ -1,5 +1,9 @@
 # 1~7단계 구조 감사 및 재구성 설계안
 
+## 현행 실행 안내 — 2026-10-22
+
+단계 번호는 [RoadMap](RoadMap.md)의 11 미술 완성·피드백 개선 / 12 PC 기술 완성·종합 검증 / 13 모바일 입력을 따른다. 이 문서의 모바일/후속 범위 표기도 이에 맞춰 재번호화했다. 기존 S1~S7/U0 설계·승인·구현 및 당시 검증 기록은 보존한다. 현재 8~10단계는 별도 사용자 승인으로 구현 진행 중이며 최신 실행 현황은 State와 RoadMap을 따른다. 아래 과거 ‘8단계 미승인/자동 진행 없음’은 당시 범위이며 현행 승인을 취소하지 않는다. 기본 GameRoot는 Scene 소유이며 18절 이후 결과가 과거 Prefab 중심 제안보다 우선한다.
+
 현재 구조 우선 안내 — GameRoot의 Scene 소유 전환, TMP, 특수 타일 분류와 거래/고용 UI는 **18절**이 최신이다. 이전16·17절 및 아래 승인 상태는 각 작업 당시 기록으로 보존한다.
 
 최신 상태 — 2026-10-20: 사용자 명시 승인으로 **S2~S7 구현·정적 검사·컴파일 완료**, **S1~S7 일괄 기능 검증 대기**. 현재 실제 결과와 위험/파일 목록은 **16절**이 우선한다. 이전 승인 대기/미승인 표기는 당시 기록이다. 일반 개발 규칙·기획은 변경하지 않았으며 이번 묶음만 단계별 기능 검증 선행을 유보했다. 미니게임/8단계/기능 테스트/새 Git 작업은 제외한다.
@@ -196,7 +200,7 @@ flowchart TD
     State --> Views
 ```
 
-`IInteractable` 하나는 현재 이미 6종 대상이 있어 필요성이 확인된 확장 경계다. 각 대상이 Prompt/접근점/실행 가능 여부/행동 요청을 제공하고 PlayerInteraction은 거리·차폐·선택만 담당한다. 계단·게시판을 추가할 때 PlayerInteraction에 타입 분기를 더하지 않는다. 입력은 Move/Interact/Steer/Back 행동으로 한 번 해석하고 키보드 직접 조회를 각 서비스에 흩어 두지 않는다. 모바일 실제 입력은 12단계다.
+`IInteractable` 하나는 현재 이미 6종 대상이 있어 필요성이 확인된 확장 경계다. 각 대상이 Prompt/접근점/실행 가능 여부/행동 요청을 제공하고 PlayerInteraction은 거리·차폐·선택만 담당한다. 계단·게시판을 추가할 때 PlayerInteraction에 타입 분기를 더하지 않는다. 입력은 Move/Interact/Steer/Back 행동으로 한 번 해석하고 키보드 직접 조회를 각 서비스에 흩어 두지 않는다. 모바일 실제 입력은 13단계다.
 
 수리·취침·조타 업무는 각각 작은 규칙으로 분리하되 범용 행동 트리나 업무 그래프 편집기를 도입하지 않는다. 자격·후보·대상/선점·진행·중단 계약은 공통으로 사용한다. 힘/손재주/지능·경력·행복/신뢰의 후속 계산은 별도 정책 위치만 지정하고 지금 산식을 확정하지 않는다.
 
@@ -217,7 +221,7 @@ GameComposition은 입력·Loop를 비활성 상태로 두고 ① 정의/Prefab/
 
 ## 6. 전체 UI Frame 선행 구축 계약 — 개정안
 
-**UI Frame 제작 시점은 U0, 기능 연결 시점은 S1~S7 및 RoadMap8~12로 분리한다.** 현재 S1 결과 위에 U0를 선행 기반 작업으로 추가한다. U0 구조 수용과 S1 기능 검증을 마치기 전 S2로 진행하지 않는다. 전체 Frame 범위는 1~7 기능 화면에 한정하지 않는다. 전투·조선소·무장·이벤트·시청 등 확정 기획의 후속 화면도 지금 설계하고 U0에서 Editor 자산으로 먼저 제작한다. 기능 관리자·저장 상태·미확정 규칙을 미리 구현한다는 의미는 아니다.
+**UI Frame 제작 시점은 U0, 기능 연결 시점은 S1~S7 및 RoadMap8~13로 분리한다.** 현재 S1 결과 위에 U0를 선행 기반 작업으로 추가한다. U0 구조 수용과 S1 기능 검증을 마치기 전 S2로 진행하지 않는다. 전체 Frame 범위는 1~7 기능 화면에 한정하지 않는다. 전투·조선소·무장·이벤트·시청 등 확정 기획의 후속 화면도 지금 설계하고 U0에서 Editor 자산으로 먼저 제작한다. 기능 관리자·저장 상태·미확정 규칙을 미리 구현한다는 의미는 아니다.
 
 ### 6.1 전체 화면 목록·도안 대응·기능 연결 시점
 
@@ -225,7 +229,7 @@ GameComposition은 입력·Loop를 비활성 상태로 두고 ① 정의/Prefab/
 
 | ID / Frame | 필수 영역·부모/자식 관계 | 기획 근거·배치 기준 | 기능 연결 시점 / Controller 책임 |
 |---|---|---|---|
-| F01 GameHud | TopLeft/Gold, Left/QuestList, TopCenter/VoyageDay, TopRight/Date/TimeBand, BottomLeft/Joystick, BottomRight/InteractButton, Prompt | D01·4.1. 항해일자 중앙, 일지 버튼 추가 금지. 모바일 영역도 실제 모양/계층 제작 | S1 Prompt·S2 시간·S4 항해일자·S6 금화·10 퀘스트·12 터치. HudController는 조회 표시 |
+| F01 GameHud | TopLeft/Gold, Left/QuestList, TopCenter/VoyageDay, TopRight/Date/TimeBand, BottomLeft/Joystick, BottomRight/InteractButton, Prompt | D01·4.1. 항해일자 중앙, 일지 버튼 추가 금지. 모바일 영역도 실제 모양/계층 제작 | S1 Prompt·S2 시간·S4 항해일자·S6 금화·10 퀘스트·13 터치. HudController는 조회 표시 |
 | F02 JournalScreen | Left/HistoryScroll/Viewport/Content 및 PenTools, Center/MapViewport/MapContent 및 기록·계획·확대축소 조작, Right/SelectionImage/Description/NoteInput, TopRight/Close | D03·4.4·6. 기록/계획/메모/과거 레이어·기존 사건 삭제. 예시의 목적지 즉시 이동 버튼 제외 | S1 열기/닫기, S7 기록·지도·계획·메모·레이어; 8 실제 사건 연결. JournalController는 명령/조회 |
 | F03 MerchantScreen | Left/Portrait/BottomExit, Right/WalletAndTotal/ProductScroll/Buy | D04·4.4·12. 좌측 인물/나가기, 우측 상품·상단 금액·하단 구매 | S6 대표 거래,10 상품 확장. MerchantController |
 | F04 BrokerScreen | LeftTwoThirds/OwnedGoods/Sell, RightThird/ResidentRequests | 4.4·12 본문. 판매2/3·요청1/3 보존 | S6 판매,10 요청·만료. BrokerController |
@@ -285,7 +289,7 @@ Game.unity
 - 반복 요소: `Assets/Prefabs/UI/Items/` 아래 JournalHistoryItem, ProductRow, ResidentRequestRow, ContractRow, CrewRow, StatRow, QuestRow, FacilityRow, ShipRow, DialogueChoice, BattleLogRow. 서로 다른 의미의 행을 하나의 범용 동적 생성기로 합치지 않는다. 같은 표시 계약인 경우에만 공유한다. 목록은 ScrollRect/Viewport/Content와 필요한 스크롤바, 빈 상태, 행 Template의 실제 레이아웃까지 U0에서 준비한다.
 - 공통 요소: 일관된 Button/닫기/금액 표시·캐릭터 정보처럼 실제 두 곳 이상에서 동일 계약이 확인되는 요소만 분리한다. 화면 하나의 단순 Panel까지 모두 Prefab으로 만들지 않는다. F21은 `Assets/Prefabs/UI/World/UnitStatusBars.prefab` 후보다.
 - 반복 행의 런타임 인스턴스화만 허용한다. 전체 Canvas/Panel/레이아웃을 Awake/BuildLayout로 만드는 방식은 금지한다. 제작 자동화가 필요하면 Editor 전용 작업으로 저장한 결과를 직접 편집·검사할 수 있어야 한다.
-- D01/D03~D07의 주요 상대 배치를 유지하고 Anchor/LayoutGroup/Mask로 구성한다. 기준1600×900 및1280×720·1920×1080에서 Editor 정적 배치를 확인한다. 모바일 영역은 미리 제작하되 터치 입력·지원 기기 대응 기능은12단계다. 미확정 세로 화면 지원을 가정하지 않는다.
+- D01/D03~D07의 주요 상대 배치를 유지하고 Anchor/LayoutGroup/Mask로 구성한다. 기준1600×900 및1280×720·1920×1080에서 Editor 정적 배치를 확인한다. 모바일 영역은 미리 제작하되 터치 입력·지원 기기 대응 기능은13단계다. 미확정 세로 화면 지원을 가정하지 않는다.
 - 이미지·폰트는 임시 자산을 쓸 수 있으나 표시 위치·레이아웃은 정식 구조다. OS 동적 폰트의 이식성 위험은 남아 있으며 신규 패키지/외부 자산 도입은 별도 범위다.
 
 ### 6.4 U0 구조 완료와 기능 완료의 분리
@@ -297,7 +301,7 @@ Game.unity
 | U-C 소유권·참조 | Scene/UI 분리, Prefab GUID/참조·부모/자식·Controller 연결 예정 필드표·수명·입력 순서 | 정적 참조 누락, 도메인 복제, 런타임 기본 트리 생성 |
 | U-D 미연결 기능 표시 | 기능별 담당 단계/비활성 상태·빈 데이터 표시, 후속 연결 위치 목록 | 가짜 성공·데이터 임의 변경, 실제 기능처럼 보이는 무반응 조작 |
 | U-E 기존 보호 | 기존 S1 연결·자산 참조·저장 파일 불변 확인, 컴파일 결과 별도 기록 | 기존 UI 삭제·저장 호환 훼손, 컴파일 확인을 기능 통과로 표현 |
-| 단계 기능 완료 | 기존 A~F + 해당 단계 Controller/바인딩/입력/게임 흐름·저장 + 별도 승인 기능 검증 | U0 구조 통과만으로 S1~S7 또는8~12 완료 선언 |
+| 단계 기능 완료 | 기존 A~F + 해당 단계 Controller/바인딩/입력/게임 흐름·저장 + 별도 승인 기능 검증 | U0 구조 통과만으로 S1~S7 또는8~13 완료 선언 |
 
 U0 정적 검사에는 기능 메서드 호출/Play/Edit Mode 테스트를 포함하지 않는다. 실제 화면 열기·스크롤·버튼·포커스 동작은 각 기능의 승인 테스트에서 검증한다. 미확정 내부 Frame이 남으면 ‘전체 게임 UI Frame 완료’라고 기록하지 않는다. 이후 규칙 연결 때문에 기본 트리를 반복 교체하지 않으며, 확정 요구 변경이 필요하면 영향과 승인부터 확인한다.
 
@@ -394,7 +398,7 @@ U0는 전체 UI Frame의 선행 구조 게이트다. 기존 S1 실행 기반 위
 | 사건(8단계) | 발생/난수 상태·이벤트 시작 스냅샷·선택/종료 결과 | Loop 경계·Flow·SaveCoordinator·인물/재고/시설 ID 재사용. 시작 상태와 진행 상태 분리 |
 | 전투/포로(9단계) | 전투 상태/규칙·U0의 D06/무장/처분 Frame에 기능 연결·수감·계약 중단 | 인물 복사 없이 동일 ID, Reservation 해제, 재고/계약/보상 1회 반영. 플레이어 관전 유지 |
 | 주민 요청/퀘스트(10단계) | portId별 상태·만료·목표/보상 정책, 준비된 UI 영역 | 게임 시간/정지·재고·보상 경계 재사용. 실제 만료수치/퀘스트 목록은 미정 유지 |
-| 모바일(12단계) | Input 행동에 터치 어댑터·기존 준비 영역 연결 | 이동/상호작용/조타 규칙을 모바일용으로 복제하지 않음 |
+| 모바일(13단계) | Input 행동에 터치 어댑터·기존 준비 영역 연결 | 이동/상호작용/조타 규칙을 모바일용으로 복제하지 않음 |
 
 8단계 이후에 기존 기반을 **절대 수정하지 않는다**는 보장은 하지 않는다. 목표는 기능 추가 때 상태 소유권·시작 구조·저장·UI 트리를 다시 설계하지 않고 위 명시된 확장 지점에서 변경하는 것이다. 새 요구나 실제 성능 근거가 생긴 경우만 영향·승인을 다시 판단한다.
 
@@ -539,7 +543,7 @@ S1 골격 완료 및 S2 진입은 보류한다. 추가 승인 대상은 **Game.u
 | 현재 S1 | 재사용 | U0에서 보완할 사항 |
 |---|---|---|
 | UIRoot의 HUD/Screens/Modals·EventSystem | 공통 소유권·Canvas·S1 일지 참조 | 전체 화면/Context/Transitions 배치와 정렬·포커스 계약. S1 직접 일지 연결은 보존하며 후속 화면 책임 분리 |
-| GameHud의 위치별 영역·금화/날짜/항해일자/Prompt | D01 대응 영역/앵커 | 퀘스트 실제 행 구조, MoveHint/InteractHint만 있는 영역에 조이스틱 표시 계층·상호작용 Button. 동작은12단계 |
+| GameHud의 위치별 영역·금화/날짜/항해일자/Prompt | D01 대응 영역/앵커 | 퀘스트 실제 행 구조, MoveHint/InteractHint만 있는 영역에 조이스틱 표시 계층·상호작용 Button. 동작은13단계 |
 | JournalScreen의 Left/Center/Right·Close·HistoryScroll | D03 기본 구도·닫기 연결·스크롤 컨테이너 | PenTools의 Label을 실제 도구 컨트롤로, NoteEditor의 placeholder를 InputField로, 기록/계획/확대축소·레이어 조작/HistoryItem Prefab·스크롤바 완성. MapContent는 정식 지도 표시 연결 자리로 유지하고 S7 기능 바인딩 |
 | 그 외 전체 화면 없음 | 기존 화면을 참고하되 런타임 생성 구조 복제 금지 | F03~F21을6절 기준으로 제작. 후속 기능 시스템·데이터는 만들지 않음 |
 
@@ -552,7 +556,7 @@ S1 골격 완료 및 S2 진입은 보류한다. 추가 승인 대상은 **Game.u
 
 ### 승인받을 다음 작업
 
-- **설계 승인:** 6절 전체 목록·Hierarchy·Prefab·소유권 및 U0→S1 검증→S2~S7 기능 연결 순서. 8~12 기능 범위는 유지한다.
+- **설계 승인:** 6절 전체 목록·Hierarchy·Prefab·소유권 및 U0→S1 검증→S2~S7 기능 연결 순서. 8~13 기능 범위는 유지한다.
 - **제작 범위 승인:** U0의 `Assets/Prefabs/UI/` 및 Items/World 하위 새 Frame, 기존 UIRoot/GameHud/JournalScreen 보완, 필요한 GameRoot/Game Scene 직렬화 배치 연결. 기존 GUID·S1 진입·이동·책상 연결 및 저장 데이터 보호. 실제 제작 전 변경 파일/도안 없는 상세 배치와 F20 미정 항목을 확정한다.
 - 후속 도메인 기능·저장 변경·기존 Scene/Prefab 삭제·새 패키지·기능 테스트·커밋·푸시·병합은 포함하지 않는다. 기능 코드 변경이 추가로 필요하면 대상과 이유를 먼저 보고한다. 현재는 문서만 수정했으며 U0 제작 승인은 아직 받지 않았다.
 

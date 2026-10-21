@@ -37,12 +37,27 @@ namespace GreatVoyage
         private GameRuntime game;
         private readonly Dictionary<string, CrewMovement> crew = new Dictionary<string, CrewMovement>();
         private string visible;
+        private string inspectionFloor;
+        private SpecialTileView[] tileViews;
+        private ShipDefinition visibleDefinition;
+        public void InspectFloor(string floorId) => inspectionFloor = floorId;
         public event Action<string> FloorChanged;
         public event Action<string> CrewSelected;
+        private Action<WorldInteraction> dispatch;
+        private Func<WorldInteraction, bool> available;
+        public bool HasStaticFacility(string id) => facilities.Any(value => value.id == id);
+        public void BindInteractions(Action<WorldInteraction> action, Func<WorldInteraction, bool> predicate)
+        {
+            dispatch = action; available = predicate;
+            foreach (var point in GetComponentsInChildren<WorldInteraction>(true)) BindPoint(point);
+        }
+        public void BindPoint(WorldInteraction point) => point.Bind(dispatch, available);
         public void Bind(GameRuntime runtime)
         {
             game = runtime;
-            foreach (var tile in GetComponentsInChildren<SpecialTileView>(true))
+            tileViews = GetComponentsInChildren<SpecialTileView>(true);
+            visibleDefinition = game.Ship.Definition;
+            foreach (var tile in tileViews)
                 tile.Bind(game.Ship);
             foreach (var area in areas)
                 area.root.transform.localScale = Vector3.one * game.Ship.CellSize;
@@ -51,7 +66,7 @@ namespace GreatVoyage
             SyncCrew();
         }
 
-        private string CurrentArea => game.Navigation.IsAboard ? game.Ship.ActiveFloor : game.State.player.areaId;
+        private string CurrentArea => game.Battle.Running ? game.Battle.Settings.floorId : inspectionFloor ?? (game.Navigation.IsAboard ? game.Ship.ActiveFloor : game.State.player.areaId);
 
         public void CapturePlayer()
         {
@@ -63,6 +78,9 @@ namespace GreatVoyage
 
         public void ApplySpace(bool teleport = false)
         {
+            game.Ship.SetPresentationFloor(game.Battle.Running ? game.Battle.Settings.floorId : inspectionFloor);
+            foreach (var sprite in player.GetComponentsInChildren<SpriteRenderer>(true))
+                sprite.enabled = !game.Battle.Running && inspectionFloor == null;
             string current = CurrentArea;
             if (!areas.Any(area => area.id == current))
                 throw new InvalidOperationException("Unknown area: " + current);
@@ -150,6 +168,10 @@ namespace GreatVoyage
 
         public void Refresh()
         {
+            bool changedDefinition = visibleDefinition != game.Ship.Definition;
+            visibleDefinition = game.Ship.Definition;
+            foreach (var tile in tileViews)
+                if (changedDefinition) tile.Bind(game.Ship); else tile.Refresh();
             SyncCrew();
             ApplySpace();
             foreach (var binding in facilities)
@@ -158,7 +180,16 @@ namespace GreatVoyage
                 binding.root.SetActive(facility != null);
                 if (facility == null)
                     continue;
-                float value = facility.durability / game.Ship.GetFacilityDefinition(facility.definitionId).maxDurability;
+                var area = areas.First(entry => entry.id == facility.floorId);
+                binding.root.transform.SetParent(area.root.transform, false);
+                var definition = game.Ship.GetFacilityDefinition(facility.definitionId);
+                binding.root.transform.localPosition = game.Ship.GetFloorDefinition(facility.floorId).origin + new Vector2(facility.x, facility.y) + (Vector2)definition.size * .5f;
+                foreach (var point in GetComponentsInChildren<WorldInteraction>(true).Where(entry => entry.TargetId == facility.id))
+                {
+                    if (!point.transform.IsChildOf(binding.root.transform)) point.transform.SetParent(area.root.transform, true);
+                    if (game.Ship.TryGetAccessCell(facility.id, out var access)) point.SetAccessPosition(access);
+                }
+                float value = facility.durability / game.Ship.MaximumDurability(facility);
                 foreach (var renderer in binding.renderers)
                     renderer.color = Color.Lerp(new Color(.4f, .12f, .1f), new Color(.7f, .55f, .32f), value);
             }

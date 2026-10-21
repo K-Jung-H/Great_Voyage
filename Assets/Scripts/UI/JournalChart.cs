@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
@@ -16,17 +17,20 @@ namespace GreatVoyage
             this.journal = journal;
             this.navigation = navigation;
             this.panel = panel;
+            center = navigation.Ports.Aggregate(Vector2.zero, (sum, port) => sum + port.position) / navigation.Ports.Length;
+            span = Mathf.Max(60, navigation.Ports.Max(port => Vector2.Distance(port.position, center)) * 2.6f);
             raycastTarget = true;
         }
 
         public void Zoom(int direction)
         {
-            span = Mathf.Clamp(span * Mathf.Pow(.85f, direction), 12, 250);
+            span = Mathf.Clamp(span * Mathf.Pow(.85f, direction), 12, MaximumSpan);
             SetVerticesDirty();
         }
 
         private Vector2 center = new Vector2(15, 0);
         private float span = 60;
+        private float MaximumSpan => navigation == null ? 250 : Mathf.Max(navigation.WorldBounds.width, navigation.WorldBounds.height) * 1.25f;
         public readonly HashSet<int> Layers = new HashSet<int>();
         // Role: 지도·기록의 현재 상태를 표시 갱신에 반영한다.
         private void Update()
@@ -51,11 +55,13 @@ namespace GreatVoyage
             if (navigation == null || journal == null || journal.State == null)
                 return;
             Color grid = new Color(.55f, .75f, .75f, .12f);
-            for (int i = -100; i <= 100; i += 5)
+            float step = Mathf.Pow(10, Mathf.Floor(Mathf.Log10(span / 8)));
+            for (float x = Mathf.Floor((center.x - span * .6f) / step) * step; x <= center.x + span * .6f; x += step)
             {
-                Line(mesh, new Vector2(i, -100), new Vector2(i, 100), grid, .7f);
-                Line(mesh, new Vector2(-100, i), new Vector2(100, i), grid, .7f);
+                Line(mesh, new Vector2(x, center.y - span), new Vector2(x, center.y + span), grid, .7f);
             }
+            for (float y = Mathf.Floor((center.y - span * .6f) / step) * step; y <= center.y + span * .6f; y += step)
+                Line(mesh, new Vector2(center.x - span, y), new Vector2(center.x + span, y), grid, .7f);
 
             foreach (JournalVoyage voyage in journal.State.voyages)
             {
@@ -127,7 +133,7 @@ namespace GreatVoyage
         // Role: 왼쪽 펜 드래그로 계획을 그리고 오른쪽 드래그로 지도를 이동한다.
         public void OnDrag(PointerEventData data)
         {
-            if (data.button == PointerEventData.InputButton.Right)
+            if (data.button == PointerEventData.InputButton.Right || (data.button == PointerEventData.InputButton.Left && panel.Tool == 0))
             {
                 center -= data.delta * (span / rectTransform.rect.width) / transform.lossyScale.x;
                 SetVerticesDirty();
@@ -139,7 +145,7 @@ namespace GreatVoyage
         // Role: 지도 중심을 기준으로 확대·축소한다.
         public void OnScroll(PointerEventData data)
         {
-            span = Mathf.Clamp(span * Mathf.Pow(.85f, data.scrollDelta.y), 12, 250);
+            span = Mathf.Clamp(span * Mathf.Pow(.85f, data.scrollDelta.y), 12, MaximumSpan);
             SetVerticesDirty();
         }
     }

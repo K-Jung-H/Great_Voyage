@@ -28,6 +28,37 @@ namespace GreatVoyage
     {
         public string portId;
         public int stock;
+        public int day;
+        public float localStanding;
+        public string condition;
+        public List<MarketQuote> quotes = new List<MarketQuote>();
+        public List<ResidentRequest> requests = new List<ResidentRequest>();
+        public List<PortQuest> quests = new List<PortQuest>();
+    }
+
+    [Serializable]
+    public sealed class MarketQuote
+    {
+        public string productId;
+        public int buyPrice, sellPrice;
+    }
+
+    [Serializable]
+    public sealed class ResidentRequest
+    {
+        public string id, neededItem, rewardItem;
+        public int needed, reward;
+        public double expiresAt;
+        public bool completed;
+    }
+
+    [Serializable]
+    public sealed class PortQuest
+    {
+        public string id, productId;
+        public int quantity, reward;
+        public double expiresAt;
+        public bool accepted, completed, failed;
     }
 
     [Serializable]

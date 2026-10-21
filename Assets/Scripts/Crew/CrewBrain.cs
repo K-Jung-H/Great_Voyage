@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 using UnityEngine;
 
 namespace GreatVoyage
@@ -276,6 +277,8 @@ namespace GreatVoyage
         // Role: 식사·취침·일반 업무 우선순위에 따라 한 선원의 상태를 진행한다.
         private void Step(CrewState member, float seconds, bool night)
         {
+            if (member.availability == CrewAvailability.Combat)
+                return;
             if (member.availability != CrewAvailability.Ready)
             {
                 Cancel(member);
@@ -308,10 +311,10 @@ namespace GreatVoyage
                 return;
             }
 
-            if (member.hunger >= settings.mealThreshold && inventory.Food > 0)
+            if (member.hunger >= settings.mealThreshold && inventory.HasMeal)
             {
                 Cancel(member);
-                inventory.Food--;
+                inventory.ConsumeMeal();
                 member.activity = CrewActivity.Eating;
                 member.remainingSeconds = settings.mealSeconds;
                 BeginWorkPosition(member);
@@ -357,6 +360,26 @@ namespace GreatVoyage
                 return;
             }
 
+            if (member.activity == CrewActivity.GoingToPest || member.activity == CrewActivity.FightingPest)
+            {
+                var pest = session.Pests.Find(member.targetId);
+                if (pest == null || !OwnsUsableTarget(member)) { Cancel(member); return; }
+                if (member.activity == CrewActivity.FightingPest)
+                {
+                    if (pest.floorId != member.floorId || Vector2.Distance(pest.position, member.position) > 1.1f * CellSize)
+                    {
+                        member.activity = CrewActivity.GoingToPest; member.hasWorkPosition = false; member.repathRemaining = 0;
+                    }
+                    else if (AtWorkPosition(member)) session.Pests.Strike(pest.id, seconds * 6 * session.Life.Performance(member, CrewDuty.Guard) * (member.specialty == CrewSpecialty.Guard ? 1.5f : 1));
+                }
+                return;
+            }
+            if (member.activity == CrewActivity.GoingToLookout || member.activity == CrewActivity.Lookingout)
+            {
+                if (!OwnsUsableTarget(member)) Cancel(member);
+                else return;
+            }
+
             if (member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing)
             {
                 if (!OwnsUsableTarget(member) || inventory.RepairTools == 0)
@@ -375,7 +398,7 @@ namespace GreatVoyage
                 member.remainingSeconds = Mathf.Max(0, member.remainingSeconds - seconds);
                 if (member.remainingSeconds == 0)
                 {
-                    if (ship.RepairFacility(member.targetId, settings.repairAmount))
+                    if (ship.RepairFacility(member.targetId, settings.repairAmount * session.Life.Performance(member, CrewDuty.Maintenance)))
                         inventory.RepairTools--;
                     member.remainingSeconds = settings.repairSeconds;
                     if (!TargetUsable(member) || inventory.RepairTools == 0)
@@ -394,21 +417,55 @@ namespace GreatVoyage
                     foreach (FacilityState item in ship.Facilities)
                     {
                         FacilityDefinition kind = ship.GetFacilityDefinition(item.definitionId);
-                        if (!claims.ContainsKey(item.id) && kind.repairable && item.durability > 0 && item.durability < kind.maxDurability)
+                        if (!claims.ContainsKey(item.id) && kind.repairable && item.durability > 0 && item.durability < ship.MaximumDurability(item))
                         {
                             workExists = true;
                             break;
                         }
                     }
                 }
+                workExists |= session.Pests.Active.Length > 0 || (!navigation.IsDocked && ship.Facilities.Any(item => item.durability > 0 && ship.GetFacilityDefinition(item.definitionId).role == FacilityRole.Lookout && !claims.ContainsKey(item.id)));
 
                 if (!workExists)
                     return;
                 Cancel(member);
             }
 
-            if (member.repathRemaining == 0 && !TryStartTask(member, false))
-                TryStartWander(member);
+            if (member.repathRemaining == 0)
+            {
+                bool generalFirst = member.primaryDuty == CrewDuty.Guard || member.primaryDuty == CrewDuty.Lookout;
+                bool started = generalFirst ? TryStartGeneral(member) || TryStartTask(member, false) : TryStartTask(member, false) || TryStartGeneral(member);
+                if (!started) TryStartWander(member);
+            }
+        }
+
+        private bool TryStartGeneral(CrewState member)
+        {
+            if (member.primaryDuty != CrewDuty.Lookout)
+                foreach (var pest in session.Pests.Active)
+                    if (!claims.ContainsKey(pest.id) && BuildPath(member, pest.floorId, pest.position, out var route))
+                    {
+                        claims.Add(pest.id, member.id); member.targetId = pest.id; member.path = route;
+                        member.destination = new CrewWaypoint { floorId = pest.floorId, position = pest.position };
+                        member.activity = CrewActivity.GoingToPest; member.repathRemaining = settings.repathInterval; return true;
+                    }
+            if (!navigation.IsDocked)
+                foreach (var facility in ship.Facilities.Where(item => item.durability > 0 && ship.GetFacilityDefinition(item.definitionId).role == FacilityRole.Lookout))
+                    if (!claims.ContainsKey(facility.id) && ship.TryGetAccessCell(facility.id, out var access) && BuildPath(member, facility.floorId, access, out var route))
+                    {
+                        claims.Add(facility.id, member.id); member.targetId = facility.id; member.path = route;
+                        member.destination = new CrewWaypoint { floorId = facility.floorId, position = access };
+                        member.activity = CrewActivity.GoingToLookout; member.repathRemaining = settings.repathInterval; return true;
+                    }
+            if (member.primaryDuty == CrewDuty.Lookout)
+                foreach (var pest in session.Pests.Active)
+                    if (!claims.ContainsKey(pest.id) && BuildPath(member, pest.floorId, pest.position, out var route))
+                    {
+                        claims.Add(pest.id, member.id); member.targetId = pest.id; member.path = route;
+                        member.destination = new CrewWaypoint { floorId = pest.floorId, position = pest.position };
+                        member.activity = CrewActivity.GoingToPest; member.repathRemaining = settings.repathInterval; return true;
+                    }
+            return false;
         }
 
         // Role: 안정 시설 순서로 자격·자재·접근·선점을 확인하고 대표 업무를 선택한다.
@@ -424,7 +481,7 @@ namespace GreatVoyage
             foreach (FacilityState item in facilities)
             {
                 FacilityDefinition kind = ship.GetFacilityDefinition(item.definitionId);
-                if (claims.ContainsKey(item.id) || item.durability <= 0 || (bed ? !kind.usableAsBed : !kind.repairable || item.durability >= kind.maxDurability))
+                if (claims.ContainsKey(item.id) || item.durability <= 0 || (bed ? !kind.usableAsBed : !kind.repairable || item.durability >= ship.MaximumDurability(item)))
                     continue;
                 if (!ship.TryGetAccessCell(item.id, out Vector2 access) || !BuildPath(member, item.floorId, access, out List<CrewWaypoint> path))
                     continue;
@@ -542,7 +599,7 @@ namespace GreatVoyage
             foreach (CrewState member in state.members)
             {
                 member.repathRemaining = Mathf.Max(0, member.repathRemaining - seconds);
-                if (member.availability == CrewAvailability.Ready && IsNavigating(member))
+                if ((member.availability == CrewAvailability.Ready || member.availability == CrewAvailability.Combat) && IsNavigating(member))
                     Navigate(member, views[member.id], seconds);
                 else
                 {
@@ -575,10 +632,25 @@ namespace GreatVoyage
             }
         }
 
+        public void ResetPositionsForShip()
+        {
+            var floor = ship.GetFloorDefinition(ship.Definition.startingFloor);
+            var positions = Enumerable.Range(0, floor.size.x * floor.size.y).Select(index => floor.origin + new Vector2(index % floor.size.x + .5f, index / floor.size.x + .5f)).Where(position => ship.HasCrewClearance(floor.id, position, settings.bodyRadius + settings.clearance)).OrderBy(position => Vector2.SqrMagnitude(position - floor.entry)).ToArray();
+            int index = 0;
+            foreach (var member in state.members)
+            {
+                Cancel(member);
+                member.floorId = ship.Definition.startingFloor;
+                member.position = positions[index++ % positions.Length];
+                member.velocity = Vector2.zero;
+                views[member.id].TeleportToState();
+            }
+        }
+
         // Role: 긴 주기 Nav 경로와 짧은 주기 Context steering을 결합한다.
         private void Navigate(CrewState member, ICrewBody view, float seconds)
         {
-            if (member.activity != CrewActivity.Wandering && !OwnsUsableTarget(member))
+            if (member.activity != CrewActivity.Wandering && member.activity != CrewActivity.EncounterMoving && !OwnsUsableTarget(member))
             {
                 Cancel(member);
                 return;
@@ -622,6 +694,12 @@ namespace GreatVoyage
             if (member.path.Count == 0)
             {
                 view.DriveVelocity(Vector2.zero, settings.acceleration, settings.normalMass);
+                if (member.activity == CrewActivity.EncounterMoving)
+                {
+                    member.activity = CrewActivity.EncounterReady;
+                    member.velocity = Vector2.zero;
+                    return;
+                }
                 if (member.activity == CrewActivity.Wandering)
                 {
                     Cancel(member);
@@ -640,13 +718,17 @@ namespace GreatVoyage
 
                     return;
                 }
+                if (member.activity == CrewActivity.GoingToPest)
+                {
+                    member.activity = CrewActivity.FightingPest; member.velocity = Vector2.zero; view.ApplyVelocity(Vector2.zero); BeginWorkPosition(member); return;
+                }
 
                 FacilityState target = ship.GetFacility(member.targetId);
                 if (target != null && member.floorId == target.floorId && ship.IsAtFacilityAccess(target.id, member.position, settings.arrivalRadius))
                 {
                     bool bed = member.activity == CrewActivity.GoingToBed;
-                    member.activity = bed ? CrewActivity.Sleeping : CrewActivity.Repairing;
-                    member.remainingSeconds = bed ? 0 : settings.repairSeconds;
+                    member.activity = bed ? CrewActivity.Sleeping : member.activity == CrewActivity.GoingToLookout ? CrewActivity.Lookingout : CrewActivity.Repairing;
+                    member.remainingSeconds = bed || member.activity == CrewActivity.Lookingout ? 0 : settings.repairSeconds;
                     member.velocity = Vector2.zero;
                     view.ApplyVelocity(Vector2.zero);
                     BeginWorkPosition(member);
@@ -681,7 +763,13 @@ namespace GreatVoyage
                     floorId = settings.helmFloor,
                     position = settings.helmPosition
                 };
-            else if (workDestination == null && member.activity != CrewActivity.Wandering)
+            else if (workDestination == null && member.activity == CrewActivity.GoingToPest)
+            {
+                var pest = session.Pests?.Find(member.targetId);
+                if (pest == null) { Cancel(member); return false; }
+                destination = new CrewWaypoint { floorId = pest.floorId, position = pest.position };
+            }
+            else if (workDestination == null && member.activity != CrewActivity.Wandering && member.activity != CrewActivity.EncounterMoving)
             {
                 FacilityState target = ship.GetFacility(member.targetId);
                 if (target == null || !ship.TryGetAccessCell(target.id, out Vector2 access))
@@ -875,14 +963,16 @@ namespace GreatVoyage
         // Role: 현재 시설이 행동 자격과 기능 조건을 계속 만족하는지 검사한다.
         private bool TargetUsable(CrewState member)
         {
+            if (member.activity == CrewActivity.GoingToPest || member.activity == CrewActivity.FightingPest) return session.Pests?.Find(member.targetId) != null;
             if (member.targetId == HelmTarget)
                 return QualifiedNavigator(member) && member.primaryDuty == CrewDuty.Navigation && navigation != null && navigation.NeedsNavigator && ship.IsWalkablePosition(settings.helmFloor, settings.helmPosition);
             FacilityState item = ship.GetFacility(member.targetId);
             if (item == null || item.durability <= 0)
                 return false;
             FacilityDefinition kind = ship.GetFacilityDefinition(item.definitionId);
+            if (member.activity == CrewActivity.GoingToLookout || member.activity == CrewActivity.Lookingout) return kind.role == FacilityRole.Lookout && !navigation.IsDocked;
             bool bed = member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Sleeping;
-            return bed ? kind.usableAsBed : member.specialty == CrewSpecialty.Maintenance && kind.repairable && item.durability < kind.maxDurability;
+            return bed ? kind.usableAsBed : member.specialty == CrewSpecialty.Maintenance && kind.repairable && item.durability < ship.MaximumDurability(item);
         }
 
         // Role: 유효한 작업 대상을 자신이 계속 선점하고 있는지 확인한다.
@@ -918,8 +1008,12 @@ namespace GreatVoyage
             member.primaryDuty = duty;
             if (duty == CrewDuty.Navigation && navigation.journal != null)
                 navigation.journal.State.autopilot = true;
-            if (member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing || member.targetId == HelmTarget)
+            if (member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing || member.targetId == HelmTarget || member.activity == CrewActivity.GoingToLookout || member.activity == CrewActivity.Lookingout || member.activity == CrewActivity.GoingToPest || member.activity == CrewActivity.FightingPest)
                 Cancel(member);
+        }
+        public void StopPestWork()
+        {
+            foreach (var member in state.members.Where(value => value.activity == CrewActivity.GoingToPest || value.activity == CrewActivity.FightingPest)) Cancel(member);
         }
 
         // Role: 사망·수감·전투 등 외부 시스템의 업무 중단을 즉시 반영한다.
@@ -937,7 +1031,7 @@ namespace GreatVoyage
         }
 
         // Role: 표시만 현재 층에 제한하고 시뮬레이션은 모든 층에서 유지한다.
-        public bool IsVisible(CrewState member) => IsReady && !session.IsSleeping && member.availability != CrewAvailability.Dead && ship.IsFloorVisible(member.floorId);
+        public bool IsVisible(CrewState member) => IsReady && !session.IsSleeping && (member.availability == CrewAvailability.Ready || member.availability == CrewAvailability.Combat) && ship.IsFloorVisible(member.floorId);
         // Role: 내부 행동 값을 사용자에게 읽을 수 있는 이름으로 표시한다.
         private static string ActivityName(CrewActivity activity) => activity switch
         {
@@ -952,13 +1046,25 @@ namespace GreatVoyage
             _ => "휴식"
         };
         // Role: 전체 경로를 런타임 캐시로 사용하는 이동 행동을 구분한다.
-        private static bool IsNavigating(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Wandering || member.activity == CrewActivity.GoingToHelm;
+        private static bool IsNavigating(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Wandering || member.activity == CrewActivity.GoingToHelm || member.activity == CrewActivity.EncounterMoving || member.activity == CrewActivity.GoingToPest || member.activity == CrewActivity.GoingToLookout;
+
+        public bool MoveForEncounter(string id, string floorId, Vector2 position)
+        {
+            var member = FindMember(id);
+            if (member == null || member.availability != CrewAvailability.Combat || !BuildPath(member, floorId, position, out List<CrewWaypoint> path))
+                return false;
+            member.destination = new CrewWaypoint { floorId = floorId, position = position };
+            member.path = path;
+            member.activity = CrewActivity.EncounterMoving;
+            member.repathRemaining = 0;
+            return true;
+        }
         // Role: 밀림 저항과 작업 시작점 복귀가 필요한 행동을 구분한다.
-        private static bool IsWorking(CrewState member) => member.activity == CrewActivity.Repairing || member.activity == CrewActivity.Sleeping || member.activity == CrewActivity.Eating || member.activity == CrewActivity.Helming;
+        private static bool IsWorking(CrewState member) => member.activity == CrewActivity.Repairing || member.activity == CrewActivity.Sleeping || member.activity == CrewActivity.Eating || member.activity == CrewActivity.Helming || member.activity == CrewActivity.FightingPest || member.activity == CrewActivity.Lookingout;
         // Role: 작업 복귀 경로가 필요한 밀림 상태를 구분한다.
         private bool IsReturning(CrewState member) => IsWorking(member) && member.hasWorkPosition && !AtWorkPosition(member);
         // Role: 시설 선점이 필요한 행동인지 구분한다.
-        private static bool HasTarget(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Sleeping || member.activity == CrewActivity.GoingToHelm || member.activity == CrewActivity.Helming;
+        private static bool HasTarget(CrewState member) => member.activity == CrewActivity.GoingToRepair || member.activity == CrewActivity.Repairing || member.activity == CrewActivity.GoingToBed || member.activity == CrewActivity.Sleeping || member.activity == CrewActivity.GoingToHelm || member.activity == CrewActivity.Helming || member.activity == CrewActivity.GoingToPest || member.activity == CrewActivity.FightingPest || member.activity == CrewActivity.GoingToLookout || member.activity == CrewActivity.Lookingout;
         // Role: 항해 특기와 최소 항해 경력을 함께 확인한다.
         public static bool QualifiedNavigator(CrewState member) => member.specialty == CrewSpecialty.Navigation && member.navigationExperience >= 1;
         // Role: 유효한 항해사가 방향타 접근 지점을 선점하고 이동을 시작한다.

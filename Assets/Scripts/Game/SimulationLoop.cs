@@ -20,6 +20,7 @@ namespace GreatVoyage
         {
             if (!game.IsReady || game.IsPaused)
                 return;
+            game.Events.PrepareBoundary();
             float budget = Mathf.Min(realSeconds, .25f) * game.Rest.TimeScale;
             bool fast = game.IsSleeping;
             while (budget > .000001f && !game.IsPaused)
@@ -32,7 +33,7 @@ namespace GreatVoyage
                     {
                         EventBoundary = double.PositiveInfinity;
                         EventBoundaryReached?.Invoke();
-                        game.Rest.Wake();
+                        if (game.State.events.current?.kind != "watch") game.Rest.Wake();
                     }
                     else
                         game.Rest.Advance(0);
@@ -41,9 +42,10 @@ namespace GreatVoyage
 
                 var from = game.Navigation.WorldPosition;
                 bool moving = !game.Navigation.IsDocked;
-                float consumed = game.Navigation.AdvanceTime(step);
+                float consumed = game.Battle.Running ? step : game.Navigation.AdvanceTime(step);
                 game.State.elapsedSeconds += consumed;
                 game.Crew.Advance(consumed, game.ElapsedSeconds);
+                game.Life.Advance(consumed);
                 if (fast)
                     game.Crew.AdvanceSleepMovement(consumed);
                 int day = (int)(game.ElapsedSeconds / GameRuntime.SecondsPerDay) + 1;
@@ -57,6 +59,9 @@ namespace GreatVoyage
                 }
                 else
                     game.Rest.Advance(consumed);
+                game.Events.Advance(consumed);
+                game.Prisoners.Advance();
+                game.Market.Advance();
                 game.Navigation.NotifyArrival();
                 game.NotifyChanged(arrived);
                 if (arrived)

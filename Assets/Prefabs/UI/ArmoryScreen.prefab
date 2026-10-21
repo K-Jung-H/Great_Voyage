@@ -1924,6 +1924,7 @@ GameObject:
   - component: {fileID: 123065768233769799}
   - component: {fileID: 844552164935022734}
   - component: {fileID: 116339755544325811}
+  - component: {fileID: 7951803672514822773}
   m_Layer: 0
   m_Name: ArmoryScreen
   m_TagString: Untagged
@@ -1995,6 +1996,139 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7951803672514822773
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6335273045209292092}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1036ecef62ddd4bb2d75188854149f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ScreenView
+  references:
+  - key: 
+    component: {fileID: 123065768233769799}
+  - key: Title
+    component: {fileID: 5280725788010990476}
+  - key: Title
+    component: {fileID: 5174633028569852854}
+  - key: Availability
+    component: {fileID: 2018384696799078186}
+  - key: Availability
+    component: {fileID: 4482153657039096607}
+  - key: CrewScroll
+    component: {fileID: 8408636307780058187}
+  - key: CrewScroll
+    component: {fileID: 5479330462497249717}
+  - key: CrewScroll/Viewport
+    component: {fileID: 6712464483688259906}
+  - key: CrewScroll/Viewport/Content
+    component: {fileID: 8767365827547392044}
+  - key: CrewScroll/Viewport/Content/ItemTemplate
+    component: {fileID: 3305611747740366208}
+  - key: CrewScroll/Viewport/Content/ItemTemplate
+    component: {fileID: 3880555864205594916}
+  - key: CrewScroll/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 261309420827921774}
+  - key: CrewScroll/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 6849794000475293174}
+  - key: CrewScroll/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 6304409581113404779}
+  - key: CrewScroll/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 6291654811918153907}
+  - key: CrewScroll/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 4567210453730359746}
+  - key: CrewScroll/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 4539658174414118442}
+  - key: CrewScroll/Viewport/EmptyState
+    component: {fileID: 7467486393287697464}
+  - key: CrewScroll/Viewport/EmptyState
+    component: {fileID: 6095022523140877006}
+  - key: CrewScroll/Scrollbar
+    component: {fileID: 432215491249578004}
+  - key: CrewScroll/Scrollbar/Handle
+    component: {fileID: 7728756475593301879}
+  - key: SelectedCrew
+    component: {fileID: 7337871173963682601}
+  - key: SelectedCrew/Name
+    component: {fileID: 513690859676365780}
+  - key: SelectedCrew/Name
+    component: {fileID: 376801239733770608}
+  - key: SelectedCrew/CurrentWeapon
+    component: {fileID: 5286453169084204804}
+  - key: SelectedCrew/CurrentWeapon
+    component: {fileID: 6293826933540257088}
+  - key: SelectedCrew/PersonalSetting
+    component: {fileID: 1746250737973544129}
+  - key: SelectedCrew/PersonalSetting
+    component: {fileID: 3120150011996338791}
+  - key: SelectedCrew/WeaponChoices
+    component: {fileID: 7237467088731859940}
+  - key: SelectedCrew/WeaponChoices
+    component: {fileID: 5972905941278086420}
+  - key: SelectedCrew/WeaponChoices/Viewport
+    component: {fileID: 2384303100016809418}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content
+    component: {fileID: 9073619125324782170}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate
+    component: {fileID: 454422555958802098}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate
+    component: {fileID: 3697652910534976881}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Item
+    component: {fileID: 3595584212487396209}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Item
+    component: {fileID: 5599272172425022930}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Stock
+    component: {fileID: 3094166026820552339}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Stock
+    component: {fileID: 3225650363536246886}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/UnitPrice
+    component: {fileID: 2538842969938843546}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/UnitPrice
+    component: {fileID: 2492947471055578835}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Quantity
+    component: {fileID: 1979579880456323890}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Quantity/TextArea
+    component: {fileID: 1234820960100144517}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Quantity/TextArea/Text
+    component: {fileID: 134483229807405033}
+  - key: SelectedCrew/WeaponChoices/Viewport/Content/ItemTemplate/Quantity/TextArea/Text
+    component: {fileID: 430168651709906556}
+  - key: SelectedCrew/WeaponChoices/Viewport/EmptyState
+    component: {fileID: 7955699985256533542}
+  - key: SelectedCrew/WeaponChoices/Viewport/EmptyState
+    component: {fileID: 29048364454270948}
+  - key: SelectedCrew/WeaponChoices/Scrollbar
+    component: {fileID: 7474891131405449014}
+  - key: SelectedCrew/WeaponChoices/Scrollbar/Handle
+    component: {fileID: 1289747147779120727}
+  - key: Exit
+    component: {fileID: 7911954473043347833}
+  - key: Exit
+    component: {fileID: 1867227174495390146}
+  - key: Exit/Label
+    component: {fileID: 4084091893578209854}
+  - key: Exit/Label
+    component: {fileID: 2946813586080519150}
+  - key: EquipAll
+    component: {fileID: 1667873605148202742}
+  - key: EquipAll
+    component: {fileID: 6941825725876551300}
+  - key: EquipAll/Label
+    component: {fileID: 6062603002981567313}
+  - key: EquipAll/Label
+    component: {fileID: 4637487241882034315}
+  - key: UnequipAll
+    component: {fileID: 1113023481503138197}
+  - key: UnequipAll
+    component: {fileID: 154293547823828224}
+  - key: UnequipAll/Label
+    component: {fileID: 8064350957246844936}
+  - key: UnequipAll/Label
+    component: {fileID: 8635342854309370661}
 --- !u!1 &6383507253563259783
 GameObject:
   m_ObjectHideFlags: 0
@@ -2973,11 +3107,70 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+--- !u!224 &261309420827921774 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5189122429031509470, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5450249260987982000}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &3305611747740366208 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7384997998640108848, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
   m_PrefabInstance: {fileID: 5450249260987982000}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3880555864205594916 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9113504626401784212, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5450249260987982000}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &4539658174414118442 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8404622752822132378, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5450249260987982000}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &4567210453730359746 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8413517290561755506, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5450249260987982000}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6291654811918153907 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2086114836047206403, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5450249260987982000}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &6304409581113404779 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2080363750804901339, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5450249260987982000}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6849794000475293174 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1489697009268467014, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5450249260987982000}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &5796969140954537894
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3097,10 +3290,147 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4215353590549193861, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3697652910534976881}
   m_SourcePrefab: {fileID: 100100000, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+--- !u!224 &134483229807405033 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5885992990959597647, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &430168651709906556 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6163946454094340570, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &454422555958802098 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6214006857911396628, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
   m_PrefabInstance: {fileID: 5796969140954537894}
   m_PrefabAsset: {fileID: 0}
+--- !u!224 &1234820960100144517 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4706278819387329059, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &1979579880456323890 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5407162692066811028, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2492947471055578835 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8280503690667161973, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &2538842969938843546 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8307224324843817020, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2649369115603615097 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8410062822503785183, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7641774561824160547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
+--- !u!224 &3094166026820552339 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8827714030870698293, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3225650363536246886 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8985023557114206144, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &3595584212487396209 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7031504896179258583, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5599272172425022930 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2145513218781516404, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!1 &7641774561824160547 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4215353590549193861, guid: ee9cc088023811e4cb4bb262de76cec1, type: 3}
+  m_PrefabInstance: {fileID: 5796969140954537894}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3697652910534976881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7641774561824160547}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+  m_Navigation:
+    m_Mode: 3
+    m_WrapAround: 0
+    m_SelectOnUp: {fileID: 0}
+    m_SelectOnDown: {fileID: 0}
+    m_SelectOnLeft: {fileID: 0}
+    m_SelectOnRight: {fileID: 0}
+  m_Transition: 1
+  m_Colors:
+    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
+    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
+    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
+    m_ColorMultiplier: 1
+    m_FadeDuration: 0.1
+  m_SpriteState:
+    m_HighlightedSprite: {fileID: 0}
+    m_PressedSprite: {fileID: 0}
+    m_SelectedSprite: {fileID: 0}
+    m_DisabledSprite: {fileID: 0}
+  m_AnimationTriggers:
+    m_NormalTrigger: Normal
+    m_HighlightedTrigger: Highlighted
+    m_PressedTrigger: Pressed
+    m_SelectedTrigger: Selected
+    m_DisabledTrigger: Disabled
+  m_Interactable: 1
+  m_TargetGraphic: {fileID: 2649369115603615097}
+  m_OnClick:
+    m_PersistentCalls:
+      m_Calls: []

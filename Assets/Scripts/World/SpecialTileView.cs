@@ -13,7 +13,17 @@ namespace GreatVoyage
         private string facilityId;
         [SerializeField, Tooltip("통행 분류에 따라 제어할 고체 Collider. 상호작용 Trigger는 넣지 않는다.")]
         private Collider2D[] blockers;
+        [SerializeField, Tooltip("이 타일이 없는 기존 함선 정의에서는 표시·충돌을 숨긴다.")]
+        private bool optionalForLegacy;
+        private ShipModel ship;
+        private SpriteRenderer[] renderers;
         public void Bind(ShipModel ship)
+        {
+            this.ship = ship;
+            renderers = GetComponentsInChildren<SpriteRenderer>(true);
+            Refresh();
+        }
+        public void Refresh()
         {
             if (string.IsNullOrEmpty(tileId) == string.IsNullOrEmpty(facilityId) || blockers == null)
                 throw new InvalidOperationException("Special tile identity/binding invalid: " + name);
@@ -29,9 +39,11 @@ namespace GreatVoyage
             {
                 var floor = ship.GetFloorDefinition(floorId);
                 var tile = Array.Find(floor?.specialTiles ?? Array.Empty<SpecialTileDefinition>(), t => t.id == tileId);
-                if (tile == null)
+                if (tile == null && !optionalForLegacy)
                     throw new InvalidOperationException("Special tile binding missing: " + tileId);
-                passability = tile.passability;
+                passability = ship.IsTileBlocking(floorId, tileId) ? TilePassability.Impassable : TilePassability.Passable;
+                if (tile?.unlockable == true || optionalForLegacy)
+                    foreach (var renderer in renderers) renderer.enabled = tile != null && passability == TilePassability.Impassable;
             }
 
             foreach (var collider in blockers)

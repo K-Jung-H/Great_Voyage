@@ -33,3 +33,4 @@ MonoBehaviour:
   maxSpeed: 4
   acceleration: 4
   turnSpeed: 60
+  towGoldFraction: 0.25

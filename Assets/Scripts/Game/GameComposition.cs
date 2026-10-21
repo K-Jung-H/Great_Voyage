@@ -38,6 +38,20 @@ namespace GreatVoyage
         private ContextPresenter context;
         [SerializeField, Tooltip("선원 상태·지속 업무 지정 화면.")]
         private CrewScreenController crewScreens;
+        [SerializeField, Tooltip("사전 제작된 사건 대화와 결과 표시.")]
+        private EventScreenController eventScreens;
+        [SerializeField, Tooltip("관전/처분/무장/포로 인계 화면.")]
+        private BattleScreens battleScreens;
+        [SerializeField, Tooltip("사전 제작 캐릭터/상태바/투사체 표현.")]
+        private BattlePresentation battlePresentation;
+        [SerializeField, Tooltip("층별 시설 Prefab 표시와 상호작용.")]
+        private FacilityPresentation facilityPresentation;
+        [SerializeField, Tooltip("조선소와 시설 편집 화면.")]
+        private ShipyardScreens shipyardScreens;
+        [SerializeField, Tooltip("시청 퀘스트 탭의 수주/납품 연결.")]
+        private QuestScreens questScreens;
+        [SerializeField, Tooltip("층별 유해 생물 표시.")]
+        private PestPresentation pestPresentation;
         private GameInput input;
         private GameFlow flow;
         private GameRuntime game;
@@ -64,13 +78,21 @@ namespace GreatVoyage
                 sessionScreens.Bind(game);
                 hud.Bind(game);
                 context.Bind(game, worldView);
-                flow = new GameFlow(input, player, interactions, ui, game, worldView, stack, economyScreens, journalController, sessionScreens, context);
+                flow = new GameFlow(input, player, interactions, ui, game, worldView, stack, economyScreens, journalController, sessionScreens, context, battleScreens, shipyardScreens);
                 journalDesk.OpenRequested += flow.OpenJournal;
-                foreach (var point in world.GetComponentsInChildren<WorldInteraction>(true))
-                    point.Bind(flow.Interact, flow.Available);
+                worldView.BindInteractions(flow.Interact, flow.Available);
                 worldView.Bind(game);
                 sessionScreens.QuitRequested += SaveAndQuit;
                 crewScreens.Bind(game);
+                if (!eventScreens)
+                    throw new InvalidOperationException("Event screen reference incomplete");
+                eventScreens.Bind(game);
+                battleScreens.Bind(game);
+                battlePresentation.Bind(game);
+                facilityPresentation.Bind(game);
+                shipyardScreens.Bind(game);
+                questScreens.Bind(game);
+                pestPresentation.Bind(game);
                 worldView.CrewSelected += crewScreens.Open;
                 if (game.State.economy.gameOver)
                     sessionScreens.ShowGameOver();
@@ -118,6 +140,9 @@ namespace GreatVoyage
                 flow.Tick();
                 game.Loop.Advance(Time.unscaledDeltaTime);
                 worldView.Refresh();
+                battlePresentation.Refresh();
+                facilityPresentation.Refresh();
+                pestPresentation.Refresh();
                 hud.Refresh();
                 context.Refresh();
             }

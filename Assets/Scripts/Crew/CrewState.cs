@@ -4,10 +4,19 @@ using UnityEngine;
 
 namespace GreatVoyage
 {
-    public enum CrewSpecialty { None, Maintenance, Navigation }
-    public enum CrewDuty { None, Maintenance, Navigation }
-    public enum CrewAvailability { Ready, Dead, Imprisoned, Combat }
-    public enum CrewActivity { Idle, GoingToRepair, Repairing, GoingToBed, Sleeping, Eating, Wandering, GoingToHelm, Helming }
+    public enum CrewSpecialty { None, Maintenance, Navigation, Lookout, Guard }
+    public enum CrewDuty { None, Maintenance, Navigation, Lookout, Guard }
+    public enum CrewWishKind { None, Duty, Destination, Facility }
+    [Serializable]
+    public sealed class CrewWish
+    {
+        public CrewWishKind kind;
+        public CrewDuty duty;
+        public string targetId;
+    }
+    public enum CrewAvailability { Ready, Dead, Imprisoned, Combat, Away }
+    public enum CrewActivity { Idle, GoingToRepair, Repairing, GoingToBed, Sleeping, Eating, Wandering, GoingToHelm, Helming, EncounterMoving, EncounterReady, GoingToPest, FightingPest, GoingToLookout, Lookingout }
+    public enum WeaponKind { Unarmed, Sword, Gun }
 
     [Serializable]
     public sealed class CrewWaypoint
@@ -31,6 +40,19 @@ namespace GreatVoyage
         public float repathRemaining;
         public float health = 100;
         public float happiness = 100;
+        public float strength = 10;
+        public float dexterity = 10;
+        public float intelligence = 10;
+        public float trust = 100;
+        public WeaponKind weapon;
+        public bool armed;
+        public string rank = "선원";
+        public List<string> career = new List<string>();
+        public CrewWish wish = new CrewWish();
+        public CrewWish acceptedPromise;
+        public bool promiseBreached;
+        public bool promiseChecked;
+        public string species;
         public float hunger;
         public float energy = 100;
         public CrewActivity activity;

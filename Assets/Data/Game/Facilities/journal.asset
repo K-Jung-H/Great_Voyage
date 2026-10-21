@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18e565e0c5ed1548ac1cde2307e5ccc, type: 3}
+  m_Name: "\uD56D\uD574 \uC77C\uC9C0"
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.FacilityDefinition
+  id: journal
+  role: 10
+  capacity: 1
+  purchasePrice: -1
+  repairPrice: 0.2
+  essential: 1
+  maximumLevel: 3
+  passability: 0
+  size: {x: 2, y: 2}
+  allowedFloors:
+  - deck-2
+  maxDurability: 100
+  repairable: 1
+  usableAsBed: 0
+  prefab: {fileID: 3943488632169995724, guid: 80a666bb82b8afc41966ed02e10280e7, type: 3}

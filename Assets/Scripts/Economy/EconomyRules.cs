@@ -24,7 +24,47 @@ namespace GreatVoyage
 
         private EconomyState state;
         private IDisposable gameOverPause;
+        private string quoteCandidate;
+        private float evaluation;
+        private float negotiationFactor = 1;
+        public bool Negotiated { get; private set; }
+        public void BeginQuote(string id)
+        {
+            quoteCandidate = id; evaluation = 0; negotiationFactor = 1; Negotiated = false; Message = null;
+        }
+        public void Evaluate(float value) => evaluation = Mathf.Clamp(value, -50, 50);
+        public float PreviewHappiness(CrewState candidate) => candidate == null ? 0 : Mathf.Clamp(candidate.happiness + evaluation * .2f, 0, 100);
+        public float PreviewTrust(CrewState candidate) => candidate == null ? 0 : Mathf.Clamp(candidate.trust + evaluation * .05f, 0, 100);
+        public int QuoteWage(CrewState candidate)
+        {
+            if (candidate == null) return 0;
+            float stats = Mathf.Max(.5f, (candidate.strength + candidate.dexterity + candidate.intelligence) / 30f + Mathf.Min(50, candidate.navigationExperience) * .01f);
+            float reputation = Mathf.Clamp(1 - (state.reputation - settings.initialReputation) * .001f, .8f, 1.3f);
+            return Mathf.Clamp(Mathf.RoundToInt(settings.wagePerVoyage * stats * reputation * (1 + evaluation / 100) * negotiationFactor), 1, 1000000);
+        }
+        public void Negotiate()
+        {
+            var candidate = Candidate(quoteCandidate);
+            if (candidate == null || Negotiated) return;
+            uint seed = 2166136261u;
+            foreach (char value in session.State.playthroughId + candidate.id + state.contractSequence) seed = (seed ^ value) * 16777619u;
+            if (seed == 0) seed = 1;
+            negotiationFactor = Mathf.Lerp(.9f, 1.1f, EventRules.Next(ref seed));
+            Negotiated = true;
+            string[] patterns = { "제 조건을 듣고 금액을 정해 주십시오.", "지난 항해의 소문도 들었습니다. 이 금액으로 이야기해 봅시다.", "명성에 어울리는 계약을 기대하겠습니다." };
+            Message = patterns[(int)(EventRules.Next(ref seed) * patterns.Length)] + (candidate.wish != null && candidate.wish.kind != CrewWishKind.None ? " 희망 조건: " + candidate.wish.kind + " " + candidate.wish.targetId : "");
+        }
         public EconomyState State => state;
+        public void BreakContract(string crewId)
+        {
+            foreach (var contract in state.contracts.Where(value => value.crewId == crewId && value.status != ContractStatus.Broken))
+            {
+                contract.status = ContractStatus.Broken;
+                contract.debt = 0;
+                contract.formerCrew = null;
+            }
+            session.RequestSave();
+        }
         public EconomySettings Settings => settings;
         public CrewState[] Candidates => new[]
         {
@@ -34,7 +74,7 @@ namespace GreatVoyage
         public int Debt => state.contracts.Sum(contract => contract.debt);
         public bool CanAct => state != null && session.IsReady && session.ErrorMessage == null && !state.gameOver && navigation.IsDocked;
         public TradePortDefinition Port => Array.Find(settings.ports, port => port.portId == navigation.DockedPort);
-        public int SalePrice => state.settlementPending ? Mathf.FloorToInt(Port.buyPrice * settings.liquidationRate) : Port.sellPrice;
+        public int SalePrice => session.Market?.SalePrice(settings.productId, state.settlementPending) ?? (state.settlementPending ? Mathf.FloorToInt(Port.buyPrice * settings.liquidationRate) : Port.sellPrice);
 
         // Role: 정의·복원 상태를 검증하고 항해 완료와 출항 검사를 연결한다.
         public EconomyState Initialize(EconomyState saved)
@@ -94,38 +134,15 @@ namespace GreatVoyage
         // Role: 수량·대금·상인 재고를 검사한 후 구매를 한 번 저장한다.
         public void Buy(int quantity)
         {
-            if (!CanAct || navigation.IsAboard || state.settlementPending)
-                return;
-            PortMarketState market = state.markets.Find(value => value.portId == navigation.DockedPort);
-            long price = (long)Port.buyPrice * quantity;
-            string owner = "port:" + market.portId + ":merchant";
-            if (quantity <= 0 || quantity > inventory.Get(settings.productId, owner) || price > inventory.Gold || (long)inventory.Cargo + quantity > int.MaxValue)
-            {
-                Message = "금화 또는 상인 재고가 부족합니다.";
-                return;
-            }
-
-            inventory.Gold -= (int)price;
-            inventory.Cargo += quantity;
-            inventory.Set(settings.productId, inventory.Get(settings.productId, owner) - quantity, owner);
-            Persist("구매했습니다.");
+            session.Market.Buy(settings.productId, quantity);
+            Message = session.Market.Message;
         }
 
         // Role: 선택한 상품을 대행인 또는 강제 매각 가격으로 판매한다.
         public void Sell(int quantity)
         {
-            if (!CanAct || (navigation.IsAboard && !state.settlementPending))
-                return;
-            long price = (long)SalePrice * quantity;
-            if (quantity <= 0 || quantity > inventory.Cargo || price + inventory.Gold > int.MaxValue)
-            {
-                Message = "판매 수량 또는 금화 한도를 확인하세요.";
-                return;
-            }
-
-            inventory.Cargo -= quantity;
-            inventory.Gold += (int)price;
-            Persist("판매했습니다. 정산에 쓰지 않은 금화는 유지됩니다.");
+            session.Market.Sell(settings.productId, quantity, state.settlementPending);
+            Message = session.Market.Message;
         }
 
         // Role: 현재 항구에서 다시 계약할 수 있는 대표 후보를 조회한다.
@@ -152,7 +169,8 @@ namespace GreatVoyage
                 return;
             }
 
-            int total = settings.wagePerVoyage * voyages;
+            if (quoteCandidate != candidate.id) BeginQuote(candidate.id);
+            int total = QuoteWage(candidate) * voyages;
             if (payment == ContractPayment.Prepaid && inventory.Gold < total)
             {
                 Message = "선불 전액을 지급할 금화가 부족합니다.";
@@ -160,6 +178,11 @@ namespace GreatVoyage
             }
 
             CrewState boarding = JsonUtility.FromJson<CrewState>(JsonUtility.ToJson(candidate));
+            boarding.happiness = PreviewHappiness(candidate);
+            boarding.trust = PreviewTrust(candidate);
+            boarding.acceptedPromise = Negotiated && candidate.wish != null ? JsonUtility.FromJson<CrewWish>(JsonUtility.ToJson(candidate.wish)) : null;
+            boarding.promiseBreached = false;
+            boarding.promiseChecked = false;
             CrewState definition = Candidates.First(item => item.id == candidate.id);
             boarding.floorId = definition.floorId;
             boarding.position = definition.position;
@@ -190,14 +213,18 @@ namespace GreatVoyage
                         contract.status = ContractStatus.Broken;
                         contract.debt = 0;
                     }
-                    else if (--contract.remainingVoyages == 0)
+                    else
                     {
-                        contract.status = ContractStatus.Expired;
-                        contract.endedPort = portId;
-                        contract.endedVoyage = sequence;
-                        session.State.Register(crew.RemoveMember(contract.crewId));
-                        contract.formerCrew = null;
-                        contract.debt = contract.payment == ContractPayment.Deferred ? contract.totalPrice : 0;
+                        session.Life.CompleteVoyage(member, portId, sequence);
+                        if (--contract.remainingVoyages == 0)
+                        {
+                            contract.status = ContractStatus.Expired;
+                            contract.endedPort = portId;
+                            contract.endedVoyage = sequence;
+                            session.State.Register(crew.RemoveMember(contract.crewId));
+                            contract.formerCrew = null;
+                            contract.debt = contract.payment == ContractPayment.Deferred ? contract.totalPrice : 0;
+                        }
                     }
                 }
 

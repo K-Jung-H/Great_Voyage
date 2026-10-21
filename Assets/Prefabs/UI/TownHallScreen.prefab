@@ -930,6 +930,7 @@ GameObject:
   - component: {fileID: 4001056622736236269}
   - component: {fileID: 8505622185291850296}
   - component: {fileID: 1718971595584977455}
+  - component: {fileID: 7735585807971123816}
   m_Layer: 0
   m_Name: TownHallScreen
   m_TagString: Untagged
@@ -1001,6 +1002,163 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &7735585807971123816
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3000362923791742567}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1036ecef62ddd4bb2d75188854149f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ScreenView
+  references:
+  - key: 
+    component: {fileID: 4001056622736236269}
+  - key: Title
+    component: {fileID: 9016810918457339144}
+  - key: Title
+    component: {fileID: 8575459091881235520}
+  - key: Availability
+    component: {fileID: 6743481676437385816}
+  - key: Availability
+    component: {fileID: 4545115252677257099}
+  - key: QuestsTab
+    component: {fileID: 3238051540953972806}
+  - key: QuestsTab
+    component: {fileID: 7558020429524988570}
+  - key: QuestsTab/Label
+    component: {fileID: 657114349872109086}
+  - key: QuestsTab/Label
+    component: {fileID: 2691313710889381104}
+  - key: PrisonersTab
+    component: {fileID: 4978364689412683904}
+  - key: PrisonersTab
+    component: {fileID: 4517804970151092156}
+  - key: PrisonersTab/Label
+    component: {fileID: 2724076339345691525}
+  - key: PrisonersTab/Label
+    component: {fileID: 3527808130636220071}
+  - key: Quests
+    component: {fileID: 6588166970026207061}
+  - key: Quests/QuestList
+    component: {fileID: 4210024361565122510}
+  - key: Quests/QuestList
+    component: {fileID: 1635212604672255811}
+  - key: Quests/QuestList/Viewport
+    component: {fileID: 7260161533980243094}
+  - key: Quests/QuestList/Viewport/Content
+    component: {fileID: 7321735521978879824}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate
+    component: {fileID: 8647565166707884473}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate
+    component: {fileID: 7282878034055699439}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate/Quest
+    component: {fileID: 7993324131459541508}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate/Quest
+    component: {fileID: 4983781366224324288}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate/Progress
+    component: {fileID: 4922276726850411203}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate/Progress
+    component: {fileID: 5726411476545868115}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate/Reward
+    component: {fileID: 1125129377394327908}
+  - key: Quests/QuestList/Viewport/Content/ItemTemplate/Reward
+    component: {fileID: 1766066165472945955}
+  - key: Quests/QuestList/Viewport/EmptyState
+    component: {fileID: 7304580096344207134}
+  - key: Quests/QuestList/Viewport/EmptyState
+    component: {fileID: 5820194359288273322}
+  - key: Quests/QuestList/Scrollbar
+    component: {fileID: 8394904658102411883}
+  - key: Quests/QuestList/Scrollbar/Handle
+    component: {fileID: 8093913621224282972}
+  - key: Quests/Details
+    component: {fileID: 3078314220593543805}
+  - key: Quests/Details/Quest
+    component: {fileID: 7274454487875904657}
+  - key: Quests/Details/Quest
+    component: {fileID: 5126648777072201243}
+  - key: Quests/Details/Description
+    component: {fileID: 7739122531556217646}
+  - key: Quests/Details/Description
+    component: {fileID: 8535814758343497825}
+  - key: Quests/Details/Requirements
+    component: {fileID: 2379898994342280967}
+  - key: Quests/Details/Requirements
+    component: {fileID: 2362235066773614291}
+  - key: Quests/Details/Reward
+    component: {fileID: 7663906127674422155}
+  - key: Quests/Details/Reward
+    component: {fileID: 6041585846522975899}
+  - key: Quests/Details/RewardResult
+    component: {fileID: 9033106435356411735}
+  - key: Quests/Details/RewardResult
+    component: {fileID: 3778509625394738068}
+  - key: Quests/Details/Accept
+    component: {fileID: 6727613222008528781}
+  - key: Quests/Details/Accept
+    component: {fileID: 2992124211789547422}
+  - key: Quests/Details/Accept/Label
+    component: {fileID: 4544928308248205180}
+  - key: Quests/Details/Accept/Label
+    component: {fileID: 3599874781097011425}
+  - key: PrisonerHandover
+    component: {fileID: 4964658505472098290}
+  - key: PrisonerHandover/PrisonerList
+    component: {fileID: 9011682558644461407}
+  - key: PrisonerHandover/PrisonerList
+    component: {fileID: 6620933438266800070}
+  - key: PrisonerHandover/PrisonerList/Viewport
+    component: {fileID: 5790979204110395117}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content
+    component: {fileID: 5059637293580409588}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate
+    component: {fileID: 873113735286008150}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate
+    component: {fileID: 1448057851088473586}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 2477634583113879992}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 9137050839712405792}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 8556781098376753597}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 8544026380689646693}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 2207878428942460180}
+  - key: PrisonerHandover/PrisonerList/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 2216354860208898812}
+  - key: PrisonerHandover/PrisonerList/Viewport/EmptyState
+    component: {fileID: 7605528108854835186}
+  - key: PrisonerHandover/PrisonerList/Viewport/EmptyState
+    component: {fileID: 1205673797574224126}
+  - key: PrisonerHandover/PrisonerList/Scrollbar
+    component: {fileID: 2330088797194277777}
+  - key: PrisonerHandover/PrisonerList/Scrollbar/Handle
+    component: {fileID: 8616744966221078086}
+  - key: PrisonerHandover/Reward
+    component: {fileID: 2823355671893992134}
+  - key: PrisonerHandover/Reward
+    component: {fileID: 5232633676756147912}
+  - key: PrisonerHandover/Handover
+    component: {fileID: 2658479940309010846}
+  - key: PrisonerHandover/Handover
+    component: {fileID: 1964842223085254051}
+  - key: PrisonerHandover/Handover/Label
+    component: {fileID: 1200649983962574103}
+  - key: PrisonerHandover/Handover/Label
+    component: {fileID: 4464243597265050942}
+  - key: Exit
+    component: {fileID: 5489254198700778624}
+  - key: Exit
+    component: {fileID: 6341640560225542485}
+  - key: Exit/Label
+    component: {fileID: 3172126167265608301}
+  - key: Exit/Label
+    component: {fileID: 1515952488905973558}
 --- !u!1 &3381143323903847016
 GameObject:
   m_ObjectHideFlags: 0
@@ -3997,6 +4155,65 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+--- !u!224 &1125129377394327908 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4389013241259343093, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+  m_PrefabInstance: {fileID: 3708058420869184913}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1766066165472945955 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3168274292787141298, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+  m_PrefabInstance: {fileID: 3708058420869184913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &4922276726850411203 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8591421021533955922, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+  m_PrefabInstance: {fileID: 3708058420869184913}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4983781366224324288 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8528790490572569425, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+  m_PrefabInstance: {fileID: 3708058420869184913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &5726411476545868115 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8939055480780696770, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+  m_PrefabInstance: {fileID: 3708058420869184913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &7282878034055699439 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6225190197348214398, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+  m_PrefabInstance: {fileID: 3708058420869184913}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!224 &7993324131459541508 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 6744235612564985749, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
+  m_PrefabInstance: {fileID: 3708058420869184913}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &8647565166707884473 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5438089742994897960, guid: 0005e0a016625e04a967aa227712e2c9, type: 3}
@@ -4108,3 +4325,62 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7384997998640108848, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
   m_PrefabInstance: {fileID: 7665448575049317478}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1448057851088473586 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9113504626401784212, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 7665448575049317478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!224 &2207878428942460180 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8413517290561755506, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 7665448575049317478}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &2216354860208898812 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8404622752822132378, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 7665448575049317478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &2477634583113879992 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5189122429031509470, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 7665448575049317478}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8544026380689646693 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2086114836047206403, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 7665448575049317478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &8556781098376753597 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2080363750804901339, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 7665448575049317478}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &9137050839712405792 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1489697009268467014, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 7665448575049317478}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI

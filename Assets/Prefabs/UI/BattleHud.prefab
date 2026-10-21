@@ -551,6 +551,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1854900522336384054}
+  - component: {fileID: 783446141695393281}
   m_Layer: 0
   m_Name: BattleHud
   m_TagString: Untagged
@@ -584,6 +585,97 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 1600, y: 900}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &783446141695393281
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3017541739577760674}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1036ecef62ddd4bb2d75188854149f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ScreenView
+  references:
+  - key: 
+    component: {fileID: 1854900522336384054}
+  - key: Title
+    component: {fileID: 3678667861242358014}
+  - key: Title
+    component: {fileID: 8776036861835590234}
+  - key: Availability
+    component: {fileID: 3853219769825182953}
+  - key: Availability
+    component: {fileID: 306748642429407153}
+  - key: AliveCrew
+    component: {fileID: 4467725103515423292}
+  - key: AliveCrew
+    component: {fileID: 8631185363796485778}
+  - key: AliveEnemies
+    component: {fileID: 3651992066482978311}
+  - key: AliveEnemies
+    component: {fileID: 3871460670767500022}
+  - key: CrewHealthScroll
+    component: {fileID: 5405237463325547874}
+  - key: CrewHealthScroll
+    component: {fileID: 8858133697749443952}
+  - key: CrewHealthScroll/Viewport
+    component: {fileID: 5499010155795868165}
+  - key: CrewHealthScroll/Viewport/Content
+    component: {fileID: 3416501390567702628}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate
+    component: {fileID: 2439272661505582975}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate
+    component: {fileID: 4170171827243975643}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 1127507777558273937}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate/Name
+    component: {fileID: 5983795763851695881}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 6591069515191549844}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate/Specialty
+    component: {fileID: 6581341693993462348}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 3703102817758407485}
+  - key: CrewHealthScroll/Viewport/Content/ItemTemplate/Health
+    component: {fileID: 3676616110630128853}
+  - key: CrewHealthScroll/Viewport/EmptyState
+    component: {fileID: 2707461116920782192}
+  - key: CrewHealthScroll/Viewport/EmptyState
+    component: {fileID: 7785081133875451502}
+  - key: CrewHealthScroll/Scrollbar
+    component: {fileID: 57682834320973945}
+  - key: CrewHealthScroll/Scrollbar/Handle
+    component: {fileID: 6223328460389788284}
+  - key: BattleLog
+    component: {fileID: 3726468290832732432}
+  - key: BattleLog
+    component: {fileID: 4151042604343906753}
+  - key: BattleLog/Viewport
+    component: {fileID: 4510302918848708305}
+  - key: BattleLog/Viewport/Content
+    component: {fileID: 1028105173137557885}
+  - key: BattleLog/Viewport/Content/ItemTemplate
+    component: {fileID: 7087495833170003577}
+  - key: BattleLog/Viewport/Content/ItemTemplate/Time
+    component: {fileID: 6777894175302422888}
+  - key: BattleLog/Viewport/Content/ItemTemplate/Time
+    component: {fileID: 2618347567764397469}
+  - key: BattleLog/Viewport/Content/ItemTemplate/Event
+    component: {fileID: 7464390547055582947}
+  - key: BattleLog/Viewport/Content/ItemTemplate/Event
+    component: {fileID: 7777808036298947898}
+  - key: BattleLog/Viewport/EmptyState
+    component: {fileID: 1055483972945921575}
+  - key: BattleLog/Viewport/EmptyState
+    component: {fileID: 2910568451714546902}
+  - key: BattleLog/Scrollbar
+    component: {fileID: 131675486209718449}
+  - key: BattleLog/Scrollbar/Handle
+    component: {fileID: 8752891035960372780}
+  - key: TransparentWorldViewport
+    component: {fileID: 1014197796147158366}
 --- !u!1 &3075746042496425819
 GameObject:
   m_ObjectHideFlags: 0
@@ -1958,11 +2050,43 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 2f7eb64435b25304eba125655329b30f, type: 3}
+--- !u!114 &2618347567764397469 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 565405635956367308, guid: 2f7eb64435b25304eba125655329b30f, type: 3}
+  m_PrefabInstance: {fileID: 2562130732825969233}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &6777894175302422888 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 9043631043476919097, guid: 2f7eb64435b25304eba125655329b30f, type: 3}
+  m_PrefabInstance: {fileID: 2562130732825969233}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &7087495833170003577 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 4743789845617099816, guid: 2f7eb64435b25304eba125655329b30f, type: 3}
   m_PrefabInstance: {fileID: 2562130732825969233}
   m_PrefabAsset: {fileID: 0}
+--- !u!224 &7464390547055582947 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4906764102132309170, guid: 2f7eb64435b25304eba125655329b30f, type: 3}
+  m_PrefabInstance: {fileID: 2562130732825969233}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7777808036298947898 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5223849429021425515, guid: 2f7eb64435b25304eba125655329b30f, type: 3}
+  m_PrefabInstance: {fileID: 2562130732825969233}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &5163026240192819791
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2084,8 +2208,67 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+--- !u!224 &1127507777558273937 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5189122429031509470, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5163026240192819791}
+  m_PrefabAsset: {fileID: 0}
 --- !u!224 &2439272661505582975 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7384997998640108848, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5163026240192819791}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3676616110630128853 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8404622752822132378, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5163026240192819791}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &3703102817758407485 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 8413517290561755506, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5163026240192819791}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4170171827243975643 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9113504626401784212, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5163026240192819791}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
+--- !u!114 &5983795763851695881 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 1489697009268467014, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5163026240192819791}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &6581341693993462348 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2086114836047206403, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
+  m_PrefabInstance: {fileID: 5163026240192819791}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &6591069515191549844 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2080363750804901339, guid: 262eee4a7c4e43340ac9df6c8819c882, type: 3}
   m_PrefabInstance: {fileID: 5163026240192819791}
   m_PrefabAsset: {fileID: 0}

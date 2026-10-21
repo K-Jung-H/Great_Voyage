@@ -19,6 +19,7 @@ MonoBehaviour:
     toFloor: deck-2
     toPosition: {x: -3.5, y: -1.5}
   id: starter-ship
+  purchasePrice: 500
   startingFloor: deck-2
   cellSize: 1
   floors:
@@ -72,6 +73,13 @@ MonoBehaviour:
         width: 1
         height: 1
       passability: 1
+    - id: telescope
+      cells:
+        x: 1
+        y: 6
+        width: 1
+        height: 1
+      passability: 1
   - id: deck-2
     displayName: "2\uCE35 \xB7 \uC120\uC2E4"
     origin: {x: -7, y: -4}
@@ -108,7 +116,16 @@ MonoBehaviour:
         height: 1
       passability: 1
   facilities:
-  - {fileID: 11400000, guid: 9bf10a6664dadb442b8c19e5bd348e7d, type: 2}
+  - {fileID: 11400000, guid: 306dd050d54545e47ba73b5d4d86e095, type: 2}
+  - {fileID: 11400000, guid: 5c333bf94dc32f148b916c6e6a1000ab, type: 2}
+  - {fileID: 11400000, guid: cbdfdf21019689d4286aa42fcf586f13, type: 2}
+  - {fileID: 11400000, guid: 0660e7fc9a7e93d4584880b09e495b1b, type: 2}
+  - {fileID: 11400000, guid: 4fb308f23f73ff94d9948e9549385d5e, type: 2}
+  - {fileID: 11400000, guid: 78ddb1e96aab12f45947d4d34004e23f, type: 2}
+  - {fileID: 11400000, guid: 8a2e07d39349c984688b909466485347, type: 2}
+  - {fileID: 11400000, guid: 77704f1a273e1fa4dae6f07f3592a280, type: 2}
+  - {fileID: 11400000, guid: 7371ecd5a1796ee4c9b896f96841025f, type: 2}
+  - {fileID: 11400000, guid: a53b370d0a4e3cc43a771cb906b200b7, type: 2}
   initialFacilities:
   - id: bed-001
     definitionId: bed
@@ -116,3 +133,33 @@ MonoBehaviour:
     x: 2
     y: 5
     durability: 100
+    sailDeployed: 1
+    level: 1
+    fixedTileId: 
+  - id: helm-console
+    definitionId: helm
+    floorId: deck-1
+    x: 10
+    y: 5
+    durability: 100
+    sailDeployed: 1
+    level: 1
+    fixedTileId: helm-console
+  - id: journal-desk
+    definitionId: journal
+    floorId: deck-2
+    x: 8
+    y: 4
+    durability: 100
+    sailDeployed: 1
+    level: 1
+    fixedTileId: journal-desk
+  - id: cargo-initial
+    definitionId: cargo
+    floorId: deck-2
+    x: 10
+    y: 1
+    durability: 100
+    sailDeployed: 1
+    level: 1
+    fixedTileId: 

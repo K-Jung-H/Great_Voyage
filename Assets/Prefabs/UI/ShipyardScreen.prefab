@@ -5611,6 +5611,7 @@ GameObject:
   - component: {fileID: 9118902090611828599}
   - component: {fileID: 5870898973857756820}
   - component: {fileID: 8116242345007540629}
+  - component: {fileID: 2756335787632613387}
   m_Layer: 0
   m_Name: ShipyardScreen
   m_TagString: Untagged
@@ -5683,6 +5684,339 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &2756335787632613387
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6094845563085960357}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff1036ecef62ddd4bb2d75188854149f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ScreenView
+  references:
+  - key: 
+    component: {fileID: 9118902090611828599}
+  - key: Title
+    component: {fileID: 6077191644364155460}
+  - key: Title
+    component: {fileID: 6753687864105596993}
+  - key: Availability
+    component: {fileID: 826864309854032797}
+  - key: Availability
+    component: {fileID: 3210848064600431845}
+  - key: Portrait
+    component: {fileID: 5074479835472172566}
+  - key: Portrait/Placeholder
+    component: {fileID: 5953895193260587548}
+  - key: Portrait/Placeholder
+    component: {fileID: 2032219861806265733}
+  - key: Exit
+    component: {fileID: 5501272690032903250}
+  - key: Exit
+    component: {fileID: 9144254849891283779}
+  - key: Exit/Label
+    component: {fileID: 5314824178632973758}
+  - key: Exit/Label
+    component: {fileID: 3270931195916810922}
+  - key: Menu
+    component: {fileID: 5744949106381060751}
+  - key: Menu/RepairMenu
+    component: {fileID: 1367959781641594622}
+  - key: Menu/RepairMenu
+    component: {fileID: 2581698446553889229}
+  - key: Menu/RepairMenu/Label
+    component: {fileID: 8088737830121958439}
+  - key: Menu/RepairMenu/Label
+    component: {fileID: 3658052950292512902}
+  - key: Menu/TilePurchaseMenu
+    component: {fileID: 8259113966768774136}
+  - key: Menu/TilePurchaseMenu
+    component: {fileID: 2235740476153088359}
+  - key: Menu/TilePurchaseMenu/Label
+    component: {fileID: 1941526130108041202}
+  - key: Menu/TilePurchaseMenu/Label
+    component: {fileID: 7483113409799251332}
+  - key: Menu/ShipPurchaseReplaceMenu
+    component: {fileID: 1016019128385673045}
+  - key: Menu/ShipPurchaseReplaceMenu
+    component: {fileID: 5940307547814621958}
+  - key: Menu/ShipPurchaseReplaceMenu/Label
+    component: {fileID: 8954135289735356887}
+  - key: Menu/ShipPurchaseReplaceMenu/Label
+    component: {fileID: 3441625121664777182}
+  - key: RepairDetails
+    component: {fileID: 5792027370184292699}
+  - key: RepairDetails/Heading
+    component: {fileID: 1256008411226950231}
+  - key: RepairDetails/Heading
+    component: {fileID: 7478253425731172710}
+  - key: RepairDetails/List
+    component: {fileID: 3986682448434022085}
+  - key: RepairDetails/List
+    component: {fileID: 6346172441026142270}
+  - key: RepairDetails/List/Viewport
+    component: {fileID: 4397208923601431801}
+  - key: RepairDetails/List/Viewport/Content
+    component: {fileID: 8312280551925161431}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate
+    component: {fileID: 5186525721758267008}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate
+    component: {fileID: 7640600910690831936}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Facility
+    component: {fileID: 6690984800152658500}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Facility
+    component: {fileID: 6885233804557701935}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Size
+    component: {fileID: 2326720571022607603}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Size
+    component: {fileID: 4834680032869244500}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Durability
+    component: {fileID: 6214325152275904853}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Durability
+    component: {fileID: 3641571707817167889}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Price
+    component: {fileID: 779787618894300818}
+  - key: RepairDetails/List/Viewport/Content/ItemTemplate/Price
+    component: {fileID: 5205786675934102691}
+  - key: RepairDetails/List/Viewport/EmptyState
+    component: {fileID: 3257316334696343966}
+  - key: RepairDetails/List/Viewport/EmptyState
+    component: {fileID: 3650008671801122637}
+  - key: RepairDetails/List/Scrollbar
+    component: {fileID: 7000698874134336800}
+  - key: RepairDetails/List/Scrollbar/Handle
+    component: {fileID: 4550316615145243411}
+  - key: RepairDetails/Back
+    component: {fileID: 5535345684477883227}
+  - key: RepairDetails/Back
+    component: {fileID: 6691132526248169388}
+  - key: RepairDetails/Back/Label
+    component: {fileID: 8431754167799452253}
+  - key: RepairDetails/Back/Label
+    component: {fileID: 4799855122680153393}
+  - key: RepairDetails/RepairSelected
+    component: {fileID: 9107488416767342243}
+  - key: RepairDetails/RepairSelected
+    component: {fileID: 7004613622636595929}
+  - key: RepairDetails/RepairSelected/Label
+    component: {fileID: 2252622913023354537}
+  - key: RepairDetails/RepairSelected/Label
+    component: {fileID: 2405560625026044082}
+  - key: RepairDetails/RepairAll
+    component: {fileID: 6716221505431776598}
+  - key: RepairDetails/RepairAll
+    component: {fileID: 7880145758043561603}
+  - key: RepairDetails/RepairAll/Label
+    component: {fileID: 3069191344054845011}
+  - key: RepairDetails/RepairAll/Label
+    component: {fileID: 753338217851383916}
+  - key: RepairDetails/Selection
+    component: {fileID: 3992708182926125715}
+  - key: RepairDetails/Selection
+    component: {fileID: 1528364545964546272}
+  - key: RepairDetails/Price
+    component: {fileID: 8991662037178456302}
+  - key: RepairDetails/Price
+    component: {fileID: 5796500350183315113}
+  - key: RepairDetails/Capacity
+    component: {fileID: 7369869017330682089}
+  - key: RepairDetails/Capacity
+    component: {fileID: 4805165471625229220}
+  - key: RepairDetails/Cargo
+    component: {fileID: 7305499873908305442}
+  - key: RepairDetails/Cargo
+    component: {fileID: 5037335075418164293}
+  - key: RepairDetails/Crew
+    component: {fileID: 1248398970157934397}
+  - key: RepairDetails/Crew
+    component: {fileID: 5870674084450727905}
+  - key: RepairDetails/Prisoners
+    component: {fileID: 4561421792464475436}
+  - key: RepairDetails/Prisoners
+    component: {fileID: 5154060104197477002}
+  - key: TilePurchaseDetails
+    component: {fileID: 2872707823030845401}
+  - key: TilePurchaseDetails/Heading
+    component: {fileID: 4196710570691090347}
+  - key: TilePurchaseDetails/Heading
+    component: {fileID: 7659753113389196168}
+  - key: TilePurchaseDetails/List
+    component: {fileID: 4034299299326948685}
+  - key: TilePurchaseDetails/List
+    component: {fileID: 5494106919810059384}
+  - key: TilePurchaseDetails/List/Viewport
+    component: {fileID: 2786543744292780772}
+  - key: TilePurchaseDetails/List/Viewport/Content
+    component: {fileID: 141961734655777867}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate
+    component: {fileID: 7007236945840406413}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate
+    component: {fileID: 5533893981942597453}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Facility
+    component: {fileID: 8799944010023021385}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Facility
+    component: {fileID: 8739739615951378978}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Size
+    component: {fileID: 472496715643555326}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Size
+    component: {fileID: 7339937848474523481}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Durability
+    component: {fileID: 8140606552570769496}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Durability
+    component: {fileID: 1463106271519606044}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Price
+    component: {fileID: 3176961880269639583}
+  - key: TilePurchaseDetails/List/Viewport/Content/ItemTemplate/Price
+    component: {fileID: 7996741661556149678}
+  - key: TilePurchaseDetails/List/Viewport/EmptyState
+    component: {fileID: 4369833821433629714}
+  - key: TilePurchaseDetails/List/Viewport/EmptyState
+    component: {fileID: 7964046624625825069}
+  - key: TilePurchaseDetails/List/Scrollbar
+    component: {fileID: 3751862839210632136}
+  - key: TilePurchaseDetails/List/Scrollbar/Handle
+    component: {fileID: 6395319719793605888}
+  - key: TilePurchaseDetails/Back
+    component: {fileID: 623131876062594720}
+  - key: TilePurchaseDetails/Back
+    component: {fileID: 5783367635316440876}
+  - key: TilePurchaseDetails/Back/Label
+    component: {fileID: 2871742628407709436}
+  - key: TilePurchaseDetails/Back/Label
+    component: {fileID: 4503486983988277481}
+  - key: TilePurchaseDetails/Purchase
+    component: {fileID: 2895629526429203105}
+  - key: TilePurchaseDetails/Purchase
+    component: {fileID: 2879985729253321842}
+  - key: TilePurchaseDetails/Purchase/Label
+    component: {fileID: 8485214709292703268}
+  - key: TilePurchaseDetails/Purchase/Label
+    component: {fileID: 7647802557993341564}
+  - key: TilePurchaseDetails/Selection
+    component: {fileID: 5005929274300576335}
+  - key: TilePurchaseDetails/Selection
+    component: {fileID: 6878425655991963791}
+  - key: TilePurchaseDetails/Price
+    component: {fileID: 2219650581443203287}
+  - key: TilePurchaseDetails/Price
+    component: {fileID: 3931932464606983330}
+  - key: TilePurchaseDetails/Capacity
+    component: {fileID: 5776038010005033552}
+  - key: TilePurchaseDetails/Capacity
+    component: {fileID: 9126226568666212357}
+  - key: TilePurchaseDetails/Cargo
+    component: {fileID: 8557195204234483662}
+  - key: TilePurchaseDetails/Cargo
+    component: {fileID: 2559927976198016152}
+  - key: TilePurchaseDetails/Crew
+    component: {fileID: 3431744453647404965}
+  - key: TilePurchaseDetails/Crew
+    component: {fileID: 3442225366065458310}
+  - key: TilePurchaseDetails/Prisoners
+    component: {fileID: 6443825546929360605}
+  - key: TilePurchaseDetails/Prisoners
+    component: {fileID: 233200974864390462}
+  - key: ShipPurchaseReplaceDetails
+    component: {fileID: 2638923886245918864}
+  - key: ShipPurchaseReplaceDetails/Heading
+    component: {fileID: 8977094230809270194}
+  - key: ShipPurchaseReplaceDetails/Heading
+    component: {fileID: 1315005886035920831}
+  - key: ShipPurchaseReplaceDetails/List
+    component: {fileID: 8806005458985432014}
+  - key: ShipPurchaseReplaceDetails/List
+    component: {fileID: 882498584711842053}
+  - key: ShipPurchaseReplaceDetails/List/Viewport
+    component: {fileID: 5067296769815383742}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content
+    component: {fileID: 2756861039131653468}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate
+    component: {fileID: 7403535624968603201}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate
+    component: {fileID: 7128967926201035500}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Ship
+    component: {fileID: 2298794266460530791}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Ship
+    component: {fileID: 7788020935773576983}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Capacity
+    component: {fileID: 277886527787485635}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Capacity
+    component: {fileID: 7867140377524456839}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Location
+    component: {fileID: 6480865520763438507}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Location
+    component: {fileID: 795081371098326227}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Price
+    component: {fileID: 6602372699644574770}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/Content/ItemTemplate/Price
+    component: {fileID: 8112883058535703361}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/EmptyState
+    component: {fileID: 3053732983734607428}
+  - key: ShipPurchaseReplaceDetails/List/Viewport/EmptyState
+    component: {fileID: 4187450392480115046}
+  - key: ShipPurchaseReplaceDetails/List/Scrollbar
+    component: {fileID: 5851983308484728088}
+  - key: ShipPurchaseReplaceDetails/List/Scrollbar/Handle
+    component: {fileID: 7982768680733027436}
+  - key: ShipPurchaseReplaceDetails/Back
+    component: {fileID: 5147086453052798389}
+  - key: ShipPurchaseReplaceDetails/Back
+    component: {fileID: 4289424680334043717}
+  - key: ShipPurchaseReplaceDetails/Back/Label
+    component: {fileID: 1451908866794192680}
+  - key: ShipPurchaseReplaceDetails/Back/Label
+    component: {fileID: 5349330269715546254}
+  - key: ShipPurchaseReplaceDetails/Buy
+    component: {fileID: 5949230486940517341}
+  - key: ShipPurchaseReplaceDetails/Buy
+    component: {fileID: 4299401569538824146}
+  - key: ShipPurchaseReplaceDetails/Buy/Label
+    component: {fileID: 1587111796607019024}
+  - key: ShipPurchaseReplaceDetails/Buy/Label
+    component: {fileID: 908854350555528475}
+  - key: ShipPurchaseReplaceDetails/Sell
+    component: {fileID: 2199126004369873021}
+  - key: ShipPurchaseReplaceDetails/Sell
+    component: {fileID: 150286658996956948}
+  - key: ShipPurchaseReplaceDetails/Sell/Label
+    component: {fileID: 3123872592166155554}
+  - key: ShipPurchaseReplaceDetails/Sell/Label
+    component: {fileID: 4783381169545208998}
+  - key: ShipPurchaseReplaceDetails/Replace
+    component: {fileID: 6962217078821684648}
+  - key: ShipPurchaseReplaceDetails/Replace
+    component: {fileID: 1269766766717563923}
+  - key: ShipPurchaseReplaceDetails/Replace/Label
+    component: {fileID: 3242784298304126460}
+  - key: ShipPurchaseReplaceDetails/Replace/Label
+    component: {fileID: 7479922967402805577}
+  - key: ShipPurchaseReplaceDetails/Selection
+    component: {fileID: 8329618337224946183}
+  - key: ShipPurchaseReplaceDetails/Selection
+    component: {fileID: 3937978601529437450}
+  - key: ShipPurchaseReplaceDetails/Price
+    component: {fileID: 6698439566093680772}
+  - key: ShipPurchaseReplaceDetails/Price
+    component: {fileID: 7650464143143426727}
+  - key: ShipPurchaseReplaceDetails/Capacity
+    component: {fileID: 3167480990487104078}
+  - key: ShipPurchaseReplaceDetails/Capacity
+    component: {fileID: 3520721668945874584}
+  - key: ShipPurchaseReplaceDetails/Cargo
+    component: {fileID: 3496910524895633644}
+  - key: ShipPurchaseReplaceDetails/Cargo
+    component: {fileID: 8885691035648267588}
+  - key: ShipPurchaseReplaceDetails/Crew
+    component: {fileID: 3143539237824484869}
+  - key: ShipPurchaseReplaceDetails/Crew
+    component: {fileID: 8309595668191752967}
+  - key: ShipPurchaseReplaceDetails/Prisoners
+    component: {fileID: 2996579642991682927}
+  - key: ShipPurchaseReplaceDetails/Prisoners
+    component: {fileID: 1450002202971491488}
 --- !u!1 &6255540842748870886
 GameObject:
   m_ObjectHideFlags: 0
@@ -9046,11 +9380,86 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+--- !u!224 &779787618894300818 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1333576370875356478, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &2326720571022607603 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4042438173365999455, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &3641571707817167889 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3088055635860660157, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &4834680032869244500 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6578553776553610744, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!224 &5186525721758267008 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6893236125364905260, guid: 3cc588df29749834eaca800258421c1e, type: 3}
   m_PrefabInstance: {fileID: 1752898688689116076}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &5205786675934102691 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5795331689850050319, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &6214325152275904853 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5651520402346617593, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &6690984800152658500 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4938385180775887336, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &6885233804557701935 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5178805026251620483, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &7640600910690831936 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8240270214874324460, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 1752898688689116076}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!1001 &4376296684221944813
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9152,11 +9561,86 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+--- !u!224 &277886527787485635 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4566925960622316078, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &795081371098326227 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 4013561514116806462, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &2298794266460530791 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 2548280450478078858, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &6480865520763438507 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7298947959581464134, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &6602372699644574770 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 7429791875190091743, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7128967926201035500 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6797220650392582401, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!224 &7403535624968603201 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6486624687721862572, guid: 193c5bff36605f341beb38b021438d81, type: 3}
   m_PrefabInstance: {fileID: 4376296684221944813}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &7788020935773576983 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5813902351078132986, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &7867140377524456839 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5878896087900528234, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &8112883058535703361 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5489178269637603500, guid: 193c5bff36605f341beb38b021438d81, type: 3}
+  m_PrefabInstance: {fileID: 4376296684221944813}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
 --- !u!1001 &4510079443331226273
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9258,8 +9742,83 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+--- !u!224 &472496715643555326 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4042438173365999455, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1463106271519606044 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3088055635860660157, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &3176961880269639583 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 1333576370875356478, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5533893981942597453 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 8240270214874324460, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
 --- !u!224 &7007236945840406413 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 6893236125364905260, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &7339937848474523481 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 6578553776553610744, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!114 &7996741661556149678 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5795331689850050319, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &8140606552570769496 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 5651520402346617593, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8739739615951378978 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5178805026251620483, guid: 3cc588df29749834eaca800258421c1e, type: 3}
+  m_PrefabInstance: {fileID: 4510079443331226273}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
+--- !u!224 &8799944010023021385 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4938385180775887336, guid: 3cc588df29749834eaca800258421c1e, type: 3}
   m_PrefabInstance: {fileID: 4510079443331226273}
   m_PrefabAsset: {fileID: 0}

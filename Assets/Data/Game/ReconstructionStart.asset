@@ -14,12 +14,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.GameStartProfile
   ship: {fileID: 11400000, guid: 6d399e0169aa41648ad86dd8d467b916, type: 2}
   navigation: {fileID: 11400000, guid: b827796e3f2f48740aa7fdb1c03f6d02, type: 2}
+  legacyNavigation: []
   crew: {fileID: 11400000, guid: 2ddfd036fb3277b46adceebad4b8553a, type: 2}
-  economy: {fileID: 11400000, guid: 423315d8acf2ee84a8aacb358df6bee2, type: 2}
+  economy: {fileID: 11400000, guid: 898198adae1caba48a7cc5b984aac3e3, type: 2}
+  events: {fileID: 11400000, guid: 62294d5645f4b20448fb596f94d38b19, type: 2}
+  battle: {fileID: 11400000, guid: 74532e7bd818ae440af413e91f09a7e2, type: 2}
+  market: {fileID: 11400000, guid: 0120dad5b81b4f248b6cc71d75456167, type: 2}
   items:
-  - {fileID: 11400000, guid: 6d918ca464e44324b8108fd9d05150ef, type: 2}
   - {fileID: 11400000, guid: b8458052a7af97041be16e65d6cdf108, type: 2}
+  - {fileID: 11400000, guid: 6d918ca464e44324b8108fd9d05150ef, type: 2}
   - {fileID: 11400000, guid: de26aa3593eb4434b975c71e0ea15c85, type: 2}
+  - {fileID: 11400000, guid: 29b0453a028501d468f2a1d7eec25d8f, type: 2}
+  - {fileID: 11400000, guid: 25af785743aab3d4bb5db563dd917046, type: 2}
+  - {fileID: 11400000, guid: f173ec80887729f4facb5b2a3ac18330, type: 2}
+  - {fileID: 11400000, guid: 6a7412c87390a32408f3fd20c26c27db, type: 2}
+  - {fileID: 11400000, guid: 43f5d475e5acb1f409334a67a08c9855, type: 2}
+  - {fileID: 11400000, guid: c8f9cb74c4cdc45489b2d9aa4f55a0d4, type: 2}
+  - {fileID: 11400000, guid: 1cf6bb830e790f84d98e1ac763a45fdf, type: 2}
+  - {fileID: 11400000, guid: 4cee0f9c2eed50048b065b44ee359b40, type: 2}
+  - {fileID: 11400000, guid: f53f04e4d47e71d4da01fbcb41c01867, type: 2}
   legacyShips:
   - {fileID: 11400000, guid: 6d399e0169aa41648ad86dd8d467b916, type: 2}
   - {fileID: 11400000, guid: d5a7c4b2dddc44a43b91ae0a45979049, type: 2}

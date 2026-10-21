@@ -38,6 +38,8 @@ namespace GreatVoyage
         public string id;
         public RectInt cells;
         public TilePassability passability;
+        public bool unlockable;
+        public int unlockPrice = 50;
     }
 
     [CreateAssetMenu(menuName = "Great Voyage/Ship")]
@@ -47,6 +49,8 @@ namespace GreatVoyage
         public StairLinkDefinition[] stairLinks;
         [Tooltip("함선 모델 ID.")]
         public string id = "starter-ship";
+        [Tooltip("함선 구매 가격. 조정용 수치.")]
+        public int purchasePrice = 500;
         [Tooltip("새 게임과 이전 버전 저장의 시작 층.")]
         public string startingFloor = "deck-2";
         [Tooltip("한 칸의 Unity 단위 크기.")]

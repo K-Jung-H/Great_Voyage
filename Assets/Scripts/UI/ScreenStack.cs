@@ -39,7 +39,7 @@ namespace GreatVoyage
                 return;
             }
 
-            if (IsOpen && opened[opened.Count - 1].locked)
+            if (IsOpen && opened[opened.Count - 1].locked && name != "SessionModals")
                 return;
             view.transform.SetAsLastSibling();
             var entry = new Entry

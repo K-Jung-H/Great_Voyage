@@ -130,6 +130,7 @@ namespace GreatVoyage
             if (!IsSleeping || !Finite(seconds) || !Finite(distance) || seconds <= 0 || distance < 0)
                 return;
             State.mode = PlayerRest.Watch;
+            State.missedWatch = false;
             State.watchRemaining = seconds;
             State.patrolRemaining = distance;
             patrolPosition = player.position;

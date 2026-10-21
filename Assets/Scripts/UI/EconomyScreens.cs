@@ -15,17 +15,26 @@ namespace GreatVoyage
         private string candidateId, contractId;
         private int quantity = 1, voyages = 1;
         private ContractPayment payment;
+        private string merchantId;
+        private string selectedRequest;
+        private readonly Dictionary<string, int> quantities = new Dictionary<string, int>();
         public event Action SettlementConfirmed;
         public void Bind(GameRuntime runtime)
         {
             game = runtime;
-            View("MerchantScreen").Action("Right/Buy", () => Command(() => game.Economy.Buy(quantity)));
+            View("MerchantScreen").Action("Right/Buy", () => Command(() => game.Market.TradeBatch(quantities, true)));
             View("MerchantScreen").Action("Exit", Close);
-            View("BrokerScreen").Action("LeftTwoThirds/Sell", () => Command(() => game.Economy.Sell(quantity)));
+            View("BrokerScreen").Action("LeftTwoThirds/Sell", () => Command(() => game.Market.TradeBatch(quantities, false)));
             View("BrokerScreen").Action("Exit", Close);
+            View("BrokerScreen").Action("ResidentRequests/Accept", () => { game.Market.Fulfill(selectedRequest); RefreshTrade("BrokerScreen"); });
             var hiring = View("HiringScreen");
             hiring.Action("Actions/Cancel", Close);
             hiring.Action("Actions/Hire", () => Command(() => game.Economy.Hire(voyages, payment, candidateId)));
+            hiring.Action("Actions/Negotiate", () => { game.Economy.Negotiate(); RefreshHiring(); });
+            var evaluation = hiring.Get<Slider>("Right/Evaluation");
+            evaluation.interactable = true;
+            evaluation.minValue = -50; evaluation.maxValue = 50;
+            evaluation.onValueChanged.AddListener(value => { game.Economy.Evaluate(value); RefreshHiring(); });
             hiring.Action("Right/Prepaid", () =>
             {
                 payment = ContractPayment.Prepaid;
@@ -61,9 +70,8 @@ namespace GreatVoyage
             });
             View("SettlementModal").Action("ConfirmSettlement", () =>
             {
-                int sale = SettlementQuantity();
-                if (sale > 0)
-                    game.Economy.Sell(sale);
+                if (!game.Market.TradeBatch(quantities, false, true))
+                    return;
                 game.Economy.SettleAndDepart();
                 stack.CloseTop();
                 SettlementConfirmed?.Invoke();
@@ -90,13 +98,18 @@ namespace GreatVoyage
         public void Open(string name)
         {
             quantity = 1;
+            quantities.Clear();
             stack.Open(name);
             Refresh();
         }
 
+        public void OpenMerchant(string id) { merchantId = id; Open("MerchantScreen"); }
+
         public void OpenHiring(string id)
         {
             candidateId = id;
+            game.Economy.BeginQuote(id);
+            View("HiringScreen").Get<Slider>("Right/Evaluation").SetValueWithoutNotify(0);
             voyages = 1;
             payment = ContractPayment.Prepaid;
             stack.Open("HiringScreen");
@@ -106,6 +119,7 @@ namespace GreatVoyage
         public void OpenSettlement()
         {
             quantity = 0;
+            quantities.Clear();
             stack.Open("SettlementModal");
             RefreshSettlement();
         }
@@ -128,24 +142,54 @@ namespace GreatVoyage
         private void RefreshTrade(string name)
         {
             var view = View(name);
-            view.Connected(game.Economy.Message ?? "대표 거래 · 직물 1종");
+            view.Connected(game.Market.Message ?? (game.Market.Current?.condition + " · 현지 평판 " + game.Market.Current?.localStanding));
             string list = name == "MerchantScreen" ? "Right/ProductScroll" : "LeftTwoThirds/OwnedGoods";
-            var row = ReplaceRows(view.Get<ScrollRect>(list), 1)[0];
-            row.Text("Item", game.Economy.Settings.productName);
-            row.Text("Stock", name == "MerchantScreen" ? game.State.inventory.Get(game.Economy.Settings.productId, "port:" + game.Navigation.DockedPort + ":merchant").ToString() : game.State.inventory.Cargo.ToString());
-            row.Text("UnitPrice", (name == "MerchantScreen" ? game.Economy.Port.buyPrice : game.Economy.SalePrice).ToString());
-            BindQuantity(row, () =>
+            bool buy = name == "MerchantScreen";
+            var products = buy ? game.Market.ProductsForMerchant(merchantId) : game.Market.Items.Where(item => item.tradeable && game.State.inventory.Get(item.id) > 0).ToArray();
+            var rows = ReplaceRows(view.Get<ScrollRect>(list), products.Length);
+            for (int i = 0; i < products.Length; i++)
             {
-                if (name == "MerchantScreen")
-                    view.Text("Right/SelectedTotal", ((long)quantity * game.Economy.Port.buyPrice).ToString());
-                else
-                    view.Text("LeftTwoThirds/SaleTotal", ((long)quantity * game.Economy.SalePrice).ToString());
-            });
+                var item = products[i];
+                rows[i].Text("Item", item.displayName);
+                rows[i].Text("Stock", game.State.inventory.Get(item.id, buy ? "port:" + game.Navigation.DockedPort + ":merchant" : "player").ToString());
+                rows[i].Text("UnitPrice", (buy ? game.Market.Quote(item.id).buyPrice : game.Market.SalePrice(item.id)).ToString());
+                BindProductQuantity(rows[i], item.id, () => RefreshTradeTotal(view, buy));
+            }
+            RefreshTradeTotal(view, buy);
             if (name == "MerchantScreen")
             {
                 view.Text("Right/Wallet", game.State.inventory.Gold.ToString());
-                view.Text("Right/SelectedTotal", ((long)quantity * game.Economy.Port.buyPrice).ToString());
+                view.Text("Right/SelectedTotal", TradeTotal(true).ToString());
             }
+            else RefreshRequests(view);
+        }
+
+        private long TradeTotal(bool buy, bool liquidation = false) => quantities.Sum(pair => (long)pair.Value * (buy ? game.Market.Quote(pair.Key)?.buyPrice ?? 0 : game.Market.SalePrice(pair.Key, liquidation)));
+        private void RefreshTradeTotal(ScreenView view, bool buy) => view.Text(buy ? "Right/SelectedTotal" : "LeftTwoThirds/SaleTotal", TradeTotal(buy).ToString());
+        private void BindProductQuantity(ListItemView row, string product, Action changed)
+        {
+            var input = row.Get<TMP_InputField>("Quantity");
+            input.interactable = true;
+            input.contentType = TMP_InputField.ContentType.IntegerNumber;
+            input.SetTextWithoutNotify(quantities.TryGetValue(product, out int value) ? value.ToString() : "0");
+            input.onValueChanged.AddListener(text => { quantities[product] = int.TryParse(text, out int number) ? Mathf.Clamp(number, 0, 1000000) : 0; changed(); });
+        }
+        private void RefreshRequests(ScreenView view)
+        {
+            var requests = game.Market.Current.requests.Where(value => !value.completed && value.expiresAt > game.ElapsedSeconds).ToArray();
+            view.Get<RectTransform>("ResidentRequests/Deferred").gameObject.SetActive(false);
+            if (!requests.Any(value => value.id == selectedRequest)) selectedRequest = requests.FirstOrDefault()?.id;
+            var rows = ReplaceRows(view.Get<ScrollRect>("ResidentRequests/Requests"), requests.Length);
+            for (int i = 0; i < requests.Length; i++)
+            {
+                var request = requests[i];
+                rows[i].Text("Request", (request.id == selectedRequest ? "▶ " : "") + request.needed + " " + game.Market.ProductName(request.neededItem));
+                rows[i].Text("Reward", request.reward + " " + game.Market.ProductName(request.rewardItem));
+                rows[i].Text("TimeRemaining", Mathf.CeilToInt((float)(request.expiresAt - game.ElapsedSeconds)) + "초");
+                rows[i].Text("Limit", "1회");
+                rows[i].OnSelect(() => { selectedRequest = request.id; RefreshRequests(view); });
+            }
+            view.Get<Button>("ResidentRequests/Accept").interactable = selectedRequest != null;
         }
 
         private void BindQuantity(ListItemView row, Action changed)
@@ -181,13 +225,15 @@ namespace GreatVoyage
         {
             var view = View("HiringScreen");
             var candidate = game.Economy.Candidate(candidateId);
-            view.Connected(game.Economy.Message ?? "대표 계약 · 협상/평가 효과는 후속 단계");
+            view.Connected(game.Economy.Message ?? "평가 금액 조정 ±50% · 능력/행복/신뢰 변화는 고용 확정 시 반영");
             view.Text("Right/Name", candidate?.displayName ?? "고용 불가");
             view.Text("Right/Health", candidate?.health.ToString("0") ?? "—");
             view.Text("Right/Experience", candidate?.navigationExperience.ToString() ?? "—");
             view.Text("Right/Specialty", candidate?.specialty.ToString() ?? "—");
-            view.Text("Right/PerVoyage", game.Economy.Settings.wagePerVoyage.ToString());
-            view.Text("Right/Total", ((long)game.Economy.Settings.wagePerVoyage * voyages).ToString("N0"));
+            view.Text("Right/FutureStats", candidate == null ? "" : $"힘 {candidate.strength:0} · 손재주 {candidate.dexterity:0} · 지능 {candidate.intelligence:0}\n행복 {candidate.happiness:0}→{game.Economy.PreviewHappiness(candidate):0} · 신뢰 {candidate.trust:0}→{game.Economy.PreviewTrust(candidate):0}\n희망 {candidate.wish?.kind ?? CrewWishKind.None} · {candidate.wish?.targetId}");
+            view.Text("Right/PerVoyage", game.Economy.QuoteWage(candidate).ToString());
+            view.Text("Right/Total", ((long)game.Economy.QuoteWage(candidate) * voyages).ToString("N0"));
+            view.Get<Button>("Actions/Negotiate").interactable = candidate != null && !game.Economy.Negotiated;
             view.Get<Button>("Right/Prepaid").GetComponent<Image>().color = payment == ContractPayment.Prepaid ? new Color(.38f, .31f, .17f) : new Color(.16f, .3f, .35f);
             view.Get<Button>("Right/Deferred").GetComponent<Image>().color = payment == ContractPayment.Deferred ? new Color(.38f, .31f, .17f) : new Color(.16f, .3f, .35f);
             view.Get<TMP_InputField>("Right/Count").SetTextWithoutNotify(voyages.ToString());
@@ -237,7 +283,7 @@ namespace GreatVoyage
         private void FillContract(ListItemView row, EmploymentContract contract)
         {
             row.Text("Name", game.State.characters.Find(m => m.id == contract.crewId)?.displayName ?? contract.crewId);
-            row.Text("Rank", "미정");
+            row.Text("Rank", game.State.characters.Find(m => m.id == contract.crewId)?.rank ?? "선원");
             row.Text("Payment", contract.payment.ToString());
             row.Text("Amount", contract.totalPrice.ToString());
             row.Text("Remaining", contract.remainingVoyages.ToString());
@@ -251,11 +297,16 @@ namespace GreatVoyage
             var rows = ReplaceRows(view.Get<ScrollRect>("DueContracts"), due.Length);
             for (int i = 0; i < rows.Count; i++)
                 FillContract(rows[i], due[i]);
-            var cargo = ReplaceRows(view.Get<ScrollRect>("CargoSelection"), 1)[0];
-            cargo.Text("Item", game.Economy.Settings.productName);
-            cargo.Text("Stock", game.State.inventory.Cargo.ToString());
-            cargo.Text("UnitPrice", game.Economy.SalePrice.ToString());
-            BindQuantity(cargo, RefreshSettlementPreview);
+            var products = game.Market.Items.Where(item => item.tradeable && game.State.inventory.Get(item.id) > 0).ToArray();
+            var cargoRows = ReplaceRows(view.Get<ScrollRect>("CargoSelection"), products.Length);
+            for (int i = 0; i < products.Length; i++)
+            {
+                var item = products[i];
+                cargoRows[i].Text("Item", item.displayName);
+                cargoRows[i].Text("Stock", game.State.inventory.Get(item.id).ToString());
+                cargoRows[i].Text("UnitPrice", game.Market.SalePrice(item.id, true).ToString());
+                BindProductQuantity(cargoRows[i], item.id, RefreshSettlementPreview);
+            }
             RefreshSettlementPreview();
             view.Connected("선택 수량은 확인 전까지 재고를 변경하지 않습니다");
         }
@@ -264,7 +315,7 @@ namespace GreatVoyage
         private void RefreshSettlementPreview()
         {
             var v = View("SettlementModal");
-            long proceeds = (long)SettlementQuantity() * game.Economy.SalePrice;
+            long proceeds = TradeTotal(false, true);
             long available = game.State.inventory.Gold + proceeds;
             v.Text("SaleProceeds", proceeds.ToString());
             v.Text("Debt", game.Economy.Debt.ToString());

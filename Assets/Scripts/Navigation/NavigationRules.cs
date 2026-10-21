@@ -1,11 +1,17 @@
 using System;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace GreatVoyage
 {
     public sealed class NavigationRules
     {
+        public void RotateByStorm(float degrees)
+        {
+            if (!IsDocked)
+                state.heading = Mathf.Repeat(state.heading + degrees, 360);
+        }
         private readonly NavigationDefinition definition;
         private readonly GameRuntime session;
         private readonly ShipModel ship;
@@ -34,7 +40,37 @@ namespace GreatVoyage
         public Vector2 WorldPosition => state?.position ?? Vector2.zero;
         public float Heading => state?.heading ?? 0;
         public PortDefinition[] Ports => definition.ports;
-        public bool NeedsNavigator => journal != null && journal.AutopilotRequested && !IsDocked && !IsSteering;
+        public Rect WorldBounds => definition.bounds;
+        public bool HelmOperational => ship.Facilities.Any(value => ship.GetFacilityDefinition(value.definitionId).role == FacilityRole.Helm && value.durability > 0);
+        public bool NeedsNavigator => HelmOperational && journal != null && journal.AutopilotRequested && !IsDocked && !IsSteering;
+        public bool CanRequestTow => IsReady && IsAboard && !IsDocked && !HelmOperational && !session.Battle.Running && !session.Events.Running && !session.Events.AwaitingChoice && !session.Economy.State.gameOver && session.ErrorMessage == null;
+        public PortDefinition NearestTowPort => CanRequestTow ? definition.ports.OrderBy(port => (port.position - state.position).sqrMagnitude).First() : null;
+        public int TowCost => (int)Math.Floor(session.State.inventory.Gold * (double)definition.towGoldFraction);
+
+        // Role: 메뉴에서 확인한 비용과 목적지를 재확인하고 공통 입항·정산을 원자 저장한다.
+        public bool RequestTow(string expectedPort, int expectedCost)
+        {
+            var destination = NearestTowPort;
+            if (destination == null || destination.id != expectedPort || TowCost != expectedCost)
+                return false;
+            if (!session.FlushSave(true))
+                return false;
+            bool completeVoyage = destination.id != state.departurePort || state.departureCleared;
+            session.Rest.Wake();
+            session.State.inventory.Gold -= expectedCost;
+            state.position = destination.position;
+            state.speed = 0;
+            state.dockedPort = destination.id;
+            IsSteering = false;
+            arrivalPending = completeVoyage;
+            state.completedSequence = state.voyageSequence;
+            session.Journal.Arrive(destination.id);
+            NotifyArrival();
+            session.RequestSave();
+            bool saved = session.FlushSave(true);
+            session.NotifyChanged(true);
+            return saved;
+        }
 
         // Role: 경제 정의의 항구 ID를 검증한다.
         public bool HasPort(string id) => !string.IsNullOrEmpty(id) && Port(id) != null;
@@ -49,15 +85,16 @@ namespace GreatVoyage
 
         public event Action<string, string> VoyageCompleted;
         // Role: 정의와 저장 상태를 검증하고 현재 공간의 표시를 복원한다.
-        public NavigationState Initialize(NavigationState saved, string playId)
+        public NavigationState Initialize(NavigationState saved, string playId, string startingPort = null)
         {
             ValidateDefinition();
             playthroughId = playId;
+            var port = Array.Find(definition.ports, value => value.id == startingPort) ?? definition.ports[0];
             state = saved ?? new NavigationState
             {
                 definitionId = definition.id,
-                position = definition.ports[0].position,
-                dockedPort = definition.ports[0].id,
+                position = port.position,
+                dockedPort = port.id,
                 aboard = true
             };
             ValidateState();
@@ -68,6 +105,8 @@ namespace GreatVoyage
         // Role: 유한 수치·항구 ID·반경·해역 및 필수 참조를 검사한다.
         private void ValidateDefinition()
         {
+            if (definition != null && (!Finite(definition.towGoldFraction) || definition.towGoldFraction < 0 || definition.towGoldFraction > 1))
+                throw new InvalidDataException("견인 비용 비율이 유효하지 않습니다.");
             if (definition == null || definition.ports == null || definition.ports.Length < 2 || session == null || ship == null || !Finite(definition.maxSpeed) || definition.maxSpeed <= 0 || !Finite(definition.acceleration) || definition.acceleration <= 0 || !Finite(definition.turnSpeed) || definition.turnSpeed <= 0 || !ValidRect(definition.bounds))
                 throw new InvalidDataException("항해 정의 또는 필수 참조가 유효하지 않습니다.");
             for (int i = 0; i < definition.ports.Length; i++)
@@ -110,15 +149,18 @@ namespace GreatVoyage
             state.departureCleared = false;
             state.voyageSequence++;
             state.voyageStartedAt = session.ElapsedSeconds;
-            state.speed = definition.maxSpeed;
+            state.speed = definition.maxSpeed * ship.SailingFactor;
             journal?.BeginVoyage();
         }
 
         // Role: 공통 세션 시간으로 항해와 자동 조타를 진행하고 실제 소모 시간을 반환한다.
         public float AdvanceTime(float seconds)
         {
+            if (!HelmOperational)
+                IsSteering = false;
             if (IsDocked)
                 return seconds;
+            state.speed = Mathf.Min(state.speed, definition.maxSpeed * ship.SailingFactor);
             if (NeedsNavigator && crew != null && crew.HelmsmanReady)
             {
                 if (journal.TryGetHeading(state.position, out float heading))
@@ -133,6 +175,7 @@ namespace GreatVoyage
                     state.speed = 0;
             }
 
+            state.speed = Mathf.Min(state.speed, definition.maxSpeed * ship.SailingFactor);
             return Advance(seconds);
         }
 
@@ -213,7 +256,7 @@ namespace GreatVoyage
         // Role: 승선 중에만 방향타 조작을 시작한다.
         public void BeginSteering()
         {
-            if (IsReady && IsAboard && !session.IsPaused)
+            if (IsReady && IsAboard && HelmOperational && !session.IsPaused)
                 IsSteering = true;
         }
 
@@ -249,7 +292,7 @@ namespace GreatVoyage
 
         public void Steer(Vector2 axes, float seconds)
         {
-            if (!IsSteering || session.IsSleeping || session.IsPaused)
+            if (!IsSteering || !HelmOperational || session.IsSleeping || session.IsPaused)
                 return;
             state.heading = Mathf.Repeat(state.heading - axes.x * definition.turnSpeed * seconds, 360);
             if (IsDocked && axes.y > 0)

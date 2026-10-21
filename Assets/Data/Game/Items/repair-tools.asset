@@ -10,9 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05404c3cf6baa00489407dd9c9b31ef8, type: 3}
-  m_Name: repair-tools
+  m_Name: "\uC218\uB9AC\uB3C4\uAD6C"
   m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ItemDefinition
   id: repair-tools
   displayName: "\uC218\uB9AC\uB3C4\uAD6C"
   use: 2
-  tradeable: 0
+  tradeable: 1
+  category: 8
+  basePrice: 10
+  dailyStock: 20

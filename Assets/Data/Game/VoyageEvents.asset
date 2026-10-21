@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de46d7ab9dd04b74bb4c1bfe87aa046d, type: 3}
+  m_Name: VoyageEvents
+  m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.EventSettings
+  minimumInterval: 180
+  maximumInterval: 360
+  stormDuration: 20
+  exposedFloor: deck-1
+  healthDamagePerSecond: 0.5
+  sailDamagePerSecond: 1
+  headingVariation: 12
+  pirateProbability: 0.35
+  weights:
+  - kind: storm
+    weight: 3
+  - kind: pirates
+    weight: 2
+  - kind: rats
+    weight: 2
+  - kind: island
+    weight: 1
+  - kind: fish
+    weight: 1
+  - kind: kraken
+    weight: 0.2
+  - kind: crabs
+    weight: 0.5
+  - kind: barnacles
+    weight: 0.5
+  watchProbability: 0.35
+  watchDuration: 60
+  patrolDistance: 8
+  dispatchDuration: 25
+  islandReward: 40
+  pestDuration: 45
+  pestDamage: 1
+  fishYield: 5
+  detectionRange: 50

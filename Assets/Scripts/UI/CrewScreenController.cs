@@ -50,11 +50,18 @@ namespace GreatVoyage
             view.Text("Details/Specialty", member.specialty.ToString());
             view.Text("Details/Health", member.health.ToString("0"));
             view.Text("Details/Happiness", member.happiness.ToString("0"));
+            view.Text("Details/Strength", member.strength.ToString("0"));
+            view.Text("Details/Dexterity", member.dexterity.ToString("0"));
+            view.Text("Details/Intelligence", member.intelligence.ToString("0"));
+            view.Text("Details/Trust", member.trust.ToString("0"));
+            view.Text("Details/History", string.Join("\n", member.career ?? new List<string>()));
+            view.Text("Details/Wishes", member.wish == null || member.wish.kind == CrewWishKind.None ? "희망 조건 없음" : member.wish.kind + " · " + member.wish.targetId);
             view.Text("Details/CurrentWork", member.primaryDuty + " · " + member.activity);
-            view.Connected("대표 상태/주업무 · 전체 능력/욕구는 후속 단계");
+            view.Connected(member.promiseBreached ? "약속 위반 · 신뢰가 지속적으로 감소합니다." : member.rank);
             var options = new List<CrewDuty>
             {
                 CrewDuty.None
+                , CrewDuty.Guard, CrewDuty.Lookout
             };
             if (member.specialty == CrewSpecialty.Maintenance)
                 options.Add(CrewDuty.Maintenance);

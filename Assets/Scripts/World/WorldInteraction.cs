@@ -15,7 +15,12 @@ namespace GreatVoyage
         Tavern,
         Contracts,
         Bed,
-        DeferredService
+        DeferredService,
+        Armory,
+        TownHall,
+        Shipyard,
+        Sail,
+        Telescope
     }
 
     public sealed class WorldInteraction : MonoBehaviour, IInteractable
@@ -45,6 +50,17 @@ namespace GreatVoyage
         {
             this.request = request;
             this.available = available;
+        }
+
+        public void ConfigureFacility(string id, FacilityDefinition definition)
+        {
+            targetId = id;
+            action = definition.usableAsBed ? WorldAction.Bed : definition.role == FacilityRole.Armory ? WorldAction.Armory : definition.role == FacilityRole.Helm ? WorldAction.Helm : definition.role == FacilityRole.Sail ? WorldAction.Sail : WorldAction.DeferredService;
+            prompt = "[E] " + definition.name;
+        }
+        public void SetAccessPosition(Vector2 position)
+        {
+            if (accessPoint) accessPoint.position = position;
         }
 
         public void Interact()

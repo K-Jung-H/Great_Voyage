@@ -10,9 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05404c3cf6baa00489407dd9c9b31ef8, type: 3}
-  m_Name: food
+  m_Name: "\uC721\uD3EC"
   m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ItemDefinition
   id: food
-  displayName: "\uC2DD\uB7C9"
+  displayName: "\uC721\uD3EC"
   use: 1
-  tradeable: 0
+  tradeable: 1
+  category: 0
+  basePrice: 5
+  dailyStock: 20

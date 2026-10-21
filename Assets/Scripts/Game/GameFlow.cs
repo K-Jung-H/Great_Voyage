@@ -16,8 +16,10 @@ namespace GreatVoyage
         private readonly JournalScreenController journal;
         private readonly SessionScreenController session;
         private readonly ContextPresenter context;
+        private readonly BattleScreens battle;
+        private readonly ShipyardScreens shipyard;
         private bool active;
-        public GameFlow(GameInput input, PlayerMovement player, InteractionController interactions, UIRoot ui, GameRuntime game, WorldView world, ScreenStack stack, EconomyScreens economy, JournalScreenController journal, SessionScreenController session, ContextPresenter context)
+        public GameFlow(GameInput input, PlayerMovement player, InteractionController interactions, UIRoot ui, GameRuntime game, WorldView world, ScreenStack stack, EconomyScreens economy, JournalScreenController journal, SessionScreenController session, ContextPresenter context, BattleScreens battle, ShipyardScreens shipyard)
         {
             this.input = input;
             this.player = player;
@@ -30,6 +32,8 @@ namespace GreatVoyage
             this.journal = journal;
             this.session = session;
             this.context = context;
+            this.battle = battle;
+            this.shipyard = shipyard;
             economy.SettlementConfirmed += AfterSettlement;
         }
 
@@ -50,7 +54,7 @@ namespace GreatVoyage
                 return;
             }
 
-            player.SetInputBlocked(game.IsPaused || game.IsSleeping || game.Navigation.IsSteering);
+            player.SetInputBlocked(game.IsPaused || game.IsSleeping || game.Navigation.IsSteering || game.Battle.Running);
             if (stack.IsOpen)
             {
                 ui.ShowPrompt(null);
@@ -61,6 +65,12 @@ namespace GreatVoyage
 
             if (game.IsPaused)
                 return;
+            if (game.Battle.Running)
+            {
+                ui.ShowPrompt("관전 전투 · ESC 메뉴");
+                if (input.CancelPressed) session.OpenMenu();
+                return;
+            }
             if (game.Navigation.IsSteering)
             {
                 ui.ShowPrompt("조타: WASD · E/ESC 종료");
@@ -108,6 +118,8 @@ namespace GreatVoyage
                 return false;
             if (item.Action == WorldAction.DeferredService)
                 return false;
+            if (item.Action == WorldAction.Helm)
+                return game.Navigation.HelmOperational;
             if (item.Action == WorldAction.Gangway || item.Action == WorldAction.BoardShip)
                 return game.Navigation.IsDocked;
             if (item.Action == WorldAction.Bed)
@@ -134,6 +146,7 @@ namespace GreatVoyage
                     game.Navigation.BeginSteering();
                     break;
                 case WorldAction.Gangway:
+                    game.State.inventory.LandFreshFish();
                     game.Navigation.SetAboard(false);
                     world.MoveArea("dock", item.Destination);
                     break;
@@ -148,7 +161,7 @@ namespace GreatVoyage
                     world.MoveArea(item.TargetId, item.Destination);
                     break;
                 case WorldAction.Merchant:
-                    economy.Open("MerchantScreen");
+                    economy.OpenMerchant(item.TargetId);
                     break;
                 case WorldAction.Broker:
                     economy.Open("BrokerScreen");
@@ -161,6 +174,22 @@ namespace GreatVoyage
                     break;
                 case WorldAction.Bed:
                     game.Rest.UseBed(item.TargetId);
+                    break;
+                case WorldAction.Armory:
+                    battle.OpenArmory();
+                    break;
+                case WorldAction.TownHall:
+                    battle.OpenTownHall();
+                    break;
+                case WorldAction.Shipyard:
+                    shipyard.Open();
+                    break;
+                case WorldAction.Sail:
+                    var sail = game.Ship.GetFacility(item.TargetId);
+                    if (sail != null) { sail.sailDeployed = !sail.sailDeployed; game.RequestSave(); }
+                    break;
+                case WorldAction.Telescope:
+                    context.ObserveSea();
                     break;
             }
 

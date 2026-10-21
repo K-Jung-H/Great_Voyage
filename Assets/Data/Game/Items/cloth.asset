@@ -10,9 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 05404c3cf6baa00489407dd9c9b31ef8, type: 3}
-  m_Name: cloth
+  m_Name: "\uC9C1\uBB3C"
   m_EditorClassIdentifier: Assembly-CSharp::GreatVoyage.ItemDefinition
   id: cloth
   displayName: "\uC9C1\uBB3C"
   use: 0
   tradeable: 1
+  category: 4
+  basePrice: 20
+  dailyStock: 20

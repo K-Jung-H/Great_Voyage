@@ -22,5 +22,7 @@ namespace GreatVoyage
         [Tooltip("초당 최대 항해 거리. Cell 크기와 독립적인 세계 좌표 단위.")] public float maxSpeed = 4;
         [Tooltip("초당 속도 조절량.")] public float acceleration = 4;
         [Tooltip("초당 회전 각도. 0도는 동쪽, 90도는 북쪽.")] public float turnSpeed = 60;
+        [Range(0, 1), Tooltip("방향타 기능 정지 시 최근접 항구 견인 비용의 보유금 비율.")]
+        public float towGoldFraction = .25f;
     }
 }

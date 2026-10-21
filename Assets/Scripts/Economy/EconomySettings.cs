@@ -10,6 +10,8 @@ namespace GreatVoyage
         public int buyPrice = 20;
         public int sellPrice = 15;
         public int initialStock = 20;
+        [Tooltip("기획 D12의 여섯 상인 위치별 상점 분류.")]
+        public ProductCategory[] shops;
     }
 
     [CreateAssetMenu(menuName = "Great Voyage/Economy Settings")]

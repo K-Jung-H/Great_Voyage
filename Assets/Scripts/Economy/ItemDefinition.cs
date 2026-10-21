@@ -6,8 +6,11 @@ namespace GreatVoyage
     {
         TradeGoods,
         Food,
-        RepairTools
+        RepairTools,
+        Weapon,
+        Medicine
     }
+    public enum ProductCategory { Food, Vegetables, Meat, Fish, Clothing, Weapons, Medicine, Spices, Crafts }
 
     [CreateAssetMenu(menuName = "Great Voyage/Item Definition")]
     public sealed class ItemDefinition : ScriptableObject
@@ -20,5 +23,11 @@ namespace GreatVoyage
         public ItemUse use;
         [Tooltip("무역 대상 여부.")]
         public bool tradeable;
+        [Tooltip("상점 분류. 식량 소비 목적과 별개다.")]
+        public ProductCategory category;
+        [Tooltip("기본 구매 시장가.")]
+        public int basePrice = 20;
+        [Tooltip("날짜 변경 시 공급할 기본 재고.")]
+        public int dailyStock = 20;
     }
 }

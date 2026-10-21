@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace GreatVoyage
 {
@@ -10,12 +11,15 @@ namespace GreatVoyage
         [SerializeField, Tooltip("공통 화면 스택.")]
         private ScreenStack stack;
         private GameRuntime game;
+        private string towPort;
+        private int towCost;
         public event Action QuitRequested;
         public void Bind(GameRuntime runtime)
         {
             game = runtime;
             view.Action("ContinueAndExit/Continue", () => stack.CloseTop());
             view.Action("ContinueAndExit/SaveAndExit", () => QuitRequested?.Invoke());
+            view.Action("ContinueAndExit/RequestTow", ConfirmTow);
             view.Action("SaveError/RetrySave", () =>
             {
                 if (game.FlushSave(true))
@@ -47,16 +51,50 @@ namespace GreatVoyage
 
         public void OpenMenu()
         {
+            towPort = null;
             Select("ContinueAndExit");
             view.Connected("정상 종료 시 마지막 상태 저장");
+            view.Text("ContinueAndExit/Message", "계속하거나 저장 후 종료할 수 있습니다. 구난은 방향타 기능 정지·해상·사건 종료 상태에서 이용할 수 있습니다.");
+            var button = view.Get<Button>("ContinueAndExit/RequestTow");
+            button.gameObject.SetActive(game.Navigation.CanRequestTow);
+            button.interactable = true;
+            view.Text("ContinueAndExit/RequestTow/Label", "최근접 항구 구난 요청");
             stack.Open("SessionModals");
+        }
+
+        private void ConfirmTow()
+        {
+            var destination = game.Navigation.NearestTowPort;
+            if (destination == null)
+            {
+                view.Text("ContinueAndExit/Message", "현재 구난을 요청할 수 없습니다. 진행 중인 사건을 먼저 마치세요.");
+                return;
+            }
+            if (towPort != destination.id || towCost != game.Navigation.TowCost)
+            {
+                towPort = destination.id;
+                towCost = game.Navigation.TowCost;
+                bool completes = towPort != game.Navigation.DeparturePort || game.Navigation.State.departureCleared;
+                view.Text("ContinueAndExit/Message", destination.displayName + " 견인 · " + towCost + " 금화\n" + (completes ? "정상 입항·계약 정산" : "출항지 미이탈 복귀·계약 횟수 유지") + "\n시설 수리 없음 · 확정 버튼을 다시 누르세요.");
+                view.Text("ContinueAndExit/RequestTow/Label", "견인 확정");
+                return;
+            }
+            if (game.Navigation.RequestTow(towPort, towCost))
+            {
+                stack.UnlockAndClose("SessionModals");
+                if (game.Economy.State.gameOver)
+                    ShowGameOver();
+            }
         }
 
         public void ShowError(string error)
         {
             Select("SaveError");
+            string operation = game?.ErrorOperation ?? "초기화";
+            view.Text("SaveError/Heading", operation + " 오류");
             view.Text("SaveError/Message", error);
-            view.Connected("저장 실패 · 현재 상태와 원본 파일 보존");
+            view.Get<Button>("SaveError/RetrySave").interactable = game != null && operation == "저장";
+            view.Connected(operation + " 실패 · 상세 호출 경로는 Console에서 확인");
             if (game != null)
                 stack.Open("SessionModals", true);
             else

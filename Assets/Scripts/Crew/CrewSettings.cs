@@ -5,6 +5,11 @@ namespace GreatVoyage
     [CreateAssetMenu(menuName = "Great Voyage/Crew Settings")]
     public sealed class CrewSettings : ScriptableObject
     {
+        [Tooltip("항구에서 초당 행복 회복량.")] public float portHappinessRecovery = .1f;
+        [Tooltip("행복이 낮을 때 초당 신뢰 감소량.")] public float unhappyTrustLoss = .005f;
+        [Tooltip("약속 위반 후 초당 신뢰 감소량.")] public float brokenPromiseTrustLoss = .015f;
+        [Tooltip("높은 행복이 지속될 때 초당 신뢰 회복량.")] public float trustRecovery = .0005f;
+        [Tooltip("업무 능력치의 성능 가중치.")] public float jobStatWeight = .03f;
         public string id = "standard-crew";
         [Tooltip("대표 방향타 업무의 층 ID.")] public string helmFloor = "deck-1";
         [Tooltip("방향타 옆 접근 지점(Cell). 배치가 바뀌면 함께 조정한다.")] public Vector2 helmPosition = new Vector2(2.5f, 1.5f);

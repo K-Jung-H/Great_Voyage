@@ -13,6 +13,7 @@ namespace GreatVoyage
         public bool IsReady { get; private set; }
         public bool IsSleeping => Rest != null && Rest.IsSleeping;
         public string ErrorMessage { get; private set; }
+        public string ErrorOperation { get; private set; }
         public double ElapsedSeconds => State.elapsedSeconds;
         public ShipModel Ship { get; private set; }
         public NavigationRules Navigation { get; private set; }
@@ -22,6 +23,14 @@ namespace GreatVoyage
         public RestSession Rest { get; private set; }
         public SaveCoordinator Saves { get; private set; }
         public SimulationLoop Loop { get; private set; }
+        public EventRules Events { get; private set; }
+        public BattleRules Battle { get; private set; }
+        public PrisonerRules Prisoners { get; private set; }
+        public ShipyardRules Shipyard { get; private set; }
+        public CrewLifeRules Life { get; private set; }
+        public MarketRules Market { get; private set; }
+        public PestRules Pests { get; private set; }
+        public DetectionRules Detection { get; private set; }
 
         private IDisposable errorPause;
         private bool saveRequested;
@@ -29,9 +38,7 @@ namespace GreatVoyage
         public event Action<bool> Changed;
         public GameRuntime(GameStartProfile profile, Vector2 startingPosition)
         {
-            if (!profile.fixedDevelopmentStart)
-                throw new InvalidOperationException("Final random-start profile belongs to roadmap10; this profile must identify its development fixture");
-            Saves = new SaveCoordinator(profile.saveSlot);
+            Saves = new SaveCoordinator(Application.isEditor ? profile.saveSlot : profile.playerSaveSlot);
             State = Saves.Load(profile.legacySourceCopy) ?? new GameState
             {
                 playthroughId = Guid.NewGuid().ToString("D"),
@@ -52,7 +59,8 @@ namespace GreatVoyage
 
             if (profile.items == null || profile.items.Any(item => item == null) || profile.items.Select(item => item.id).Distinct().Count() != profile.items.Length || State.inventory.items.Any(entry => !profile.items.Any(item => item.id == entry.productId)))
                 throw new InvalidOperationException("Item definition/registry mismatch");
-            var shipDefinition = State.ship == null || State.ship.definitionId == profile.ship.id ? profile.ship : Array.Find(profile.legacyShips ?? Array.Empty<ShipDefinition>(), definition => definition.id == State.ship.definitionId);
+            var shipDefinitions = (profile.shipCatalog ?? Array.Empty<ShipDefinition>()).Concat(profile.legacyShips ?? Array.Empty<ShipDefinition>()).Concat(new[] { profile.ship }).GroupBy(value => value.id).Select(group => group.First()).ToArray();
+            var shipDefinition = State.ship == null || State.ship.definitionId == profile.ship.id ? profile.ship : Array.Find(shipDefinitions, definition => definition.id == State.ship.definitionId);
             var crewSettings = State.crew == null || State.crew.settingsId == profile.crew.id ? profile.crew : Array.Find(profile.legacyCrew ?? Array.Empty<CrewSettings>(), settings => settings.id == State.crew.settingsId);
             if (shipDefinition == null || crewSettings == null)
                 throw new InvalidOperationException("Unknown legacy definition ID; original copy preserved");
@@ -61,8 +69,11 @@ namespace GreatVoyage
                 throw new InvalidOperationException("Cell size changed; explicit position migration is required");
             State.cellSize = Ship.CellSize;
             State.ship = Ship.Initialize(State.ship);
-            Navigation = new NavigationRules(profile.navigation, this, Ship);
-            State.navigation = Navigation.Initialize(State.navigation, State.playthroughId);
+            var navigationDefinition = State.navigation == null || State.navigation.definitionId == profile.navigation.id ? profile.navigation : Array.Find(profile.legacyNavigation ?? Array.Empty<NavigationDefinition>(), definition => definition.id == State.navigation.definitionId);
+            if (!navigationDefinition) throw new InvalidOperationException("Unknown saved world definition; original save preserved");
+            Navigation = new NavigationRules(navigationDefinition, this, Ship);
+            int startingPort = profile.fixedDevelopmentStart ? 0 : new Guid(State.playthroughId).ToByteArray()[0] % navigationDefinition.ports.Length;
+            State.navigation = Navigation.Initialize(State.navigation, State.playthroughId, navigationDefinition.ports[startingPort].id);
             Ship.SetAboard(Navigation.IsAboard);
             if (!Navigation.ValidPlayerPosition(State.player.position))
                 throw new InvalidOperationException("Player location cannot be restored");
@@ -79,10 +90,19 @@ namespace GreatVoyage
             Rest = new RestSession(this, Navigation, Ship, Crew, Journal, State.player);
             State.sleep = Rest.Initialize(State.sleep);
             Loop = new SimulationLoop(this);
+            Events = new EventRules(this, profile.events);
+            Battle = new BattleRules(this, profile.battle, profile.items);
+            Prisoners = new PrisonerRules(this);
+            Shipyard = new ShipyardRules(this, profile.shipCatalog ?? new[] { profile.ship }, shipDefinitions);
+            Life = new CrewLifeRules(this, crewSettings);
+            Market = new MarketRules(this, profile.items, profile.market);
+            Pests = new PestRules(this, profile.events);
+            Detection = new DetectionRules(this, profile.events);
+            Loop.EventBoundaryReached += Events.BeginScheduled;
             IsReady = true;
         }
 
-        public bool CanDepart() => Economy.CanDepart();
+        public bool CanDepart() => Shipyard.CanDepart() && Economy.CanDepart();
         public void MarkInteraction() => Journal.MarkInteraction();
         public bool RequestSave()
         {
@@ -104,20 +124,25 @@ namespace GreatVoyage
                 Saves.Save(State);
                 saveRequested = false;
                 ErrorMessage = null;
+                ErrorOperation = null;
                 errorPause?.Dispose();
                 errorPause = null;
                 return true;
             }
             catch (Exception error)
             {
-                Fail(error);
+                Fail(error, "저장");
                 return false;
             }
         }
 
-        public void Fail(Exception error)
+        public void Fail(Exception error, string operation = "게임 실행")
         {
+            if (ErrorMessage == error.Message && ErrorOperation == operation)
+                return;
             ErrorMessage = error.Message;
+            ErrorOperation = operation;
+            Debug.LogException(error);
             if (errorPause == null)
                 errorPause = Pauses.Acquire("SaveError");
             Error?.Invoke(ErrorMessage);
