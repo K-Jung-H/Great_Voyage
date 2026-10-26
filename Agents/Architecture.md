@@ -2,7 +2,7 @@
 
 ## 현행 구조·문서 역할 — 2026-10-22
 
-현행 개발 순서는 [RoadMap](RoadMap.md)의 11 미술/피드백·12 PC 기술 완성/종합 검증·13 모바일 입력이다. 중복 CompletionPlan은 RoadMap에 통합했고 별도 견인 제안 문서는 아래 확정 결정으로 통합했다. 두 문서의 이전 전문은 [History](History.md#문서-통합-원문-보존--2026-10-22)에 보존했다. 아래 이전 구성·검증 표시는 작성 당시 기록이며 최신 State와 실제 파일을 우선 대조한다.
+현행 개발 순서는 [RoadMap](RoadMap.md)의 11 최종 그래픽/게임 내용 평가·12 최적화/밸런싱·13 모바일 입력이다. 중복 CompletionPlan은 RoadMap에 통합했고 별도 견인 제안 문서는 아래 확정 결정으로 통합했다. 두 문서의 이전 전문은 [History](History.md#문서-통합-원문-보존--2026-10-22)에 보존했다. 아래 이전 구성·검증 표시는 작성 당시 기록이며 최신 State와 실제 파일을 우선 대조한다.
 
 - 공통 GameRuntime에 EventRules/BattleRules/PrisonerRules·ShipyardRules·CrewLifeRules·MarketRules·PestRules/DetectionRules가 연결돼 있다. 각 상태는 GameState·단일 재고/인물 등록부를 사용한다. 현재 8~10단계 진행 중이며 기능 완료 판정은 아니다.
 - SaveCoordinator는 v9 읽기/v10 출력과 기존 원자 저장·백업을 유지한다. 현재 저장 및 사건 체크포인트는 공개 필드 전용 Newtonsoft 직렬화로 선택 상태 null을 보존한다. 사용자 지시로 수정 후 컴파일만 확인했으며 실제 실행 오류 해소는 미확인이다.
